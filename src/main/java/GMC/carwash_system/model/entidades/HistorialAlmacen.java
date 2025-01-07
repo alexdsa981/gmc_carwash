@@ -1,6 +1,5 @@
-package GMC.carwash_system.model;
+package GMC.carwash_system.model.entidades;
 
-import GMC.carwash_system.model.clasificadores.MetodoPago;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,26 +13,28 @@ import java.time.LocalTime;
 @Builder
 @Getter
 @Setter
-public class Venta {
+public class HistorialAlmacen {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_cliente", nullable = false)
-    private Cliente cliente;
+    @JoinColumn(name = "id_producto", nullable = false)
+    private Producto producto;
 
-    @ManyToOne
-    @JoinColumn(name = "id_metodo_pago", nullable = false)
-    private MetodoPago metodoPago;
+    @Column(nullable = false)
+    private Integer cantidad; // Cantidad positiva (entrada) o negativa (salida)
 
+    @Column(nullable = false)
+    private String motivo; // Ejemplo: "Compra", "Venta", "Devolución"
 
     @Column(nullable = false)
     private LocalDate fecha;
+
     @Column(nullable = false)
     private LocalTime hora;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal total;
+    private BigDecimal precioUnitario; // Precio al que se compró o vendió el producto
 }

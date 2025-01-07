@@ -1,10 +1,9 @@
-package GMC.carwash_system.model;
+package GMC.carwash_system.model.entidades;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -13,19 +12,18 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-public class Colaborador {
+public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+
     private String nombre;
     private String identificacion;
     private String telefono;
 
-    private String descripcion;
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal soueldo_fijo;
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente")
+    private List<Vehiculo> listaVehiculos;
 
 }

@@ -1,4 +1,4 @@
-package GMC.carwash_system.model;
+package GMC.carwash_system.model.entidades;
 
 import GMC.carwash_system.model.clasificadores.ConceptoPago;
 import jakarta.persistence.*;
