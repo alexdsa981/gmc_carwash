@@ -41,13 +41,13 @@ public class ColaboradoresController {
             HttpServletResponse response
     ) throws IOException {
 
-        Colaborador colaborador = Colaborador.builder()
-                        .nombre(nombre)
-                        .telefono(telefono)
-                        .identificacion(identificacion)
-                        .soueldo_fijo(sueldo_fijo)
-                        .descripcion(descripcion)
-                        .build();
+        Colaborador colaborador = new Colaborador();
+        colaborador.setNombre(nombre);
+        colaborador.setTelefono(telefono);
+        colaborador.setIdentificacion(identificacion);
+        colaborador.setSueldo_fijo(sueldo_fijo);
+        colaborador.setDescripcion(descripcion);
+
         colaboradorRepository.save(colaborador);
 
         response.sendRedirect("/colaboradores/lista");
@@ -74,7 +74,7 @@ public class ColaboradoresController {
         colaborador.setNombre(nombre);
         colaborador.setTelefono(telefono);
         colaborador.setIdentificacion(identificacion);
-        colaborador.setSoueldo_fijo(sueldo_fijo);
+        colaborador.setSueldo_fijo(sueldo_fijo);
         colaborador.setDescripcion(descripcion);
         colaboradorRepository.save(colaborador);
 
@@ -82,6 +82,11 @@ public class ColaboradoresController {
         return ResponseEntity.ok("Colaborador editado correctamente");
     }
 
-    //falta logica de eliminacion o desactivacion
+    //falta logica de eliminacion o desactivacion de colaboradores
+
+
+
+
+
 
 }

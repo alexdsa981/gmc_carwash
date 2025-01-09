@@ -24,6 +24,6 @@ public class Colaborador {
     private String descripcion;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal soueldo_fijo;
+    private BigDecimal sueldo_fijo;
 
 }

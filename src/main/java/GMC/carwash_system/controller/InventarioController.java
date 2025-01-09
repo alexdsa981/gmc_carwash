@@ -58,12 +58,11 @@ public class InventarioController {
             @RequestParam("nombre")String nombre,
             HttpServletResponse response
     ) throws IOException {
-        TipoProducto tipoproducto = TipoProducto.builder()
-                .nombre(nombre)
-                .build();
-        tipoProductoRepository.save(tipoproducto);
+        TipoProducto tipoProducto = new TipoProducto();
+        tipoProducto.setNombre(nombre);
+        tipoProductoRepository.save(tipoProducto);
         response.sendRedirect("/inventario/lista");
-        return ResponseEntity.ok("Producto creado correctamente");
+        return ResponseEntity.ok("Tipo producto creado correctamente");
     }
 
     @PostMapping("/tipoproducto-{id}/editar")
@@ -99,13 +98,12 @@ public class InventarioController {
             HttpServletResponse response
     ) throws IOException {
 
-        Producto producto = Producto.builder()
-                .nombre(nombre)
-                .precio_costo(precio_costo)
-                .precio_venta(precio_venta)
-                .stock(stock)
-                .tipo_producto(tipoProductoRepository.findById(id_tipo_producto).get())
-                .build();
+        Producto producto = new Producto();
+        producto.setNombre(nombre);
+        producto.setPrecio_costo(precio_costo);
+        producto.setPrecio_venta(precio_venta);
+        producto.setStock(stock);
+        producto.setTipo_producto(tipoProductoRepository.findById(id_tipo_producto).get());
         productoRepository.save(producto);
 
         response.sendRedirect("/inventario/lista");
@@ -170,14 +168,13 @@ public class InventarioController {
                 producto.setStock(producto.getStock() - cantidad);
             }
         }
-        HistorialAlmacen historialAlmacen = HistorialAlmacen.builder()
-                .cantidad(cantidad)
-                .fecha(LocalDate.now())
-                .hora(LocalTime.now())
-                .motivo(motivo)
-                .precioUnitario(precio_unitario)
-                .producto(producto)
-                .build();
+        HistorialAlmacen historialAlmacen = new HistorialAlmacen();
+        historialAlmacen.setCantidad(cantidad);
+        historialAlmacen.setFecha(LocalDate.now());
+        historialAlmacen.setHora(LocalTime.now());
+        historialAlmacen.setMotivo(motivo);
+        historialAlmacen.setPrecioUnitario(precio_unitario);
+        historialAlmacen.setProducto(producto);
         historialAlmacenRepository.save(historialAlmacen);
 
         response.sendRedirect("/inventario/lista");
