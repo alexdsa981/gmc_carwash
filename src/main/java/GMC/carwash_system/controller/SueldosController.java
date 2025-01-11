@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -46,6 +43,7 @@ public class SueldosController {
         return model;
     }
 
+
     @PostMapping("/crear-concepto")
     public ResponseEntity<String> crearConceptoPago(
             @RequestParam("nombre")String nombre,
@@ -58,7 +56,7 @@ public class SueldosController {
         nuevoConceptoPago.setDentro_sueldo(dentroSueldo);
         conceptoPagoRepository.save(nuevoConceptoPago);
 
-        response.sendRedirect("/colaboradores/lista");
+        response.sendRedirect("/colaboradores/pagos");
         return ResponseEntity.ok("Concpeto pago creado correctamente");
     }
 
@@ -80,7 +78,7 @@ public class SueldosController {
         conceptoPago.setDentro_sueldo(dentroSueldo);
         conceptoPagoRepository.save(conceptoPago);
 
-        response.sendRedirect("/colaboradores/lista");
+        response.sendRedirect("/colaboradores/pagos");
         return ResponseEntity.ok("Concepto Pago editado correctamente");
     }
 
@@ -107,8 +105,21 @@ public class SueldosController {
 
         sueldosRepository.save(nuevoPago);
 
-        response.sendRedirect("colaboradores/lista");
+        response.sendRedirect("/colaboradores/pagos");
         return ResponseEntity.ok("Pago realizado correctamente");
     }
+    // Eliminar Pago
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<String> eliminarPago(@PathVariable Long id) {
+        Optional<Sueldos> optionalSueldos = sueldosRepository.findById(id);
+        if (optionalSueldos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pago no encontrado");
+        }
+        sueldosRepository.deleteById(id);
+        return ResponseEntity.ok("Pago eliminado correctamente");
+    }
+
+
+
 
 }

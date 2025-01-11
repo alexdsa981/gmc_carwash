@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colaborador</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body>
+
+
+<div class="container mt-5" id="mainView">
+    <h2 class="text-center mb-4">Datos Colaborador</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+            Añadir Colaborador
+        </button>
+        <a class="btn btn-outline-secondary" href="/colaboradores/pagos">Pagos</a>
+    </div>
+    <!-- Tabla de Colaboradores -->
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+        <tr>
+            <th>N°</th>
+            <th>Nombre</th>
+            <th>Identificación</th>
+            <th>Teléfono</th>
+            <th>Sueldo Fijo</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterar sobre la lista de colaboradores con un índice -->
+        <tr th:each="colaborador, iterStat : ${listaColaboradores}">
+            <!-- Agregar el contador en la columna N° -->
+            <td th:text="${iterStat.index + 1}"></td> <!-- +1 para que el contador comience desde 1 -->
+            <td th:text="${colaborador.nombre}"></td>
+            <td th:text="${colaborador.identificacion}"></td>
+            <td th:text="${colaborador.telefono}"></td>
+            <td th:text="'S/. ' + ${colaborador.sueldo_fijo}"></td>
+            <td th:text="${colaborador.descripcion}"></td>
+            <td>
+                <!-- Botón de editar -->
+                <button class="btn btn-outline-success btn-sm edit-row" th:data-id="${colaborador.id}"
+                        th:data-nombre="${colaborador.nombre}"
+                        th:data-identificacion="${colaborador.identificacion}"
+                        th:data-telefono="${colaborador.telefono}" th:data-sueldo-fijo="${colaborador.sueldo_fijo}"
+                        th:data-descripcion="${colaborador.descripcion}">
+                    <i class="bi bi-pencil"></i>
+                </button>
+
+                <!-- Botón de eliminar -->
+                <button class="btn btn-outline-danger btn-sm delete-row" th:data-id="${colaborador.id}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Modal para añadir colaborador -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Añadir Colaborador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="collaboratorForm" action="/app/colaboradores/crear" method="POST" autocomplete="off">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="name" name="nombre" autocomplete="off"
+                               placeholder="Ingresa el nombre del colaborador" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id" class="form-label">Identificación</label>
+                        <input type="text" class="form-control" id="id" name="identificacion" autocomplete="off"
+                               placeholder="Ingresa la identificación" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="phone" name="telefono" autocomplete="off"
+                               placeholder="Ingresa el teléfono" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="money" class="form-label">Sueldo Fijo</label>
+                        <input type="number" class="form-control" id="money" name="sueldo_fijo" step="0.01" min="0"
+                               autocomplete="off" placeholder="Ingresa el sueldo fijo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="description" name="descripcion" autocomplete="off"
+                               placeholder="Ingresa una breve descripción" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para editar colaborador -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Colaborador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCollaboratorForm" method="POST" autocomplete="off" onsubmit="event.preventDefault(); enviarFormulario();">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editName" name="nombre" autocomplete="off"
+                               placeholder="Ingresa el nuevo nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editId" class="form-label">Identificación</label>
+                        <input type="text" class="form-control" id="editId" name="identificacion" autocomplete="off"
+                               placeholder="Ingresa la nueva identificación" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="editPhone" name="telefono" autocomplete="off"
+                               placeholder="Ingresa el nuevo teléfono" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMoney" class="form-label">Sueldo Fijo</label>
+                        <input type="number" class="form-control" id="editMoney" name="sueldo_fijo" step="0.01" min="0"
+                               autocomplete="off" placeholder="Ingresa el nuevo sueldo fijo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="editDescription" name="descripcion"
+                               autocomplete="off"
+                               placeholder="Ingresa la nueva descripción" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para cargar los datos en el modal de edición
+    document.querySelectorAll('.edit-row').forEach(button => {
+        button.addEventListener('click', function () {
+            // Cargar los datos del colaborador en el modal
+            document.getElementById('editName').value = this.getAttribute('data-nombre');
+            document.getElementById('editId').value = this.getAttribute('data-identificacion');
+            document.getElementById('editPhone').value = this.getAttribute('data-telefono');
+            document.getElementById('editMoney').value = this.getAttribute('data-sueldo-fijo');
+            document.getElementById('editDescription').value = this.getAttribute('data-descripcion');
+
+            // Guardar el ID del colaborador en un atributo de la forma
+            document.getElementById('editCollaboratorForm').setAttribute('data-id', this.getAttribute('data-id'));
+
+            // Abrir el modal
+            $('#editModal').modal('show');
+        });
+    });
+
+    // Función para enviar el formulario con una solicitud PUT usando fetch
+    function enviarFormulario() {
+        const form = document.getElementById('editCollaboratorForm');
+        const formData = new FormData(form);
+
+        // Obtener el ID del colaborador del atributo de la forma
+        const id = form.getAttribute('data-id');
+
+        // Enviar solicitud PUT con fetch
+        fetch(`/app/colaboradores/editar/${id}`, {
+            method: 'PUT',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);  // Mostrar mensaje de éxito
+            // Puedes agregar aquí un mensaje al usuario o cerrar el modal
+            $('#editModal').modal('hide');
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Aquí puedes mostrar un mensaje de error si ocurre un fallo
+        });
+    }
+</script>
+
+<script>
+    // Función para eliminar un colaborador
+    document.querySelectorAll('.delete-row').forEach(button => {
+        button.addEventListener('click', function () {
+            const colaboradorId = this.getAttribute('data-id');
+
+            // Usar SweetAlert para la confirmación
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'No podrás revertir esta acción.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Llamar a la API para eliminar el colaborador
+                    fetch(`/app/colaboradores/eliminar/${colaboradorId}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire(
+                                    'Eliminado!',
+                                    'El colaborador ha sido eliminado.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload(); // Recargar la página para actualizar la lista
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'Hubo un problema al eliminar el colaborador.',
+                                    'error'
+                                );
+                            }
+                        });
+                }
+            });
+        });
+    });
+
+</script>
+
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
+        });
+    });
+</script>
+</body>
+
+</html>

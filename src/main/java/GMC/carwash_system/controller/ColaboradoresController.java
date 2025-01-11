@@ -8,17 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("/app/colaboradores")
 public class ColaboradoresController {
     @Autowired
@@ -30,17 +30,21 @@ public class ColaboradoresController {
         return model;
     }
 
+    @GetMapping("/lista")
+    public List<Colaborador> getAllColaboradores() {
+        return colaboradorRepository.findAll();
+    }
 
     @PostMapping("/crear")
     public ResponseEntity<String> crearColaborador(
-            @RequestParam("nombre")String nombre,
-            @RequestParam("telefono")String telefono,
-            @RequestParam("identificacion")String identificacion,
-            @RequestParam("sueldo_fijo")BigDecimal sueldo_fijo,
-            @RequestParam("descripcion")String descripcion,
+            @RequestParam("nombre") String nombre,
+            @RequestParam("telefono") String telefono,
+            @RequestParam("identificacion") String identificacion,
+            @RequestParam("sueldo_fijo") BigDecimal sueldo_fijo,
+            @RequestParam("descripcion") String descripcion,
             HttpServletResponse response
     ) throws IOException {
-
+        // Crear un nuevo colaborador
         Colaborador colaborador = new Colaborador();
         colaborador.setNombre(nombre);
         colaborador.setTelefono(telefono);
@@ -48,43 +52,57 @@ public class ColaboradoresController {
         colaborador.setSueldo_fijo(sueldo_fijo);
         colaborador.setDescripcion(descripcion);
 
+        // Guardar el colaborador en la base de datos
         colaboradorRepository.save(colaborador);
+
+        // Crear un mapa con el mensaje en formato JSON
 
         response.sendRedirect("/colaboradores/lista");
         return ResponseEntity.ok("Colaborador creado correctamente");
     }
 
-    @PostMapping("/editar-{id}")
-    public ResponseEntity<String> editarColaborador(
-            @PathVariable Long id,
-            @RequestParam("nombre")String nombre,
-            @RequestParam("telefono")String telefono,
-            @RequestParam("identificacion")String identificacion,
-            @RequestParam("sueldo_fijo")BigDecimal sueldo_fijo,
-            @RequestParam("descripcion")String descripcion,
-            HttpServletResponse response
-    ) throws IOException {
-        // Buscar al colaborador
-        Optional<Colaborador> optionalColaborador = colaboradorRepository.findById(id);
-        if (optionalColaborador.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Colaborador no encontrado");
-        }
 
-        Colaborador colaborador = optionalColaborador.get();
+
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<Map<String, String>> editarColaborador(
+            @PathVariable("id") Long id,
+            @RequestParam("nombre") String nombre,
+            @RequestParam("telefono") String telefono,
+            @RequestParam("identificacion") String identificacion,
+            @RequestParam("sueldo_fijo") BigDecimal sueldo_fijo,
+            @RequestParam("descripcion") String descripcion) {
+        // Buscar y actualizar colaborador
+        Colaborador colaborador = colaboradorRepository.findById(id).orElseThrow(() -> new RuntimeException("Colaborador no encontrado"));
         colaborador.setNombre(nombre);
         colaborador.setTelefono(telefono);
         colaborador.setIdentificacion(identificacion);
         colaborador.setSueldo_fijo(sueldo_fijo);
         colaborador.setDescripcion(descripcion);
+
+        // Guardar el colaborador actualizado
         colaboradorRepository.save(colaborador);
 
-        response.sendRedirect("/colaboradores/lista");
-        return ResponseEntity.ok("Colaborador editado correctamente");
+        // Crear un mapa con el mensaje en formato JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Colaborador actualizado correctamente");
+
+        return ResponseEntity.ok(response);
     }
 
-    //falta logica de eliminacion o desactivacion de colaboradores
 
 
+
+    // Eliminar colaborador
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<String> eliminarColaborador(@PathVariable Long id) {
+        Optional<Colaborador> optionalColaborador = colaboradorRepository.findById(id);
+        if (optionalColaborador.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Colaborador no encontrado");
+        }
+
+        colaboradorRepository.deleteById(id);
+        return ResponseEntity.ok("Colaborador eliminado correctamente");
+    }
 
 
 
