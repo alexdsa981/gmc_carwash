@@ -30,6 +30,7 @@ public class WebController {
     }
     @GetMapping("/colaboradores/pagos")
     public String paginaListaPagosColaboradores(Model model) {
+        colaboradoresController.retornaListaColaboradores(model);
         sueldosController.retornaListaPagos(model);
         sueldosController.retornaListaConceptoPagos(model);
         return "colaboradores/pagos";

@@ -31,6 +31,7 @@
             <th>Nombre</th>
             <th>Monto</th>
             <th>Concepto</th>
+            <th>Descripción</th>
             <th>Fecha</th>
             <th>Hora</th>
             <th>Acciones</th>
@@ -43,6 +44,7 @@
                 <td th:text="${pago.colaborador.nombre}"></td>
                 <td th:text="'S/. ' + ${pago.monto}"></td>
                 <td th:text="${pago.conceptoPago.nombre}"></td>
+                <td th:text="${pago.comentario}"></td>
                 <td th:text="${pago.formattedFecha}"></td>
                 <td th:text="${pago.formattedHora}"></td>
                 <td>
@@ -69,19 +71,13 @@
             <div class="modal-body">
                 <form id="paySalaryForm" action="/app/pagos/realizar-transaccion" method="POST">
                     <!-- Campo oculto para enviar el id del colaborador -->
-                    <input type="hidden" id="idColaborador" name="idColaborador">
-
                     <div class="mb-3">
                         <label for="collaboratorSelect" class="form-label">Seleccionar Colaborador</label>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle w-100" type="button"
-                                    id="collaboratorSelectButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                Seleccionar Colaborador
-                            </button>
-                            <ul class="dropdown-menu w-100" id="collaboratorSelect">
-                                <!-- Opciones de colaboradores se agregarán dinámicamente aquí -->
-                            </ul>
-                        </div>
+                        <select class="form-select" id="collaboratorSelect" name="idColaborador" required>
+                            <th:block th:each="colaborador : ${listaColaboradores}">
+                                <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
+                            </th:block>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="amount" class="form-label">Monto</label>
@@ -108,6 +104,7 @@
 </div>
 
 <script>
+
     // Función para eliminar un pago
     document.querySelectorAll('.delete-payment').forEach(button => {
         button.addEventListener('click', function () {

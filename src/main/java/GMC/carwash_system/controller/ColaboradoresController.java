@@ -30,11 +30,6 @@ public class ColaboradoresController {
         return model;
     }
 
-    @GetMapping("/lista")
-    public List<Colaborador> getAllColaboradores() {
-        return colaboradorRepository.findAll();
-    }
-
     @PostMapping("/crear")
     public ResponseEntity<String> crearColaborador(
             @RequestParam("nombre") String nombre,
