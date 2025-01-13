@@ -27,6 +27,20 @@ public class WebController {
         return "inicio";
     }
 
+    //PAGINAS DE SERVICIOS
+    @GetMapping("/servicios")
+    public String paginaServicios(Model model) {
+
+        return "servicios/servicios";
+    }
+    @GetMapping("/servicios/ex")
+    public String paginaServiciosOriginal(Model model) {
+
+        return "ex/servicios";
+    }
+
+
+    //PAGINAS DE COLABORADORES
     @GetMapping("/colaboradores/lista")
     public String paginaListaColaboradores(Model model) {
         colaboradoresController.retornaListaColaboradores(model);
@@ -39,6 +53,8 @@ public class WebController {
         sueldosController.retornaListaConceptoPagos(model);
         return "colaboradores/pagos";
     }
+
+    //PAGINAS DE CLIENTES
     @GetMapping("/clientes/lista")
     public String paginaListaClientes(Model model) {
         clienteController.retornaListaClientes(model);
