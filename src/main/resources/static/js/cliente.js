@@ -100,9 +100,9 @@ $('#addClientModalLabel').text('Añadir Cliente'); // Cambiar el título del mod
             rowData[0] = rowIdx + 1;
             this.data(rowData);
         }).draw();
-        
+
     });
-    
+
 // Añadir o editar tipo de vehículo
 $('#addVehicleTypeForm').on('submit', function (e) {
 e.preventDefault(); // Evitar el envío del formulario

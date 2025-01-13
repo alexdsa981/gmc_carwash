@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Clientes</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+
+    <div class="tab-content mt-3">
+        <!-- Clientes Tab -->
+        <div class="tab-pane fade show active" id="clients" role="tabpanel" aria-labelledby="clients-tab">
+            <div class="d-flex justify-content-between mb-3">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#addClientModal">
+                    AÑADIR CLIENTE
+                </button>
+            </div>
+            <!-- Tabla de clientes -->
+            <table id="clientTable" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Nombre</th>
+                    <th>DNI</th>
+                    <th>Teléfono</th>
+                    <th>Vehiculos</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cliente, iterStat : ${listaClientes}">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${cliente.nombre}"></td>
+                    <td th:text="${cliente.identificacion}"></td>
+                    <td th:text="${cliente.telefono}"></td>
+                    <td>
+                        <ul style="list-style-type: none; margin-bottom:0px; padding-left: 0;">
+                            <li th:each="vehiculo : ${cliente.listaVehiculos}" th:text="${vehiculo.placa}"></li>
+                        </ul>
+                    </td>
+                    <td>
+                        <!-- Botón de editar -->
+                        <button type="button" class="btn btn-outline-success btn-sm edit-row"
+                                th:data-id="${cliente.id}"
+                                th:data-nombre="${cliente.nombre}"
+                                th:data-identificacion="${cliente.identificacion}"
+                                th:data-telefono="${cliente.telefono}"
+                                th:data-placas="${cliente.listaPlacasJson}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+
+                        <!-- Botón de eliminar -->
+                        <button class="btn btn-outline-danger btn-sm delete-row" th:data-id="${cliente.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para añadir cliente -->
+    <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="addClientForm" method="post" action="/app/cliente/crear">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addClientModalLabel">Añadir Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="clientName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="clientName" name="nombre" required
+                                   autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientDNI" class="form-label">DNI</label>
+                            <input type="text" class="form-control" id="clientDNI" name="identificacion" required
+                                   autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientPhone" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="clientPhone" name="telefono" required
+                                   autocomplete="off">
+                        </div>
+                        <div id="vehiculosContainer">
+                            <div class="mb-3">
+                                <label for="clientPlaca1" class="form-label">Placa</label>
+                                <input type="text" class="form-control" id="clientPlaca1" name="placas" required
+                                       autocomplete="off">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary" id="addPlacaButton">Añadir otra placa
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    let placaCounter = 1;
+    document.getElementById('addPlacaButton').addEventListener('click', function () {
+        placaCounter++;
+        const container = document.getElementById('vehiculosContainer');
+        const newPlacaInput = document.createElement('div');
+        newPlacaInput.classList.add('mb-3');
+        newPlacaInput.innerHTML = `
+            <label for="clientPlaca${placaCounter}" class="form-label">Placa</label>
+            <input type="text" class="form-control" id="clientPlaca${placaCounter}" name="placas" required autocomplete="off">
+        `;
+        container.appendChild(newPlacaInput);
+    });
+</script>
+
+
+
+
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editClientForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClientModalLabel">Editar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editClientName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editClientName" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editClientDNI" class="form-label">DNI</label>
+                        <input type="text" class="form-control" id="editClientDNI" name="identificacion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editClientPhone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="editClientPhone" name="telefono" required>
+                    </div>
+                    <div id="editVehiculosContainer"></div>
+                    <button type="button" class="btn btn-outline-secondary" id="editAddPlacaButton">Añadir otra placa</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-row');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Obtener los datos del cliente del botón
+                const id = this.getAttribute('data-id');
+                const nombre = this.getAttribute('data-nombre');
+                const identificacion = this.getAttribute('data-identificacion');
+                const telefono = this.getAttribute('data-telefono');
+                const placas = JSON.parse(this.getAttribute('data-placas'));
+
+                // Rellenar los campos del modal
+                document.getElementById('editClientName').value = nombre;
+                document.getElementById('editClientDNI').value = identificacion;
+                document.getElementById('editClientPhone').value = telefono;
+
+                // Guardar el ID en el formulario
+                document.getElementById('editClientForm').setAttribute('data-id', id);
+
+                // Limpiar el contenedor de placas
+                const vehiculosContainer = document.getElementById('editVehiculosContainer');
+                vehiculosContainer.innerHTML = '';
+
+                // Crear los inputs de placas
+                placas.forEach((placa, index) => {
+                    const inputDiv = document.createElement('div');
+                    inputDiv.classList.add('mb-3');
+                    inputDiv.innerHTML = `
+                        <label for="editClientPlaca${index + 1}" class="form-label">Placa</label>
+                        <input type="text" class="form-control placa-input" id="editClientPlaca${index + 1}" name="placas" value="${placa}">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-placa-button">Eliminar</button>
+                    `;
+                    vehiculosContainer.appendChild(inputDiv);
+
+                    // Añadir evento de eliminar para cada placa
+                    inputDiv.querySelector('.remove-placa-button').addEventListener('click', function () {
+                        inputDiv.remove();
+                    });
+                });
+
+                // Mostrar el modal
+                const editModal = new bootstrap.Modal(document.getElementById('editClientModal'));
+                editModal.show();
+            });
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('editAddPlacaButton').addEventListener('click', function () {
+        const vehiculosContainer = document.getElementById('editVehiculosContainer');
+        const inputDiv = document.createElement('div');
+        inputDiv.classList.add('mb-3');
+        inputDiv.innerHTML = `
+            <label for="newClientPlaca" class="form-label">Placa</label>
+            <input type="text" class="form-control placa-input" name="placas">
+            <button type="button" class="btn btn-outline-danger btn-sm remove-placa-button">Eliminar</button>
+        `;
+        vehiculosContainer.appendChild(inputDiv);
+
+        // Añadir evento de eliminar para el nuevo input
+        inputDiv.querySelector('.remove-placa-button').addEventListener('click', function () {
+            inputDiv.remove();
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('editClientForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Obtener el ID del cliente desde el formulario
+        const id = this.getAttribute('data-id');
+
+        // Obtener los datos del formulario
+        const nombre = document.getElementById('editClientName').value;
+        const identificacion = document.getElementById('editClientDNI').value;
+        const telefono = document.getElementById('editClientPhone').value;
+
+        // Recopilar las placas desde los inputs
+        const placas = Array.from(document.querySelectorAll('.placa-input')).map(input => input.value);
+
+        // Construir el cuerpo de la solicitud
+        const data = {
+            nombre: nombre,
+            identificacion: identificacion,
+            telefono: telefono,
+            placas: placas
+        };
+
+        // Construir la URL del endpoint
+        const endpoint = `/app/cliente/editar/${id}`;
+
+        // Imprimir los datos en la consola
+        console.log('Enviando los siguientes datos:');
+        console.log('Endpoint:', endpoint);
+        console.log('Datos:', data);
+
+        // Enviar los datos al endpoint
+        fetch(endpoint, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Hubo un error al actualizar el cliente');
+        });
+    });
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function () {
+        var table = $('#clientTable').DataTable({
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
+        });
+    });
+</script>
+</body>
+</html>

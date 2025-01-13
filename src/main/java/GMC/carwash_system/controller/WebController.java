@@ -1,5 +1,6 @@
 package GMC.carwash_system.controller;
 
+import ch.qos.logback.core.net.server.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,9 @@ public class WebController {
     ColaboradoresController colaboradoresController;
     @Autowired
     SueldosController sueldosController;
+
+    @Autowired
+    ClienteController clienteController;
 
     @GetMapping("/")
     public String redirectToInicio() {
@@ -36,7 +40,12 @@ public class WebController {
         return "colaboradores/pagos";
     }
     @GetMapping("/clientes/lista")
-    public String paginaListaClientes() {
+    public String paginaListaClientes(Model model) {
+        clienteController.retornaListaClientes(model);
+        return "clientes/lista";
+    }
+    @GetMapping("/clientes")
+    public String paginaClientes() {
 
         return "clientes/cliente";
     }

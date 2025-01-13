@@ -30,7 +30,7 @@ public class Vehiculo {
     private Cliente cliente;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_vehiculo", nullable = false)
+    @JoinColumn(name = "id_tipo_vehiculo")
     private TipoVehiculo tipo_vehiculo;
 
 
