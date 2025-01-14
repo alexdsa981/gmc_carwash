@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,22 @@
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
+<style>
+    /* Estilo para los campos deshabilitados (opacos) */
+    .disabled-input {
+        background-color: #f8f9fa;
+        opacity: 0.5;
+    }
+</style>
+<style>
+    .modal-body small {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 4px;
+        display: block;
+    }
+</style>
 
 <body>
 
@@ -73,8 +89,7 @@
     </div>
 </div>
 <!-- Modal para Añadir Ingreso -->
-<div class="modal fade" id="addIngresoModal" tabindex="-1" aria-labelledby="addIngresoModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="addIngresoModal" tabindex="-1" aria-labelledby="addIngresoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -83,51 +98,221 @@
             </div>
             <div class="modal-body">
                 <form id="addIngresoForm">
+                    <!-- Campo Placa -->
                     <div class="mb-3">
-                        <label for="placa" class="form-label">Placa</label>
+                        <small class="text-muted">Placa</small>
                         <div class="input-group">
-                            <input type="text" id="placa" class="form-control" placeholder="Ingrese la placa"
-                                   required>
+                            <input type="text" id="placa" class="form-control" placeholder="Ingrese la placa" required>
                             <button class="btn btn-secondary" type="button"><i class="bi bi-search"></i></button>
                         </div>
                     </div>
-                    <h6>Datos del Cliente</h6>
+
+                    <!-- Sección Datos del Cliente -->
+                    <h6 class="mt-4">Datos del Cliente</h6>
+
                     <div class="mb-3">
-                        <input type="text" id="cliente" class="form-control" placeholder="Nombre del cliente"
-                               required>
+                        <small class="text-muted">Nombre</small>
+                        <div class="input-group">
+                            <input type="text" id="cliente" class="form-control" required readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="editClienteBtn" disabled><i class="bi bi-pencil"></i></button>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <input type="text" id="telefono" class="form-control" placeholder="Teléfono" required>
+                        <small class="text-muted">Teléfono</small>
+                        <div class="input-group">
+                            <input type="text" id="telefono" class="form-control" required readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="editTelefonoBtn" disabled><i class="bi bi-pencil"></i></button>
+                        </div>
                     </div>
-                    <h6>Datos del Vehículo</h6>
+
+                    <!-- Sección Datos del Vehículo -->
+                    <h6 class="mt-4">Datos del Vehículo</h6>
+
                     <div class="mb-3">
-                        <input type="text" id="marca" class="form-control" placeholder="Marca" required>
+                        <small class="text-muted">Marca</small>
+                        <div class="input-group">
+                            <input type="text" id="marca" class="form-control"  required readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="editMarcaBtn" disabled><i class="bi bi-pencil"></i></button>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <input type="text" id="modelo" class="form-control" placeholder="Modelo" required>
+                        <small class="text-muted">Modelo</small>
+                        <div class="input-group">
+                            <input type="text" id="modelo" class="form-control" required readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="editModeloBtn" disabled><i class="bi bi-pencil"></i></button>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <select class="form-select" id="tipoVehiculo" required>
-                            <option selected disabled>Seleccione el tipo de vehículo</option>
-                            <option value="Auto">Auto</option>
-                            <option value="SUV">SUV</option>
-                            <option value="Camioneta 3F">Camioneta 3F</option>
-                            <option value="Pick Up">Pick Up</option>
-                            <option value="Mini Van">Mini Van</option>
-                            <option value="Van">Van</option>
-                            <option value="Moto Lineal">Moto Lineal</option>
-                            <option value="Moto Car">Moto Car</option>
-                        </select>
+                        <small class="text-muted">Tipo de Vehículo</small>
+                        <div class="input-group">
+                            <select class="form-select" id="tipoVehiculo" name="tipoVehiculo" required>
+                                <option selected disabled>Seleccione el tipo de vehículo</option>
+                                <option th:each="tipoVehiculo : ${listaTipoVehiculo}"
+                                        th:value="${tipoVehiculo.id}"
+                                        th:text="${tipoVehiculo.nombre}">
+                                </option>
+                            </select>
+                            <button type="button" class="btn btn-outline-secondary" id="editTipoVehiculoBtn" disabled><i class="bi bi-pencil"></i></button>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-warning" id="limpiarFormulario">Limpiar</button>
                 <button type="button" class="btn btn-primary" id="guardarIngreso">Guardar</button>
             </div>
         </div>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Referencia al botón de búsqueda
+        const buscarBtn = document.querySelector("#placa + button");
+
+        // Al cargar el modal, deshabilitar todos los campos menos la placa
+        deshabilitarCamposInicialmente();
+
+        // Evento de click en el botón de búsqueda
+        buscarBtn.addEventListener("click", async function () {
+            const placaInput = document.getElementById("placa");
+            const placa = placaInput.value.trim();
+
+            if (!placa) {
+                alert("Por favor, ingrese una placa.");
+                return;
+            }
+
+            try {
+                // Llamada al endpoint para obtener los datos del cliente
+                const clienteResponse = await fetch(`/app/cliente/buscar-cliente-por-placa/${placa}`);
+                if (!clienteResponse.ok) throw new Error("Cliente no encontrado");
+
+                const cliente = await clienteResponse.json();
+                document.getElementById("cliente").value = cliente.nombre;
+                document.getElementById("telefono").value = cliente.telefono;
+
+                // Llamada al endpoint para obtener los datos del vehículo
+                const vehiculoResponse = await fetch(`/app/cliente/buscar-vehiculo-por-placa/${placa}`);
+                if (!vehiculoResponse.ok) throw new Error("Vehículo no encontrado");
+
+                const vehiculo = await vehiculoResponse.json();
+                document.getElementById("marca").value = vehiculo.marca;
+                document.getElementById("modelo").value = vehiculo.modelo;
+
+                // Aquí seleccionamos el tipo de vehículo en el select basado en el id recibido
+                const tipoVehiculoId = vehiculo.tipoVehiculo.id;
+                const select = document.getElementById("tipoVehiculo");
+
+                // Buscar y seleccionar la opción correspondiente al tipo de vehículo
+                for (let option of select.options) {
+                    if (option.value == tipoVehiculoId) {
+                        option.selected = true;
+                        break;
+                    }
+                }
+
+                // Deshabilitar los campos y habilitar los botones de edición
+                deshabilitarCampos();
+                habilitarBotones();
+
+            } catch (error) {
+                alert("Placa no encontrada. Puede ingresar nuevos datos.");
+                habilitarCampos();
+            }
+        });
+
+        // Función para deshabilitar los campos al inicio
+        function deshabilitarCamposInicialmente() {
+            const campos = ["cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            campos.forEach(campo => {
+                const input = document.getElementById(campo);
+                input.readOnly = true;
+                input.classList.add("disabled-input");
+            });
+
+            // Deshabilitar los botones de edición al inicio
+            deshabilitarBotones();
+        }
+
+        // Función para deshabilitar los campos después de una búsqueda exitosa
+        function deshabilitarCampos() {
+            const campos = ["placa", "cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            campos.forEach(campo => {
+                const input = document.getElementById(campo);
+                input.readOnly = true;
+                input.classList.add("disabled-input");
+            });
+        }
+
+        // Función para habilitar todos los campos si la búsqueda no encuentra resultados
+        function habilitarCampos() {
+            const campos = ["placa", "cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            campos.forEach(campo => {
+                const input = document.getElementById(campo);
+                input.readOnly = false;
+                input.classList.remove("disabled-input");
+            });
+
+            // Habilitar los botones de edición
+            habilitarBotones();
+        }
+
+        // Función para habilitar los botones de edición
+        function habilitarBotones() {
+            document.querySelector("#editClienteBtn").disabled = false;
+            document.querySelector("#editTelefonoBtn").disabled = false;
+            document.querySelector("#editMarcaBtn").disabled = false;
+            document.querySelector("#editModeloBtn").disabled = false;
+            document.querySelector("#editTipoVehiculoBtn").disabled = false;
+        }
+
+        // Función para deshabilitar los botones de edición
+        function deshabilitarBotones() {
+            document.querySelector("#editClienteBtn").disabled = true;
+            document.querySelector("#editTelefonoBtn").disabled = true;
+            document.querySelector("#editMarcaBtn").disabled = true;
+            document.querySelector("#editModeloBtn").disabled = true;
+            document.querySelector("#editTipoVehiculoBtn").disabled = true;
+        }
+
+        // Botones de editar junto a los campos
+        document.querySelector("#editClienteBtn").addEventListener("click", function () { habilitarCampo("cliente"); });
+        document.querySelector("#editTelefonoBtn").addEventListener("click", function () { habilitarCampo("telefono"); });
+        document.querySelector("#editMarcaBtn").addEventListener("click", function () { habilitarCampo("marca"); });
+        document.querySelector("#editModeloBtn").addEventListener("click", function () { habilitarCampo("modelo"); });
+        document.querySelector("#editTipoVehiculoBtn").addEventListener("click", function () { habilitarCampo("tipoVehiculo"); });
+
+        // Función para habilitar un campo específico
+        function habilitarCampo(campo) {
+            const input = document.getElementById(campo);
+            input.readOnly = false;
+            input.classList.remove("disabled-input");
+        }
+
+        // Limpiar el formulario y habilitar todos los campos nuevamente
+        document.querySelector("#limpiarFormulario").addEventListener("click", function () {
+            const campos = ["placa", "cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            campos.forEach(campo => {
+                const input = document.getElementById(campo);
+                input.value = "";  // Limpiar los valores de los campos
+                input.readOnly = false;  // Habilitar los campos
+                input.classList.remove("disabled-input");  // Quitar el estilo opaco
+            });
+
+            // Deshabilitar los botones de editar
+            deshabilitarBotones();
+        });
+    });
+</script>
+
+
+
 
 <!-- Modal para Añadir Servicio -->
 <div class="modal fade" id="addServicioModal" tabindex="-1" aria-labelledby="addServicioModalLabel"
@@ -291,6 +476,8 @@
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+
 
 <script>
     $(document).ready(function () {

@@ -13,9 +13,10 @@ public class WebController {
     ColaboradoresController colaboradoresController;
     @Autowired
     SueldosController sueldosController;
-
     @Autowired
     ClienteController clienteController;
+    @Autowired
+    ServiciosController serviciosController;
 
     @GetMapping("/")
     public String redirectToInicio() {
@@ -30,15 +31,12 @@ public class WebController {
     //PAGINAS DE SERVICIOS
     @GetMapping("/servicios")
     public String paginaServicios(Model model) {
-
+        serviciosController.retornaListaTipoVehiculo(model);
+        serviciosController.retornaListaPrecioServicio(model);
+        serviciosController.retornaListaTipoServicio(model);
+        serviciosController.retornaListaProducto(model);
         return "servicios/servicios";
     }
-    @GetMapping("/servicios/ex")
-    public String paginaServiciosOriginal(Model model) {
-
-        return "ex/servicios";
-    }
-
 
     //PAGINAS DE COLABORADORES
     @GetMapping("/colaboradores/lista")
@@ -60,16 +58,20 @@ public class WebController {
         clienteController.retornaListaClientes(model);
         return "clientes/lista";
     }
-    @GetMapping("/clientes")
+
+
+
+
+
+    @GetMapping("/clientes/ex")
     public String paginaClientes() {
 
-        return "clientes/cliente";
+        return "ex/cliente";
     }
+    @GetMapping("/servicios/ex")
+    public String paginaServiciosOriginal(Model model) {
 
-    @GetMapping("/inventario/lista")
-    public String paginaListaInventario() {
-
-        return "inventario/inventarioLista";
+        return "ex/servicios";
     }
 
 }

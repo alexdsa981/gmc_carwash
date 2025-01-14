@@ -3,11 +3,14 @@ package GMC.carwash_system.controller;
 
 import GMC.carwash_system.model.clasificadores.ConceptoPago;
 import GMC.carwash_system.model.clasificadores.TipoServicio;
+import GMC.carwash_system.model.clasificadores.TipoVehiculo;
 import GMC.carwash_system.model.entidades.PrecioServicio;
+import GMC.carwash_system.model.entidades.Producto;
 import GMC.carwash_system.model.entidades.Sueldos;
 import GMC.carwash_system.repository.clasificadores.TipoServicioRepository;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.PrecioServicioRepository;
+import GMC.carwash_system.repository.entidades.ProductoRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +37,9 @@ public class ServiciosController {
     PrecioServicioRepository precioServicioRepository;
     @Autowired
     TipoVehiculoRepository tipoVehiculoRepository;
+    @Autowired
+    ProductoRepository productoRepository;
+
 
     public Model retornaListaTipoServicio(Model model) {
         List<TipoServicio> listaTipoServicio = tipoServicioRepository.findAll();
@@ -43,6 +49,16 @@ public class ServiciosController {
     public Model retornaListaPrecioServicio(Model model) {
         List<PrecioServicio> listaPrecioServicio = precioServicioRepository.findAll();
         model.addAttribute("listaPrecioServicio", listaPrecioServicio);
+        return model;
+    }
+    public Model retornaListaTipoVehiculo(Model model) {
+        List<TipoVehiculo> listaTipoVehiculo= tipoVehiculoRepository.findAll();
+        model.addAttribute("listaTipoVehiculo", listaTipoVehiculo);
+        return model;
+    }
+    public Model retornaListaProducto(Model model) {
+        List<Producto> listaProducto= productoRepository.findAll();
+        model.addAttribute("listaProducto", listaProducto);
         return model;
     }
 

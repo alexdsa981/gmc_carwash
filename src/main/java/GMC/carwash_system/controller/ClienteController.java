@@ -1,12 +1,14 @@
 package GMC.carwash_system.controller;
 
 import GMC.carwash_system.model.dto.ClienteDTO;
+import GMC.carwash_system.model.dto.VehiculoDTO;
 import GMC.carwash_system.model.entidades.Cliente;
 import GMC.carwash_system.model.entidades.Colaborador;
 import GMC.carwash_system.model.entidades.Vehiculo;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.ClienteRepository;
 import GMC.carwash_system.repository.entidades.VehiculoRepository;
+import ch.qos.logback.core.net.server.Client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -151,7 +153,6 @@ public class ClienteController {
     }
 
 
-
     // Eliminar un cliente
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarCliente(@PathVariable Long id) {
@@ -162,6 +163,28 @@ public class ClienteController {
 
         clienteRepository.deleteById(id);
         return ResponseEntity.ok("Cliente eliminado correctamente");
+    }
+
+
+    @GetMapping("/buscar-cliente-por-placa/{placa}")
+    public ResponseEntity<ClienteDTO> buscarClientePorPlaca(@PathVariable String placa) {
+        Optional<Vehiculo> vehiculo = vehiculoRepository.findByPlaca(placa);
+        if (vehiculo.isPresent()) {
+            ClienteDTO clienteDTO = new ClienteDTO(vehiculo.get().getCliente());
+            return ResponseEntity.ok(clienteDTO);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+    @GetMapping("/buscar-vehiculo-por-placa/{placa}")
+    public ResponseEntity<VehiculoDTO> buscarVehiculoPorPlaca(@PathVariable String placa) {
+        Optional<Vehiculo> vehiculo = vehiculoRepository.findByPlaca(placa);
+        if (vehiculo.isPresent()) {
+            VehiculoDTO vehiculoDTO = new VehiculoDTO(vehiculo.get());
+            return ResponseEntity.ok(vehiculoDTO);
+        }
+        return ResponseEntity.notFound().build();
     }
 
 

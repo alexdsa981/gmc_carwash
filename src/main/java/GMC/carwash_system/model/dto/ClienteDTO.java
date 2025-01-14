@@ -1,8 +1,10 @@
 package GMC.carwash_system.model.dto;
 
+import GMC.carwash_system.model.entidades.Cliente;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,4 +14,18 @@ public class ClienteDTO {
     private String identificacion;
     private String telefono;
     private List<String> placas;
+
+    public ClienteDTO(Cliente cliente) {
+        this.nombre = cliente.getNombre();
+        this.identificacion = cliente.getIdentificacion();
+        this.telefono = cliente.getTelefono();
+        // Si la lista de vehículos no es nula, obtenemos las placas de los vehículos
+        if (cliente.getListaVehiculos() != null) {
+            this.placas = cliente.getListaPlacas();
+        } else {
+            this.placas = new ArrayList<>();
+        }
+    }
+
+
 }
