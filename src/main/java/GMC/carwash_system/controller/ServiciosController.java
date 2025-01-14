@@ -4,13 +4,10 @@ package GMC.carwash_system.controller;
 import GMC.carwash_system.model.clasificadores.ConceptoPago;
 import GMC.carwash_system.model.clasificadores.TipoServicio;
 import GMC.carwash_system.model.clasificadores.TipoVehiculo;
-import GMC.carwash_system.model.entidades.PrecioServicio;
-import GMC.carwash_system.model.entidades.Producto;
-import GMC.carwash_system.model.entidades.Sueldos;
+import GMC.carwash_system.model.entidades.*;
 import GMC.carwash_system.repository.clasificadores.TipoServicioRepository;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
-import GMC.carwash_system.repository.entidades.PrecioServicioRepository;
-import GMC.carwash_system.repository.entidades.ProductoRepository;
+import GMC.carwash_system.repository.entidades.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +38,18 @@ public class ServiciosController {
     TipoVehiculoRepository tipoVehiculoRepository;
     @Autowired
     ProductoRepository productoRepository;
+    @Autowired
+    ClienteRepository clienteRepository;
+    @Autowired
+    VehiculoRepository vehiculoRepository;
+    @Autowired
+    DetalleAtencionRepository detalleAtencionRepository;
 
+    public Model retornaListaIngresoClientes(Model model) {
+        List<DetalleAtencion> listaIngresos= detalleAtencionRepository.findAll();
+        model.addAttribute("listaIngresos", listaIngresos);
+        return model;
+    }
 
     public Model retornaListaTipoServicio(Model model) {
         List<TipoServicio> listaTipoServicio = tipoServicioRepository.findAll();
@@ -61,6 +71,57 @@ public class ServiciosController {
         model.addAttribute("listaProducto", listaProducto);
         return model;
     }
+
+    @PostMapping("/agregar-ingreso/{placa}")
+    public ResponseEntity<String> agregarIngreso(
+            @PathVariable("placa") String placa,
+            @RequestParam(value = "nombre", required = false) String nombre,
+            @RequestParam(value = "telefono", required = false) String telefono,
+            @RequestParam(value = "identificacion", required = false) String identificacion,
+            @RequestParam(value = "marca", required = false) String marca,
+            @RequestParam(value = "modelo", required = false) String modelo,
+            @RequestParam(value = "idTipoVehiculo", required = false) Long idTipoVehiculo
+    ) {
+        // Buscar o crear el vehículo
+        Vehiculo vehiculo = vehiculoRepository.findByPlaca(placa).orElse(new Vehiculo());
+
+        // Buscar o crear el cliente
+        Cliente cliente = vehiculo.getCliente() != null ? vehiculo.getCliente() : new Cliente();
+
+        // Actualizar los datos del cliente
+        cliente.setNombre(nombre);
+        cliente.setTelefono(telefono);
+        cliente.setIdentificacion(identificacion);
+        clienteRepository.save(cliente);
+
+        // Actualizar los datos del vehículo
+        vehiculo.setPlaca(placa);
+        vehiculo.setMarca(marca);
+        vehiculo.setModelo(modelo);
+
+        tipoVehiculoRepository.findById(idTipoVehiculo)
+                .ifPresentOrElse(
+                        vehiculo::setTipo_vehiculo,
+                        () -> {
+                            throw new IllegalArgumentException("El tipo de vehículo no existe");
+                        }
+                );
+
+        vehiculo.setCliente(cliente);
+        vehiculoRepository.save(vehiculo);
+
+        // Crear y guardar el detalle de atención
+        DetalleAtencion detalleAtencion = new DetalleAtencion();
+        detalleAtencion.setCliente(cliente);
+        detalleAtencion.setVehiculo(vehiculo);
+        detalleAtencion.setFecha(LocalDate.now());
+        detalleAtencion.setHora(LocalTime.now());
+        detalleAtencionRepository.save(detalleAtencion);
+
+        return ResponseEntity.ok("Ingreso agregado correctamente");
+    }
+
+
 
 
     @PostMapping("/crear-tipo-servicio")

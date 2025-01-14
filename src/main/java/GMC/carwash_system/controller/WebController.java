@@ -35,6 +35,7 @@ public class WebController {
         serviciosController.retornaListaPrecioServicio(model);
         serviciosController.retornaListaTipoServicio(model);
         serviciosController.retornaListaProducto(model);
+        serviciosController.retornaListaIngresoClientes(model);
         return "servicios/servicios";
     }
 

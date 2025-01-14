@@ -20,7 +20,7 @@ public class DetalleAtencion {
 
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_servicio", nullable = false)
+    @JoinColumn(name = "id_tipo_servicio")
     private TipoServicio tipo_servicio;
 
     @ManyToOne
@@ -28,7 +28,7 @@ public class DetalleAtencion {
     private Vehiculo vehiculo;
 
     @ManyToOne
-    @JoinColumn(name = "id_colaborador", nullable = false)
+    @JoinColumn(name = "id_colaborador")
     private Colaborador colaborador;
 
     @ManyToOne

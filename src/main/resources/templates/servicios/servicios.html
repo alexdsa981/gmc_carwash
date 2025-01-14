@@ -62,8 +62,26 @@
                 </tr>
                 </thead>
                 <tbody>
+                <th:block th:each="detalle, iterStat : ${listaIngresos}">
+                    <tr>
+                        <td th:text="${iterStat.index + 1}">Nº</td>
+                        <td th:text="${detalle.vehiculo != null ? detalle.vehiculo.placa : ''}">PLACA</td>
+                        <td th:text="${detalle.vehiculo != null ? detalle.vehiculo.marca : ''}">MARCA</td>
+                        <td th:text="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.nombre : ''}">TIPO VEHÍCULO</td>
+                        <td th:text="${detalle.cliente != null ? detalle.cliente.nombre : ''}">CLIENTE</td>
+                        <td th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELEFONO</td>
+                        <td th:text="${detalle.tipo_servicio != null ? detalle.tipo_servicio.nombre : ''}">SERVICIOS/PRODUCTOS</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" title="Añadir Servicio" data-bs-toggle="modal" data-bs-target="#addServicioModal"><i class="bi bi-plus"></i></button>
+                            <button class="btn btn-warning btn-sm" title="Pagar"><i class="bi bi-currency-dollar"></i></button>
+                            <button class="btn btn-primary btn-sm" title="Editar"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-danger btn-sm" title="Eliminar"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                </th:block>
                 </tbody>
             </table>
+
         </div>
 
         <!-- Vista de REALIZADOS -->
@@ -126,13 +144,21 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <small class="text-muted">Identificación</small>
+                        <div class="input-group">
+                            <input type="text" id="identificacion" class="form-control" required readonly>
+                            <button type="button" class="btn btn-outline-secondary" id="editIdentificacionBtn" disabled><i class="bi bi-pencil"></i></button>
+                        </div>
+                    </div>
+
                     <!-- Sección Datos del Vehículo -->
                     <h6 class="mt-4">Datos del Vehículo</h6>
 
                     <div class="mb-3">
                         <small class="text-muted">Marca</small>
                         <div class="input-group">
-                            <input type="text" id="marca" class="form-control"  required readonly>
+                            <input type="text" id="marca" class="form-control" required readonly>
                             <button type="button" class="btn btn-outline-secondary" id="editMarcaBtn" disabled><i class="bi bi-pencil"></i></button>
                         </div>
                     </div>
@@ -170,15 +196,66 @@
 </div>
 
 
+<!--Envio de datos al controlador-->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Referencia al botón de búsqueda
-        const buscarBtn = document.querySelector("#placa + button");
+    // Referencia al botón Guardar
+    const guardarBtn = document.getElementById("guardarIngreso");
 
-        // Al cargar el modal, deshabilitar todos los campos menos la placa
+    // Evento de click en el botón Guardar
+    guardarBtn.addEventListener("click", async function () {
+        // Obtener los valores de los campos (permitiendo valores vacíos)
+        const placa = document.getElementById("placa").value.trim();
+        const nombre = document.getElementById("cliente").value.trim() || "";
+        const telefono = document.getElementById("telefono").value.trim() || "";
+        const identificacion = document.getElementById("identificacion").value.trim() || "";
+        const marca = document.getElementById("marca").value.trim() || "";
+        const modelo = document.getElementById("modelo").value.trim() || "";
+        const idTipoVehiculo = document.getElementById("tipoVehiculo").value;
+
+        // Validar que la placa esté presente
+        if (!placa) {
+            alert("La placa es obligatoria.");
+            return;
+        }
+
+        try {
+            // Enviar los datos al backend mediante fetch
+            const response = await fetch(`/app/servicios/agregar-ingreso/${placa}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    nombre,
+                    telefono,
+                    identificacion,
+                    marca,
+                    modelo,
+                    idTipoVehiculo: idTipoVehiculo || ""
+                })
+            });
+
+            if (response.ok) {
+                alert("Ingreso agregado correctamente.");
+                location.reload(); // Recargar la página
+            } else {
+                const errorText = await response.text();
+                alert("Error al agregar el ingreso: " + errorText);
+            }
+        } catch (error) {
+            alert("Ocurrió un error: " + error.message);
+        }
+    });
+});
+
+</script>
+<!--Logica para forzar busqueda de placa antes de agregar los demás campos-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buscarBtn = document.querySelector("#placa + button");
         deshabilitarCamposInicialmente();
 
-        // Evento de click en el botón de búsqueda
         buscarBtn.addEventListener("click", async function () {
             const placaInput = document.getElementById("placa");
             const placa = placaInput.value.trim();
@@ -189,27 +266,22 @@
             }
 
             try {
-                // Llamada al endpoint para obtener los datos del cliente
                 const clienteResponse = await fetch(`/app/cliente/buscar-cliente-por-placa/${placa}`);
                 if (!clienteResponse.ok) throw new Error("Cliente no encontrado");
 
                 const cliente = await clienteResponse.json();
                 document.getElementById("cliente").value = cliente.nombre;
                 document.getElementById("telefono").value = cliente.telefono;
+                document.getElementById("identificacion").value = cliente.identificacion;
 
-                // Llamada al endpoint para obtener los datos del vehículo
                 const vehiculoResponse = await fetch(`/app/cliente/buscar-vehiculo-por-placa/${placa}`);
                 if (!vehiculoResponse.ok) throw new Error("Vehículo no encontrado");
 
                 const vehiculo = await vehiculoResponse.json();
                 document.getElementById("marca").value = vehiculo.marca;
                 document.getElementById("modelo").value = vehiculo.modelo;
-
-                // Aquí seleccionamos el tipo de vehículo en el select basado en el id recibido
                 const tipoVehiculoId = vehiculo.tipoVehiculo.id;
                 const select = document.getElementById("tipoVehiculo");
-
-                // Buscar y seleccionar la opción correspondiente al tipo de vehículo
                 for (let option of select.options) {
                     if (option.value == tipoVehiculoId) {
                         option.selected = true;
@@ -217,32 +289,26 @@
                     }
                 }
 
-                // Deshabilitar los campos y habilitar los botones de edición
                 deshabilitarCampos();
                 habilitarBotones();
-
             } catch (error) {
                 alert("Placa no encontrada. Puede ingresar nuevos datos.");
                 habilitarCampos();
             }
         });
 
-        // Función para deshabilitar los campos al inicio
         function deshabilitarCamposInicialmente() {
-            const campos = ["cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            const campos = ["cliente", "telefono", "identificacion", "marca", "modelo", "tipoVehiculo"];
             campos.forEach(campo => {
                 const input = document.getElementById(campo);
                 input.readOnly = true;
                 input.classList.add("disabled-input");
             });
-
-            // Deshabilitar los botones de edición al inicio
             deshabilitarBotones();
         }
 
-        // Función para deshabilitar los campos después de una búsqueda exitosa
         function deshabilitarCampos() {
-            const campos = ["placa", "cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            const campos = ["placa", "cliente", "telefono", "identificacion", "marca", "modelo", "tipoVehiculo"];
             campos.forEach(campo => {
                 const input = document.getElementById(campo);
                 input.readOnly = true;
@@ -250,64 +316,53 @@
             });
         }
 
-        // Función para habilitar todos los campos si la búsqueda no encuentra resultados
         function habilitarCampos() {
-            const campos = ["placa", "cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
+            const campos = ["placa", "cliente", "telefono", "identificacion", "marca", "modelo", "tipoVehiculo"];
             campos.forEach(campo => {
                 const input = document.getElementById(campo);
                 input.readOnly = false;
                 input.classList.remove("disabled-input");
             });
-
-            // Habilitar los botones de edición
             habilitarBotones();
         }
 
-        // Función para habilitar los botones de edición
         function habilitarBotones() {
             document.querySelector("#editClienteBtn").disabled = false;
             document.querySelector("#editTelefonoBtn").disabled = false;
+            document.querySelector("#editIdentificacionBtn").disabled = false;
             document.querySelector("#editMarcaBtn").disabled = false;
             document.querySelector("#editModeloBtn").disabled = false;
             document.querySelector("#editTipoVehiculoBtn").disabled = false;
         }
 
-        // Función para deshabilitar los botones de edición
         function deshabilitarBotones() {
             document.querySelector("#editClienteBtn").disabled = true;
             document.querySelector("#editTelefonoBtn").disabled = true;
+            document.querySelector("#editIdentificacionBtn").disabled = true;
             document.querySelector("#editMarcaBtn").disabled = true;
             document.querySelector("#editModeloBtn").disabled = true;
             document.querySelector("#editTipoVehiculoBtn").disabled = true;
         }
-
-        // Botones de editar junto a los campos
         document.querySelector("#editClienteBtn").addEventListener("click", function () { habilitarCampo("cliente"); });
         document.querySelector("#editTelefonoBtn").addEventListener("click", function () { habilitarCampo("telefono"); });
-        document.querySelector("#editMarcaBtn").addEventListener("click", function () { habilitarCampo("marca"); });
-        document.querySelector("#editModeloBtn").addEventListener("click", function () { habilitarCampo("modelo"); });
-        document.querySelector("#editTipoVehiculoBtn").addEventListener("click", function () { habilitarCampo("tipoVehiculo"); });
+        document.querySelector("#editIdentificacionBtn").addEventListener("click", function () { habilitarCampo("identificacion"); });
 
-        // Función para habilitar un campo específico
+        document.querySelector("#limpiarFormulario").addEventListener("click", function () {
+            const campos = ["placa", "cliente", "telefono", "identificacion", "marca", "modelo", "tipoVehiculo"];
+            campos.forEach(campo => {
+                const input = document.getElementById(campo);
+                input.value = "";
+                input.readOnly = false;
+                input.classList.remove("disabled-input");
+            });
+            deshabilitarBotones();
+        });
+
         function habilitarCampo(campo) {
             const input = document.getElementById(campo);
             input.readOnly = false;
             input.classList.remove("disabled-input");
         }
-
-        // Limpiar el formulario y habilitar todos los campos nuevamente
-        document.querySelector("#limpiarFormulario").addEventListener("click", function () {
-            const campos = ["placa", "cliente", "telefono", "marca", "modelo", "tipoVehiculo"];
-            campos.forEach(campo => {
-                const input = document.getElementById(campo);
-                input.value = "";  // Limpiar los valores de los campos
-                input.readOnly = false;  // Habilitar los campos
-                input.classList.remove("disabled-input");  // Quitar el estilo opaco
-            });
-
-            // Deshabilitar los botones de editar
-            deshabilitarBotones();
-        });
     });
 </script>
 
