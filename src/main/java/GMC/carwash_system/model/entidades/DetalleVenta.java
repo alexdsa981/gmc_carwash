@@ -28,9 +28,6 @@ public class DetalleVenta {
 
     private Long idItem; //se coloca el id del Producto o Servicio
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(MAX)")
-    private String descripcion;
-
     @Column(nullable = false)
     private Integer cantidad;
 

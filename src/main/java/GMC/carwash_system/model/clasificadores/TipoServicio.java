@@ -18,5 +18,6 @@ public class TipoServicio {
     @Column(nullable = false)
     private String nombre;
     private String descripcion;
+    private Boolean isEspecial;
 
 }

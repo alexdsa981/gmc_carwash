@@ -81,26 +81,27 @@
                                 </td>
                                 <td>
 
-                                    <button class="btn btn-success btn-sm" title="Añadir Servicio"
-                                        data-bs-toggle="modal" data-bs-target="#addServicioModal"><i
-                                            class="bi bi-plus"></i></button>
+                                    <button class="btn btn-success btn-sm add-service-btn" title="Añadir Servicio"
+                                            data-bs-toggle="modal" data-bs-target="#addServicioModal"
+                                            th:data-id="${detalle.id}">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
 
                                     <button class="btn btn-warning btn-sm" title="Pagar"><i
                                             class="bi bi-currency-dollar"></i></button>
 
                                     <button class="btn btn-primary btn-sm edit-btn" title="Editar"
-                                            th:data-id="${detalle.id}"
-                                            th:data-placa="${detalle.vehiculo != null ? detalle.vehiculo.placa : ''}"
-                                            th:data-marca="${detalle.vehiculo != null ? detalle.vehiculo.marca : ''}"
-                                            th:data-modelo="${detalle.vehiculo != null ? detalle.vehiculo.modelo : ''}"
-                                            th:data-tipo-vehiculo="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.nombre : ''}"
-                                            th:data-tipo-vehiculo-id="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.id : ''}"
-                                            th:data-cliente="${detalle.cliente != null ? detalle.cliente.nombre : ''}"
-                                            th:data-telefono="${detalle.cliente != null ? detalle.cliente.telefono : ''}"
-                                            th:data-identificacion="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">
+                                        th:data-id="${detalle.id}"
+                                        th:data-placa="${detalle.vehiculo != null ? detalle.vehiculo.placa : ''}"
+                                        th:data-marca="${detalle.vehiculo != null ? detalle.vehiculo.marca : ''}"
+                                        th:data-modelo="${detalle.vehiculo != null ? detalle.vehiculo.modelo : ''}"
+                                        th:data-tipo-vehiculo="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.id : ''}"
+                                        th:data-cliente="${detalle.cliente != null ? detalle.cliente.nombre : ''}"
+                                        th:data-telefono="${detalle.cliente != null ? detalle.cliente.telefono : ''}"
+                                        th:data-identificacion="${detalle.cliente != null ? detalle.cliente.identificacion : ''}"
+                                        data-bs-toggle="modal" data-bs-target="#editIngresoModal">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-
 
 
 
@@ -183,44 +184,89 @@
             </div>
 
             <script>
-                // Seleccionar todos los botones de edición y agregar el evento 'click'
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        // Obtener los datos del botón clickeado
-                        const placa = this.getAttribute('data-placa');
-                        const marca = this.getAttribute('data-marca');
-                        const modelo = this.getAttribute('data-modelo');
-                        const tipoVehiculo = this.getAttribute('data-tipo-vehiculo');
-                        const tipoVehiculoId = this.getAttribute('data-tipo-vehiculo-id');
-                        const cliente = this.getAttribute('data-cliente');
-                        const telefono = this.getAttribute('data-telefono');
-                        const identificacion = this.getAttribute('data-identificacion');
+                //llenar el modal con datos
+                document.addEventListener("DOMContentLoaded", function () {
+                    const editButtons = document.querySelectorAll(".edit-btn");
 
-                        // Llenar los campos del modal con los datos recibidos
-                        document.getElementById('editPlaca').value = placa || '';
-                        document.getElementById('editCliente').value = cliente || '';
-                        document.getElementById('editTelefono').value = telefono || '';
-                        document.getElementById('editIdentificacion').value = identificacion || '';
-                        document.getElementById('editMarca').value = marca || '';
-                        document.getElementById('editModelo').value = modelo || '';
+                    editButtons.forEach(button => {
+                        button.addEventListener("click", function () {
+                            // Asignar el ID al modal
+                            const id = this.getAttribute("data-id");
+                            const modal = document.getElementById("editIngresoModal");
+                            modal.setAttribute("data-id", id);
 
-                        // Asignar el valor al select de tipo de vehículo
-                        const selectTipoVehiculo = document.getElementById('editTipoVehiculo');
-                        if (tipoVehiculoId) {
-                            selectTipoVehiculo.value = tipoVehiculoId;
-                        } else {
-                            selectTipoVehiculo.selectedIndex = 0; // Seleccionar el primer valor si está vacío
-                        }
-
-                        // Abrir el modal usando Bootstrap Modal
-                        const modal = new bootstrap.Modal(document.getElementById('editIngresoModal'));
-                        modal.show();
+                            // Llenar los campos del modal con los datos del botón
+                            document.getElementById("editPlaca").value = this.getAttribute("data-placa");
+                            document.getElementById("editCliente").value = this.getAttribute("data-cliente");
+                            document.getElementById("editTelefono").value = this.getAttribute("data-telefono");
+                            document.getElementById("editIdentificacion").value = this.getAttribute("data-identificacion");
+                            document.getElementById("editMarca").value = this.getAttribute("data-marca");
+                            document.getElementById("editModelo").value = this.getAttribute("data-modelo");
+                            document.getElementById("editTipoVehiculo").value = this.getAttribute("data-tipo-vehiculo");
+                        });
                     });
                 });
 
+
             </script>
 
+            <script>
+                //envio del boton editar:
+                document.addEventListener("DOMContentLoaded", function () {
+                    // Referencia al botón Guardar del modal de edición
+                    const guardarBtn = document.getElementById("guardarEdicion");
 
+                    // Evento de click en el botón Guardar
+                    guardarBtn.addEventListener("click", async function () {
+                        // Obtener los valores del formulario de edición
+                        const id = document.getElementById("editIngresoModal").getAttribute("data-id");
+                        const placa = document.getElementById("editPlaca").value.trim();
+                        const nombre = document.getElementById("editCliente").value.trim() || "";
+                        const telefono = document.getElementById("editTelefono").value.trim() || "";
+                        const identificacion = document.getElementById("editIdentificacion").value.trim() || "";
+                        const marca = document.getElementById("editMarca").value.trim() || "";
+                        const modelo = document.getElementById("editModelo").value.trim() || "";
+                        const idTipoVehiculo = document.getElementById("editTipoVehiculo").value || null;
+
+                        // Validar que la placa esté presente
+                        if (!placa) {
+                            alert("La placa es obligatoria.");
+                            return;
+                        }
+
+                        try {
+                            // Enviar los datos al backend mediante fetch
+                            const response = await fetch(`/app/servicios/editar-detalle-servicio/${id}`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: new URLSearchParams({
+                                    placa,
+                                    nombre,
+                                    telefono,
+                                    identificacion,
+                                    marca,
+                                    modelo,
+                                    idTipoVehiculo: idTipoVehiculo || ""
+                                })
+                            });
+
+                            if (response.ok) {
+                                alert("Detalle de servicio editado correctamente.");
+                                location.reload(); // Recargar la página
+                            } else {
+                                const errorText = await response.text();
+                                alert("Error al editar el detalle del servicio: " + errorText);
+                            }
+                        } catch (error) {
+                            alert("Ocurrió un error: " + error.message);
+                        }
+                    });
+                });
+
+
+            </script>
             <script>
                 function eliminarDesdeBoton(boton) {
                     const id = boton.getAttribute("data-id");
@@ -547,8 +593,7 @@
 
 
     <!-- Modal para Añadir Servicio -->
-    <div class="modal fade" id="addServicioModal" tabindex="-1" aria-labelledby="addServicioModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="addServicioModal" tabindex="-1" aria-labelledby="addServicioModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -556,69 +601,151 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addServicioForm">
+                    <form id="addServicioForm" action="/app/servicios/agregar-detalle-venta" method="POST">
+                        <!-- Tipo de Venta -->
                         <div class="mb-3">
+                            <input type="hidden" name="idDetalle" id="detalleId">
                             <label for="tipoVenta" class="form-label">Tipo de Venta</label>
-                            <select class="form-select" id="tipoVenta" required>
-                                <option selected disabled>Seleccione una opción</option>
-                                <option value="Producto">Producto</option>
-                                <option value="Servicio">Servicio</option>
+                            <select class="form-select" id="tipoVenta" name="tipoVenta" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option th:each="tipoItem : ${listaTipoItem}"
+                                        th:value="${tipoItem.id}"
+                                        th:text="${tipoItem.nombre}">
+                                </option>
                             </select>
                         </div>
+
+                        <!-- Producto Container -->
                         <div id="productoContainer" class="mb-3 d-none">
                             <label for="producto" class="form-label">Producto</label>
-                            <input type="text" id="producto" class="form-control" placeholder="Ingrese el producto">
+                            <select class="form-select" id="producto" name="producto">
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option th:each="producto : ${listaProducto}"
+                                        th:value="${producto.id}"
+                                        th:text="${producto.nombre}">
+                                </option>
+                            </select>
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" name="cantidad" id="cantidad" class="form-control" placeholder="Ingresa la cantidad" value="1" min="1">
                         </div>
+
+
+                        <!-- Servicio Container -->
                         <div id="servicioContainer" class="d-none">
+                            <!-- Tipo de Servicio -->
                             <div class="mb-3">
                                 <label for="tipoServicio" class="form-label">Tipo de Servicio</label>
-                                <select class="form-select" id="tipoServicio">
+                                <select class="form-select" id="tipoServicio" name="tipoServicio">
                                     <option selected disabled>Seleccione un tipo de servicio</option>
                                     <option value="Basico">Servicio Básico</option>
                                     <option value="Especial">Servicio Especial</option>
                                 </select>
                             </div>
+
+                            <!-- Servicio Básico Container -->
                             <div id="servicioBasicoContainer" class="mb-3 d-none">
                                 <label for="servicioBasico" class="form-label">Servicio Básico</label>
-                                <select class="form-select" id="servicioBasico">
-                                    <option value="Lavado Basico">Lavado Básico</option>
-                                    <option value="Lavado Basico + Cera">Lavado Básico + Cera</option>
-                                    <option value="Lavado Basico + Cera Carnauba">Lavado Básico + Cera Carnauba</option>
+                                <select class="form-select" id="servicioBasico" name="servicioBasico">
+                                    <option value="" selected disabled>Seleccione una opción</option>
+                                    <option th:each="servicioBasico : ${listaTipoServicioBasico}"
+                                            th:value="${servicioBasico.id}"
+                                            th:text="${servicioBasico.nombre}">
+                                    </option>
                                 </select>
                             </div>
+
+                            <!-- Servicio Especial Container -->
                             <div id="servicioEspecialContainer" class="mb-3 d-none">
                                 <label for="servicioEspecial" class="form-label">Servicio Especial</label>
-                                <select class="form-select" id="servicioEspecial">
-                                    <option value="Lavado Salon">Lavado Salón</option>
-                                    <option value="Lavado Asientos">Lavado Asientos</option>
-                                    <option value="Lavado Cinturones">Lavado Cinturones</option>
-                                    <option value="Lavado de Techo">Lavado de Techo</option>
-                                    <option value="Lavado de Pisos">Lavado de Pisos</option>
-                                    <option value="Tratamiento de Cueros">Tratamiento de Cueros</option>
-                                    <option value="Tratamiento de Faros">Tratamiento de Faros</option>
-                                    <option value="Descontaminacion de Pinturas">Descontaminación de Pinturas</option>
-                                    <option value="Lavado de Motor">Lavado de Motor</option>
-                                    <option value="Lavado de Alfombra">Lavado de Alfombra</option>
-                                    <option value="Lavado de Chasis">Lavado de Chasis</option>
+                                <select class="form-select" id="servicioEspecial" name="servicioEspecial">
+                                    <option value="" selected disabled>Seleccione una opción</option>
+                                    <option th:each="servicioEspecial : ${listaTipoServicioEspecial}"
+                                            th:value="${servicioEspecial.id}"
+                                            th:text="${servicioEspecial.nombre}">
+                                    </option>
                                 </select>
                             </div>
                         </div>
+
+                        <!-- Colaborador -->
                         <div class="mb-3">
-                            <label for="colaborador" class="form-label">Colaborador</label>
-                            <select class="form-select" id="colaborador">
-                                <option selected disabled>Seleccione un colaborador</option>
-                                <!-- Opciones se generarán dinámicamente -->
+                            <label for="collaboratorSelect" class="form-label">Colaborador</label>
+                            <select class="form-select" id="collaboratorSelect" name="idColaborador" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <th:block th:each="colaborador : ${listaColaboradores}">
+                                    <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
+                                </th:block>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary" form="addServicioForm">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <!-- JavaScript -->
+    <script>
+        //enviar el id del detalle servicio al modal:
+            document.addEventListener('DOMContentLoaded', function () {
+                const addServiceButtons = document.querySelectorAll('.add-service-btn');
+                addServiceButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const detalleId = this.getAttribute('data-id');
+                        document.getElementById('detalleId').value = detalleId;
+                    });
+                });
+            });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cambios dinámicos en el tipo de venta
+            const tipoVentaSelect = document.getElementById('tipoVenta');
+            const productoContainer = document.getElementById('productoContainer');
+            const servicioContainer = document.getElementById('servicioContainer');
+
+            tipoVentaSelect.addEventListener('change', function () {
+                const tipo = tipoVentaSelect.value;
+                productoContainer.classList.toggle('d-none', tipo !== '2');
+                servicioContainer.classList.toggle('d-none', tipo !== '1');
+
+                // Si se muestra el contenedor de producto o servicio, selecciona el primer option
+                if (tipo === '2') { // Producto
+                    document.getElementById('producto').selectedIndex = 0; // Selecciona el primer producto
+                }
+                if (tipo === '1') { // Servicio
+                    document.getElementById('tipoServicio').selectedIndex = 0; // Selecciona el primer tipo de servicio
+                    // Resetea los servicios básicos y especiales a su primer opción
+                    document.getElementById('servicioBasico').selectedIndex = 0;
+                    document.getElementById('servicioEspecial').selectedIndex = 0;
+                }
+            });
+
+            // Cambios dinámicos en el tipo de servicio
+            const tipoServicioSelect = document.getElementById('tipoServicio');
+            const servicioBasicoContainer = document.getElementById('servicioBasicoContainer');
+            const servicioEspecialContainer = document.getElementById('servicioEspecialContainer');
+
+            tipoServicioSelect.addEventListener('change', function () {
+                const tipoServicio = tipoServicioSelect.value;
+                servicioBasicoContainer.classList.toggle('d-none', tipoServicio !== 'Basico');
+                servicioEspecialContainer.classList.toggle('d-none', tipoServicio !== 'Especial');
+
+                // Resetea los servicios a su primer opción al mostrar un contenedor
+                if (tipoServicio === 'Basico') {
+                    document.getElementById('servicioBasico').selectedIndex = 0;
+                }
+                if (tipoServicio === 'Especial') {
+                    document.getElementById('servicioEspecial').selectedIndex = 0;
+                }
+            });
+        });
+    </script>
+
+
+
     <!-- Modal para Pagar -->
     <div class="modal fade" id="pagarModal" tabindex="-1" aria-labelledby="pagarModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -679,6 +806,7 @@
             var table = $('#example').DataTable({
                 language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
             });
+
         });
 
     </script>
