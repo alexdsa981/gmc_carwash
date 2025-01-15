@@ -99,13 +99,16 @@ public class ServiciosController {
         vehiculo.setMarca(marca);
         vehiculo.setModelo(modelo);
 
-        tipoVehiculoRepository.findById(idTipoVehiculo)
-                .ifPresentOrElse(
-                        vehiculo::setTipo_vehiculo,
-                        () -> {
-                            throw new IllegalArgumentException("El tipo de vehículo no existe");
-                        }
-                );
+        if (idTipoVehiculo != null) {
+            tipoVehiculoRepository.findById(idTipoVehiculo)
+                    .ifPresentOrElse(
+                            vehiculo::setTipo_vehiculo,
+                            () -> {
+                                throw new IllegalArgumentException("El tipo de vehículo no existe");
+                            }
+                    );
+        }
+
 
         vehiculo.setCliente(cliente);
         vehiculoRepository.save(vehiculo);
@@ -119,6 +122,16 @@ public class ServiciosController {
         detalleAtencionRepository.save(detalleAtencion);
 
         return ResponseEntity.ok("Ingreso agregado correctamente");
+    }
+
+    @PostMapping("/eliminar-ingreso/{id}")
+    public ResponseEntity<String> eliminarIngreso(@PathVariable("id") Long id) {
+        if (detalleAtencionRepository.existsById(id)) {
+            detalleAtencionRepository.deleteById(id);
+            return ResponseEntity.ok("Ingreso eliminado correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Detalle de atención no encontrado");
+        }
     }
 
 
