@@ -1,10 +1,10 @@
 package GMC.carwash_system.controller;
 
 
-import GMC.carwash_system.model.clasificadores.ConceptoPago;
 import GMC.carwash_system.model.clasificadores.TipoItem;
 import GMC.carwash_system.model.clasificadores.TipoServicio;
 import GMC.carwash_system.model.clasificadores.TipoVehiculo;
+import GMC.carwash_system.model.dto.DetalleVentaDTO;
 import GMC.carwash_system.model.entidades.*;
 import GMC.carwash_system.repository.clasificadores.TipoItemRepository;
 import GMC.carwash_system.repository.clasificadores.TipoServicioRepository;
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ public class ServiciosController {
     @Autowired
     VehiculoRepository vehiculoRepository;
     @Autowired
-    DetalleAtencionRepository detalleAtencionRepository;
+    DetalleIngresoVehiculoRepository detalleIngresoVehiculoRepository;
     @Autowired
     TipoItemRepository tipoItemRepository;
     @Autowired
@@ -54,7 +55,27 @@ public class ServiciosController {
     ColaboradorRepository colaboradorRepository;
 
     public Model retornaListaIngresoClientes(Model model) {
-        List<DetalleAtencion> listaIngresos= detalleAtencionRepository.findAll();
+        List<DetalleIngresoVehiculo> listaIngresos= detalleIngresoVehiculoRepository.findAll();
+            for (DetalleIngresoVehiculo ingreso : listaIngresos){
+                if (ingreso.getListaDetalleVentas() != null) {
+                    List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
+                    for (DetalleVenta detalleVenta: ingreso.getListaDetalleVentas()){
+                        DetalleVentaDTO detalleVentaDTO = new DetalleVentaDTO(detalleVenta);
+
+                        if (detalleVenta.getTipoItem().getId() == 1){
+                            detalleVentaDTO.setNombreItem(tipoServicioRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+                        } else if (detalleVenta.getTipoItem().getId() == 2){
+                            detalleVentaDTO.setNombreItem(productoRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+                        }else{
+                            detalleVentaDTO.setNombreItem("N/D");
+                        }
+
+
+                        listaDetallesDTO.add(detalleVentaDTO);
+                    }
+                    ingreso.setListaDetalleVentasDTO(listaDetallesDTO);
+                }
+        }
         model.addAttribute("listaIngresos", listaIngresos);
         return model;
     }
@@ -95,7 +116,7 @@ public class ServiciosController {
     @PostMapping("/agregar-detalle-venta")
     public String addServicio(
             @RequestParam("tipoVenta") Long idTipoVenta,
-            @RequestParam("idDetalle") Long idDetalleServicio,
+            @RequestParam("idDetalle") Long idDetalleIngreso,
             @RequestParam(value = "producto", required = false) Long IDproducto,
             @RequestParam(value = "cantidad", required = false) Integer cantidad,
             @RequestParam(value = "servicioBasico", required = false) Long IDservicioBasico,
@@ -103,8 +124,8 @@ public class ServiciosController {
             @RequestParam("precio") BigDecimal precioUnitarioPersonalizado,
             @RequestParam("idColaborador") Long idColaborador) {
 
-        DetalleAtencion detalleAtencion = detalleAtencionRepository.findById(idDetalleServicio).get();
-        TipoVehiculo tipoVehiculo = detalleAtencion.getVehiculo().getTipo_vehiculo();
+        DetalleIngresoVehiculo detalleIngresoVehiculo = detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get();
+        TipoVehiculo tipoVehiculo = detalleIngresoVehiculo.getVehiculo().getTipo_vehiculo();
         DetalleVenta detalleVenta = new DetalleVenta();
         if (idTipoVenta == 1){ //SERVICIO
             detalleVenta.setCantidad(1);
@@ -147,13 +168,13 @@ public class ServiciosController {
             }
         }
         detalleVenta.setColaborador(colaboradorRepository.findById(idColaborador).get());
-//
-//        detalleVentaRepository.save(detalleVenta);
+        detalleVenta.setDetalleIngresoVehiculo(detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get());
+        detalleVentaRepository.save(detalleVenta);
 
         // Imprimir los valores enviados
         System.out.println("-------------Recibidos-------------");
         System.out.println("Tipo de Venta: " + idTipoVenta);
-        System.out.println("id detalle" + idDetalleServicio);
+        System.out.println("id detalle" + idDetalleIngreso);
         System.out.println("Producto: " + IDproducto);
         System.out.println("cantidad: " + cantidad);
         System.out.println("Servicio Básico: " + IDservicioBasico);
@@ -162,6 +183,7 @@ public class ServiciosController {
         System.out.println("Colaborador ID: " + idColaborador);
         System.out.println("-------------Detalle Venta-------------");
         System.out.println("TIPO DE VENTA:" + detalleVenta.getTipoItem().getNombre());
+        System.out.println("id detalle ingreso" + idDetalleIngreso);
         System.out.println("ID ITEM:" + detalleVenta.getIdItem());
         System.out.println("CANTIDAD: " + detalleVenta.getCantidad());
         System.out.println("PRECIO UNITARIO:" + detalleVenta.getPrecio_unitario());
@@ -215,12 +237,12 @@ public class ServiciosController {
         vehiculoRepository.save(vehiculo);
 
         // Crear y guardar el detalle de atención
-        DetalleAtencion detalleAtencion = new DetalleAtencion();
-        detalleAtencion.setCliente(cliente);
-        detalleAtencion.setVehiculo(vehiculo);
-        detalleAtencion.setFecha(LocalDate.now());
-        detalleAtencion.setHora(LocalTime.now());
-        detalleAtencionRepository.save(detalleAtencion);
+        DetalleIngresoVehiculo detalleIngresoVehiculo = new DetalleIngresoVehiculo();
+        detalleIngresoVehiculo.setCliente(cliente);
+        detalleIngresoVehiculo.setVehiculo(vehiculo);
+        detalleIngresoVehiculo.setFecha(LocalDate.now());
+        detalleIngresoVehiculo.setHora(LocalTime.now());
+        detalleIngresoVehiculoRepository.save(detalleIngresoVehiculo);
 
         return ResponseEntity.ok("Ingreso agregado correctamente");
     }
@@ -228,7 +250,7 @@ public class ServiciosController {
 
 
     @PostMapping("/editar-detalle-servicio/{id}")
-    public ResponseEntity<String> editarDetalleAtencion(
+    public ResponseEntity<String> editarDetalleIngreso(
             @PathVariable("id") Long idDetalle,
             @RequestParam(value = "placa", required = false) String placa,
             @RequestParam(value = "nombre", required = false) String nombre,
@@ -238,9 +260,9 @@ public class ServiciosController {
             @RequestParam(value = "modelo", required = false) String modelo,
             @RequestParam(value = "idTipoVehiculo", required = false) Long idTipoVehiculo
     ) {
-        DetalleAtencion detalleAtencion = detalleAtencionRepository.findById(idDetalle).get();
-        Cliente cliente = detalleAtencion.getCliente();
-        Vehiculo vehiculo = detalleAtencion.getVehiculo();
+        DetalleIngresoVehiculo detalleIngresoVehiculo = detalleIngresoVehiculoRepository.findById(idDetalle).get();
+        Cliente cliente = detalleIngresoVehiculo.getCliente();
+        Vehiculo vehiculo = detalleIngresoVehiculo.getVehiculo();
 
         cliente.setNombre(nombre);
         cliente.setTelefono(telefono);
@@ -260,11 +282,11 @@ public class ServiciosController {
 
     @PostMapping("/eliminar-ingreso/{id}")
     public ResponseEntity<String> eliminarIngreso(@PathVariable("id") Long id) {
-        if (detalleAtencionRepository.existsById(id)) {
-            detalleAtencionRepository.deleteById(id);
+        if (detalleIngresoVehiculoRepository.existsById(id)) {
+            detalleIngresoVehiculoRepository.deleteById(id);
             return ResponseEntity.ok("Ingreso eliminado correctamente");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Detalle de atención no encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Detalle de Ingreso no encontrado");
         }
     }
 

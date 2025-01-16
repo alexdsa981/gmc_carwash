@@ -39,6 +39,11 @@ public class DetalleVenta {
 
     @ManyToOne
     @JoinColumn(name = "id_colaborador", nullable = false)
+
     private Colaborador colaborador;
+
+    @ManyToOne
+    @JoinColumn(name = "id_entrada_vehiculo", nullable = false)
+    private DetalleIngresoVehiculo detalleIngresoVehiculo;
 
 }

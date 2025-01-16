@@ -76,19 +76,39 @@
                                 </td>
                                 <td th:text="${detalle.cliente != null ? detalle.cliente.nombre : ''}">CLIENTE</td>
                                 <td th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELEFONO</td>
-                                <td th:text="${detalle.tipo_servicio != null ? detalle.tipo_servicio.nombre : ''}">
-                                    SERVICIOS/PRODUCTOS
-                                </td>
                                 <td>
+                                    <ul>
+                                        <!-- Servicios -->
+                                        <strong th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">Servicios:</strong>
+                                        <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}" th:if="${detalleVenta.tipoItemNombre == 'Servicio'}">
+                                            <span th:text="${detalleVenta.nombreItem}"></span>
+                                            - <span th:text="'S/.' + ${detalleVenta.subtotal}"></span>,
+                                             <span th:text="${detalleVenta.colaborador.nombre}"></span>
 
+                                        </li>
+                                        <!-- Productos -->
+                                        <strong th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">Productos:</strong>
+                                        <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}" th:if="${detalleVenta.tipoItemNombre == 'Producto'}">
+                                            <span th:text="${detalleVenta.nombreItem}"></span>,
+                                            x<span th:text="${detalleVenta.cantidad}"></span>,
+                                            Subtotal: <span th:text="'S/.' + ${detalleVenta.subtotal}"></span>
+                                        </li>
+                                    </ul>
+                                </td>
+
+
+                                <td>
                                     <button class="btn btn-success btn-sm add-service-btn" title="Añadir Servicio"
                                             data-bs-toggle="modal" data-bs-target="#addServicioModal"
                                             th:data-id="${detalle.id}">
                                         <i class="bi bi-plus"></i>
                                     </button>
 
-                                    <button class="btn btn-warning btn-sm" title="Pagar"><i
-                                            class="bi bi-currency-dollar"></i></button>
+                                    <button class="btn btn-warning btn-sm" title="Pagar" data-bs-toggle="modal" data-bs-target="#pagarModal"
+                                            th:data-servicios="${detalle.listaDetalleVentasDTO}">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </button>
+
 
                                     <button class="btn btn-primary btn-sm edit-btn" title="Editar"
                                         th:data-id="${detalle.id}"
@@ -761,13 +781,13 @@
                 <div class="modal-body">
                     <table class="table table-bordered">
                         <thead>
-                            <tr>
-                                <th>Producto/Servicio</th>
-                                <th>Precio</th>
-                            </tr>
+                        <tr>
+                            <th>Producto/Servicio</th>
+                            <th>Precio</th>
+                        </tr>
                         </thead>
                         <tbody id="detallePago">
-                            <!-- Aquí se llenará dinámicamente con datos desde tu base de datos -->
+                        <!-- Aquí se llenará dinámicamente con datos desde tu base de datos -->
                         </tbody>
                     </table>
                     <div class="mb-3">
@@ -792,6 +812,31 @@
             </div>
         </div>
     </div>
+    <script>
+        // Cuando se abre el modal, llenar el contenido con los servicios del botón
+        const pagarModal = document.getElementById('pagarModal');
+        pagarModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;  // El botón que abrió el modal
+            const servicios = JSON.parse(button.getAttribute('data-servicios'));  // Obtener los servicios
+
+            const detallePago = document.getElementById('detallePago');
+            detallePago.innerHTML = '';  // Limpiar la tabla
+
+            let total = 0;
+            servicios.forEach(servicio => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${servicio.nombreItem}</td>
+                    <td>S/. ${servicio.subtotal}</td>
+                `;
+                detallePago.appendChild(row);
+                total += servicio.subtotal;  // Acumular el total
+            });
+
+            // Llenar el total
+            document.getElementById('total').value = 'S/. ' + total.toFixed(2);
+        });
+    </script>
 
 
     <!-- Bootstrap Icons -->
