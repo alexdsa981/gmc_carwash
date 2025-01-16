@@ -100,6 +100,7 @@ public class ServiciosController {
             @RequestParam(value = "cantidad", required = false) Integer cantidad,
             @RequestParam(value = "servicioBasico", required = false) Long IDservicioBasico,
             @RequestParam(value = "servicioEspecial", required = false) Long IDservicioEspecial,
+            @RequestParam("precio") BigDecimal precioUnitarioPersonalizado,
             @RequestParam("idColaborador") Long idColaborador) {
 
         DetalleAtencion detalleAtencion = detalleAtencionRepository.findById(idDetalleServicio).get();
@@ -110,15 +111,26 @@ public class ServiciosController {
             if (IDservicioBasico != null){
                 detalleVenta.setIdItem(IDservicioBasico);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(1L).get());
-                detalleVenta.setPrecio_unitario(precioServicioRepository.buscarPorTipoServicioYVehiculo(IDservicioBasico, tipoVehiculo.getId()).get().getPrecio());
-                detalleVenta.setSubtotal(detalleVenta.getSubtotal());
-                //AGREGAR PRECION CON PRECIOVEHICULO
+                //si no se agrega precio, puede usarse uno personalizado
+                if (precioUnitarioPersonalizado == null){
+                    detalleVenta.setPrecio_unitario(precioServicioRepository.buscarPorTipoServicioYVehiculo(IDservicioBasico, tipoVehiculo.getId()).get().getPrecio());
+                    detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario());
+                }else{
+                    detalleVenta.setPrecio_unitario(precioUnitarioPersonalizado);
+                    detalleVenta.setSubtotal(precioUnitarioPersonalizado);
+                }
             }
             if (IDservicioEspecial != null){
                 detalleVenta.setIdItem(IDservicioEspecial);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(1L).get());
-                detalleVenta.setPrecio_unitario(precioServicioRepository.buscarPorTipoServicioYVehiculo(IDservicioEspecial, tipoVehiculo.getId()).get().getPrecio());
-                detalleVenta.setSubtotal(detalleVenta.getSubtotal());
+                //si no se agrega precio, puede usarse uno personalizado
+                if (precioUnitarioPersonalizado == null){
+                    detalleVenta.setPrecio_unitario(precioServicioRepository.buscarPorTipoServicioYVehiculo(IDservicioBasico, tipoVehiculo.getId()).get().getPrecio());
+                    detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario());
+                }else{
+                    detalleVenta.setPrecio_unitario(precioUnitarioPersonalizado);
+                    detalleVenta.setSubtotal(precioUnitarioPersonalizado);
+                }
             }
         }if (idTipoVenta == 2){ //PRODUCTO
             detalleVenta.setColaborador(null);
@@ -126,22 +138,36 @@ public class ServiciosController {
                 detalleVenta.setIdItem(IDproducto);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(2L).get());
                 detalleVenta.setCantidad(cantidad);
-                detalleVenta.setPrecio_unitario(productoRepository.findById(IDproducto).get().getPrecio_venta());
+                if (precioUnitarioPersonalizado == null){
+                    detalleVenta.setPrecio_unitario(productoRepository.findById(IDproducto).get().getPrecio_venta());
+                }else{
+                    detalleVenta.setPrecio_unitario(precioUnitarioPersonalizado);
+                }
                 detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario().multiply(BigDecimal.valueOf(cantidad)));
             }
         }
         detalleVenta.setColaborador(colaboradorRepository.findById(idColaborador).get());
-
-        detalleVentaRepository.save(detalleVenta);
+//
+//        detalleVentaRepository.save(detalleVenta);
 
         // Imprimir los valores enviados
+        System.out.println("-------------Recibidos-------------");
         System.out.println("Tipo de Venta: " + idTipoVenta);
-        System.out.println("cantidad: " + cantidad);
+        System.out.println("id detalle" + idDetalleServicio);
         System.out.println("Producto: " + IDproducto);
+        System.out.println("cantidad: " + cantidad);
         System.out.println("Servicio Básico: " + IDservicioBasico);
         System.out.println("Servicio Especial: " + IDservicioEspecial);
+        System.out.println("precio: " + precioUnitarioPersonalizado);
         System.out.println("Colaborador ID: " + idColaborador);
-        System.out.println("id detalle" + idDetalleServicio);
+        System.out.println("-------------Detalle Venta-------------");
+        System.out.println("TIPO DE VENTA:" + detalleVenta.getTipoItem().getNombre());
+        System.out.println("ID ITEM:" + detalleVenta.getIdItem());
+        System.out.println("CANTIDAD: " + detalleVenta.getCantidad());
+        System.out.println("PRECIO UNITARIO:" + detalleVenta.getPrecio_unitario());
+        System.out.println("SUBTOTAL: " + detalleVenta.getSubtotal());
+        System.out.println("ID COLABORADOR: " + detalleVenta.getColaborador().getId());
+        System.out.println("VENTA: " + detalleVenta.getVenta());
 
         return "redirect:/servicios";
     }

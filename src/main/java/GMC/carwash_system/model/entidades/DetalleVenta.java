@@ -19,7 +19,7 @@ public class DetalleVenta {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_venta", nullable = false)
+    @JoinColumn(name = "id_venta")
     private Venta venta;
 
     @ManyToOne
