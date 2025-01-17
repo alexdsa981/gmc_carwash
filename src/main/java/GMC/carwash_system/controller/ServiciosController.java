@@ -1,33 +1,32 @@
 package GMC.carwash_system.controller;
 
 
+import GMC.carwash_system.model.clasificadores.MetodoPago;
 import GMC.carwash_system.model.clasificadores.TipoItem;
 import GMC.carwash_system.model.clasificadores.TipoServicio;
 import GMC.carwash_system.model.clasificadores.TipoVehiculo;
 import GMC.carwash_system.model.dto.DetalleVentaDTO;
 import GMC.carwash_system.model.entidades.*;
+import GMC.carwash_system.repository.clasificadores.MetodoPagoRepository;
 import GMC.carwash_system.repository.clasificadores.TipoItemRepository;
 import GMC.carwash_system.repository.clasificadores.TipoServicioRepository;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/app/servicios")
@@ -53,9 +52,13 @@ public class ServiciosController {
     DetalleVentaRepository detalleVentaRepository;
     @Autowired
     ColaboradorRepository colaboradorRepository;
+    @Autowired
+    MetodoPagoRepository metodoPagoRepository;
+    @Autowired
+    VentaRepository ventaRepository;
 
     public Model retornaListaIngresoClientes(Model model) {
-        List<DetalleIngresoVehiculo> listaIngresos= detalleIngresoVehiculoRepository.findAll();
+        List<DetalleIngresoVehiculo> listaIngresos= detalleIngresoVehiculoRepository.findByRealizadoFalse();
             for (DetalleIngresoVehiculo ingreso : listaIngresos){
                 if (ingreso.getListaDetalleVentas() != null) {
                     List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
@@ -112,6 +115,98 @@ public class ServiciosController {
         model.addAttribute("listaTipoItem", listaTipoItem);
         return model;
     }
+    public Model retornaListaMetodoPago(Model model) {
+        List<MetodoPago> ListaMetodoPago= metodoPagoRepository.findAll();
+        model.addAttribute("ListaMetodoPago", ListaMetodoPago);
+        return model;
+    }
+
+
+    @PostMapping("/venta")
+    public ResponseEntity<?> procesarPago(@RequestBody Map<String, Object> body) {
+        try {
+            // Extraer los datos del JSON recibido
+            BigDecimal total = new BigDecimal(body.get("total").toString());
+            Long idMetodoPago = Long.parseLong(body.get("metodoPago").toString());
+            String detalleVentaIdsJson = body.get("detalleVentaIds").toString();
+
+            System.out.println("Total: " + total);
+            System.out.println("Método de pago: " + idMetodoPago);
+            System.out.println("Detalle Venta IDs (JSON): " + detalleVentaIdsJson);
+
+            // Deserializar el JSON de los IDs de detalleVenta como una lista de objetos
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Object> detalleVentaIdsObjects = objectMapper.readValue(detalleVentaIdsJson, List.class);
+
+            // Convertir la lista de objetos a una lista de Longs
+            List<Long> detalleVentaIds = new ArrayList<>();
+            for (Object idObj : detalleVentaIdsObjects) {
+                try {
+                    // Convertir cada objeto a Long (en caso de que sea Integer o String)
+                    detalleVentaIds.add(Long.parseLong(idObj.toString()));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Formato inválido para el ID de detalleVenta: " + idObj);
+                }
+            }
+
+            // Verificar que la lista de detalleVentaIds no esté vacía
+            if (detalleVentaIds.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", "No se proporcionaron IDs de detalle de venta"));
+            }
+
+            DetalleVenta primerDetalleVenta = detalleVentaRepository.findById(detalleVentaIds.get(0)).get();
+            Cliente cliente = primerDetalleVenta.getDetalleIngresoVehiculo().getCliente();
+            DetalleIngresoVehiculo detalleIngresoVehiculo = primerDetalleVenta.getDetalleIngresoVehiculo();
+            detalleIngresoVehiculo.setRealizado(Boolean.TRUE);
+            detalleIngresoVehiculoRepository.save(detalleIngresoVehiculo);
+
+            // Lógica para procesar el pago
+            Venta venta = new Venta();
+            venta.setTotal(total);
+            venta.setMetodoPago(metodoPagoRepository.findById(idMetodoPago).orElseThrow(() -> new IllegalArgumentException("Método de pago no encontrado")));
+            venta.setCliente(cliente);
+            venta.setFecha(LocalDate.now());
+            venta.setHora(LocalTime.now());
+            ventaRepository.save(venta);
+
+            for (Long id : detalleVentaIds){
+                DetalleVenta detalleVenta = detalleVentaRepository.findById(id).get();
+                detalleVenta.setVenta(venta);
+                detalleVentaRepository.save(detalleVenta);
+            }
+
+            // Respuesta de éxito
+            return ResponseEntity.ok().build();  // Respuesta vacía, solo éxito
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
+
+
+
+    @GetMapping("/ingreso/{idIngreso}")
+    @ResponseBody
+    public List<DetalleVentaDTO> obtenerServicios(@PathVariable Long idIngreso) {
+        List<DetalleVenta> listaDetallesVenta = detalleVentaRepository.findByDetalleIngresoVehiculoId(idIngreso);
+        List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
+
+        for (DetalleVenta detalleVenta : listaDetallesVenta) {
+            DetalleVentaDTO detalleVentaDTO = new DetalleVentaDTO(detalleVenta);
+            if (detalleVenta.getTipoItem().getId() == 1) {
+                detalleVentaDTO.setNombreItem(tipoServicioRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+            } else if (detalleVenta.getTipoItem().getId() == 2) {
+                detalleVentaDTO.setNombreItem(productoRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+            } else {
+                detalleVentaDTO.setNombreItem("N/D");
+            }
+            listaDetallesDTO.add(detalleVentaDTO);
+        }
+        return listaDetallesDTO;
+    }
+
+
 
     @PostMapping("/agregar-detalle-venta")
     public String addServicio(
@@ -239,6 +334,7 @@ public class ServiciosController {
         // Crear y guardar el detalle de atención
         DetalleIngresoVehiculo detalleIngresoVehiculo = new DetalleIngresoVehiculo();
         detalleIngresoVehiculo.setCliente(cliente);
+        detalleIngresoVehiculo.setRealizado(Boolean.FALSE);
         detalleIngresoVehiculo.setVehiculo(vehiculo);
         detalleIngresoVehiculo.setFecha(LocalDate.now());
         detalleIngresoVehiculo.setHora(LocalTime.now());
@@ -282,6 +378,7 @@ public class ServiciosController {
 
     @PostMapping("/eliminar-ingreso/{id}")
     public ResponseEntity<String> eliminarIngreso(@PathVariable("id") Long id) {
+
         if (detalleIngresoVehiculoRepository.existsById(id)) {
             detalleIngresoVehiculoRepository.deleteById(id);
             return ResponseEntity.ok("Ingreso eliminado correctamente");

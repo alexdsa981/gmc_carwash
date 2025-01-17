@@ -105,9 +105,10 @@
                                     </button>
 
                                     <button class="btn btn-warning btn-sm" title="Pagar" data-bs-toggle="modal" data-bs-target="#pagarModal"
-                                            th:data-servicios="${detalle.listaDetalleVentasDTO}">
+                                            th:data-id="${detalle.id}">
                                         <i class="bi bi-currency-dollar"></i>
                                     </button>
+
 
 
                                     <button class="btn btn-primary btn-sm edit-btn" title="Editar"
@@ -783,7 +784,9 @@
                         <thead>
                         <tr>
                             <th>Producto/Servicio</th>
-                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Precio unitario</th>
+                            <th>Subtotal</th>
                         </tr>
                         </thead>
                         <tbody id="detallePago">
@@ -796,12 +799,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="metodoPago" class="form-label">Método de Pago</label>
-                        <select id="metodoPago" class="form-select" required>
-                            <option selected disabled>Seleccione un método</option>
-                            <option value="Yape">Yape</option>
-                            <option value="Plin">Plin</option>
-                            <option value="Transferencia">Transferencia</option>
-                            <option value="Efectivo">Efectivo</option>
+                        <select class="form-select" id="metodoPago" name="idMetodoPago" required>
+                            <option value="" selected disabled>Seleccione una opción</option>
+                            <th:block th:each="metodopago : ${ListaMetodoPago}">
+                                <option th:value="${metodopago.id}" th:text="${metodopago.nombre}"></option>
+                            </th:block>
                         </select>
                     </div>
                 </div>
@@ -813,30 +815,100 @@
         </div>
     </div>
     <script>
-        // Cuando se abre el modal, llenar el contenido con los servicios del botón
         const pagarModal = document.getElementById('pagarModal');
-        pagarModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;  // El botón que abrió el modal
-            const servicios = JSON.parse(button.getAttribute('data-servicios'));  // Obtener los servicios
+        pagarModal.addEventListener('show.bs.modal', async function (event) {
+            const button = event.relatedTarget;  // Botón que abrió el modal
+            const detalleId = button.getAttribute('data-id');  // ID del detalle ingreso
 
-            const detallePago = document.getElementById('detallePago');
-            detallePago.innerHTML = '';  // Limpiar la tabla
+            try {
+                const response = await fetch(`/app/servicios/ingreso/${detalleId}`);
+                const servicios = await response.json();
 
-            let total = 0;
-            servicios.forEach(servicio => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${servicio.nombreItem}</td>
-                    <td>S/. ${servicio.subtotal}</td>
-                `;
-                detallePago.appendChild(row);
-                total += servicio.subtotal;  // Acumular el total
+                const detallePago = document.getElementById('detallePago');
+                detallePago.innerHTML = '';  // Limpiar la tabla
+
+                let total = 0;
+                servicios.forEach(servicio => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-id', servicio.id);  // Agregar el atributo data-id aquí
+                    row.innerHTML = `
+                        <td>${servicio.nombreItem}</td>
+                        <td>${servicio.cantidad}</td>
+                        <td>${servicio.precio_unitario}</td>
+                        <td>S/. ${servicio.subtotal}</td>
+                    `;
+                    detallePago.appendChild(row);
+                    total += parseFloat(servicio.subtotal);  // Sumar el subtotal
+                });
+
+                document.getElementById('total').value = 'S/. ' + total.toFixed(2);
+            } catch (error) {
+                console.error("Error al obtener los servicios:", error);
+            }
+        });
+
+    </script>
+    <script>
+        document.getElementById('confirmarPago').addEventListener('click', async function () {
+            // Obtener los datos del modal
+            const total = document.getElementById('total').value.replace('S/. ', '').trim(); // Eliminar el prefijo de moneda
+            const metodoPago = document.getElementById('metodoPago').value; // Obtener el método de pago
+            const detallePagoRows = document.querySelectorAll('#detallePago tr'); // Filas de la tabla
+            const detalleVentaIds = []; // Lista de IDs de detalle_venta
+
+            // Extraer los IDs de detalle_venta (asumiendo que has agregado un atributo "data-id" en cada fila)
+            detallePagoRows.forEach(row => {
+                const id = row.getAttribute('data-id'); // Asume que has agregado el atributo data-id en cada fila
+                if (id) {
+                    detalleVentaIds.push(id);
+                }
             });
 
-            // Llenar el total
-            document.getElementById('total').value = 'S/. ' + total.toFixed(2);
+            // Validar datos requeridos
+            if (!metodoPago || detalleVentaIds.length === 0) {
+                console.log('Método de pago seleccionado:', metodoPago);
+                console.log('Lista id detalle venta:', detalleVentaIds);
+                alert('Debe seleccionar un método de pago y tener al menos un detalle para pagar.');
+                return;
+            }
+
+            try {
+                // Crear un objeto JSON para enviar los datos
+                const data = {
+                    total: total,
+                    metodoPago: metodoPago,
+                    detalleVentaIds: detalleVentaIds
+                };
+
+                // Verificar el contenido antes de enviarlo
+                console.log('Datos a enviar:', JSON.stringify(data));
+
+                // Realizar la solicitud POST con el objeto JSON
+                const response = await fetch('/app/servicios/venta', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Establecemos el tipo de contenido a JSON
+                    },
+                    body: JSON.stringify(data) // Enviar el objeto JSON
+                });
+
+                if (response.ok) {
+                    $('#pagarModal').modal('hide');
+                    window.location.reload();
+                } else {
+                    const error = await response.json();
+                    console.error('Error al realizar el pago:', error);
+                    alert('Error al realizar el pago: ' + error.message);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                alert('Ocurrió un error inesperado. Inténtelo de nuevo más tarde.');
+            }
         });
+
     </script>
+
+
 
 
     <!-- Bootstrap Icons -->

@@ -24,6 +24,7 @@ public class DetalleIngresoVehiculo {
     @JoinColumn(name = "id_vehiculo", nullable = false)
     private Vehiculo vehiculo;
 
+    private Boolean realizado;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)

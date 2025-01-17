@@ -39,6 +39,7 @@ public class WebController {
         serviciosController.retornaListaTipoItem(model);
         colaboradoresController.retornaListaColaboradores(model);
         serviciosController.retornaListaTipoServicio_Especial_Basico(model);
+        serviciosController.retornaListaMetodoPago(model);
         return "servicios/servicios";
     }
 
