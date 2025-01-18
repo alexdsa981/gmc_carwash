@@ -17,6 +17,8 @@ public class WebController {
     ClienteController clienteController;
     @Autowired
     ServiciosController serviciosController;
+    @Autowired
+    InventarioController inventarioController;
 
     @GetMapping("/")
     public String redirectToInicio() {
@@ -40,6 +42,7 @@ public class WebController {
         colaboradoresController.retornaListaColaboradores(model);
         serviciosController.retornaListaTipoServicio_Especial_Basico(model);
         serviciosController.retornaListaMetodoPago(model);
+        serviciosController.retornaListaRealizados(model);
         return "servicios/servicios";
     }
 
@@ -65,8 +68,28 @@ public class WebController {
     }
 
 
+    //PAGINAS DE INVENTARIO
+    @GetMapping("/inventario/lista")
+    public String paginaListaInventario(Model model) {
+        inventarioController.retornalistaProductos(model);
+        inventarioController.retornalistaTipoProductos(model);
+        return "inventario/lista";
+    }
 
+    //PAGINAS DE INVENTARIO
+    @GetMapping("/inventario/historial")
+    public String paginaListaHistorialInventario(Model model) {
+        inventarioController.retornaHistorialAlmacen(model);
+        inventarioController.retornalistaProductos(model);
+        inventarioController.retornalistaTipoProductos(model);
+        return "inventario/historial";
+    }
 
+    @GetMapping("/inventario/ex")
+    public String paginaInventario() {
+
+        return "ex/inventario";
+    }
 
     @GetMapping("/clientes/ex")
     public String paginaClientes() {

@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -113,61 +110,75 @@ public class InventarioController {
     @PostMapping("/producto-{id}/editar")
     public ResponseEntity<String> editarProducto(
             @PathVariable Long id,
-            @RequestParam("nombre")String nombre,
-            @RequestParam("precio_costo")BigDecimal precio_costo,
-            @RequestParam("precio_venta")BigDecimal precio_venta,
-            @RequestParam("id_tipo_producto")Long id_tipo_producto,
-            HttpServletResponse response
-
+            @RequestParam("nombre") String nombre,
+            @RequestParam("precio_costo") BigDecimal precioCosto,
+            @RequestParam("precio_venta") BigDecimal precioVenta,
+            @RequestParam("id_tipo_producto") Long idTipoProducto
     ) {
-        // Buscar al colaborador
+        // Buscar el producto
         Optional<Producto> optionalProducto = productoRepository.findById(id);
         if (optionalProducto.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
         }
 
+        // Buscar el tipo de producto
+        Optional<TipoProducto> optionalTipoProducto = tipoProductoRepository.findById(idTipoProducto);
+        if (optionalTipoProducto.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tipo de producto no encontrado");
+        }
+
+        // Actualizar los datos del producto
         Producto producto = optionalProducto.get();
         producto.setNombre(nombre);
-        producto.setTipo_producto(tipoProductoRepository.findById(id_tipo_producto).get());
-        producto.setPrecio_costo(precio_costo);
-        producto.setPrecio_venta(precio_venta);
+        producto.setTipo_producto(optionalTipoProducto.get());
+        producto.setPrecio_costo(precioCosto);
+        producto.setPrecio_venta(precioVenta);
 
-        //El stock debe cambiarse en otro modal donde se llenen los campos de hisotorial inventario
-        //producto.setStock(stock);
-
+        // Guardar cambios en la base de datos
         productoRepository.save(producto);
+
         return ResponseEntity.ok("Producto editado correctamente");
     }
 
-    //
-    //
-    //falta logica de eliminacion o desactivacion de producto
-    //
-    //
+    @DeleteMapping("/producto-{id}/eliminar")
+    public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
+        // Buscar el producto por ID
+        Optional<Producto> optionalProducto = productoRepository.findById(id);
+        if (optionalProducto.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
+        }
+
+        // Eliminar el producto
+        productoRepository.delete(optionalProducto.get());
+
+        return ResponseEntity.ok("Producto eliminado correctamente");
+    }
+
 
     @PostMapping("/producto-{id}/stock")
     public ResponseEntity<String> cambiarStock(
             @PathVariable Long id,
-            @RequestParam("cantidad")Integer cantidad,
-            @RequestParam("motivo")String motivo,
-            @RequestParam("precio_venta")BigDecimal precio_unitario, //costo del producto comprado
-            @RequestParam("id_producto")Long id_producto,
+            @RequestParam("cantidad") Integer cantidad,
+            @RequestParam("motivo") String motivo,
+            @RequestParam("precio_venta") BigDecimal precio_unitario,
             HttpServletResponse response
     ) throws IOException {
         Producto producto = productoRepository.findById(id).get();
-        if (cantidad < 0){
-            producto.setStock(producto.getStock() + cantidad);
-        }else if(cantidad > 0){
-            if (producto.getStock() < cantidad){
+        if (cantidad < 0) {
+            // Salida de stock (resta)
+            if (producto.getStock() < Math.abs(cantidad)) {
                 System.out.println("El Stock es insuficiente, valor negativo");
-                //
-                //Manejar logica cuando no hay stock
-                //
-                producto.setStock(producto.getStock() - cantidad);
-            }else{
-                producto.setStock(producto.getStock() - cantidad);
+                // Manejar caso de stock insuficiente (por ejemplo, lanzar una excepción o devolver un mensaje)
+                return ResponseEntity.badRequest().body("Stock insuficiente");
+            } else {
+                producto.setStock(producto.getStock() + cantidad); // Resta la cantidad negativa del stock
             }
+        } else if (cantidad > 0) {
+            // Entrada de stock (suma)
+            producto.setStock(producto.getStock() + cantidad); // Sumar la cantidad positiva al stock
         }
+
+
         HistorialAlmacen historialAlmacen = new HistorialAlmacen();
         historialAlmacen.setCantidad(cantidad);
         historialAlmacen.setFecha(LocalDate.now());
@@ -178,7 +189,8 @@ public class InventarioController {
         historialAlmacenRepository.save(historialAlmacen);
 
         response.sendRedirect("/inventario/lista");
-        return ResponseEntity.ok("Stock actualizado  correctamente");
+        return ResponseEntity.ok("Stock actualizado correctamente");
     }
+
 
 }

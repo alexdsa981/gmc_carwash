@@ -82,6 +82,32 @@ public class ServiciosController {
         model.addAttribute("listaIngresos", listaIngresos);
         return model;
     }
+    public Model retornaListaRealizados(Model model) {
+        List<DetalleIngresoVehiculo> listaIngresosRealizados= detalleIngresoVehiculoRepository.findByRealizadoTrue();
+        for (DetalleIngresoVehiculo ingreso : listaIngresosRealizados){
+            if (ingreso.getListaDetalleVentas() != null) {
+                List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
+                for (DetalleVenta detalleVenta: ingreso.getListaDetalleVentas()){
+                    DetalleVentaDTO detalleVentaDTO = new DetalleVentaDTO(detalleVenta);
+
+                    if (detalleVenta.getTipoItem().getId() == 1){
+                        detalleVentaDTO.setNombreItem(tipoServicioRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+                    } else if (detalleVenta.getTipoItem().getId() == 2){
+                        detalleVentaDTO.setNombreItem(productoRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+                    }else{
+                        detalleVentaDTO.setNombreItem("N/D");
+                    }
+                    listaDetallesDTO.add(detalleVentaDTO);
+                }
+                ingreso.setListaDetalleVentasDTO(listaDetallesDTO);
+            }
+        }
+        model.addAttribute("listaIngresosRealizados", listaIngresosRealizados);
+        return model;
+    }
+
+
+
 
     public Model retornaListaTipoServicio(Model model) {
         List<TipoServicio> listaTipoServicio = tipoServicioRepository.findAll();
