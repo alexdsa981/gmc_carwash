@@ -58,7 +58,7 @@ public class ServiciosController {
     VentaRepository ventaRepository;
 
     public Model retornaListaIngresoClientes(Model model) {
-        List<DetalleIngresoVehiculo> listaIngresos= detalleIngresoVehiculoRepository.findByRealizadoFalse();
+        List<DetalleIngresoVehiculo> listaIngresos= detalleIngresoVehiculoRepository.findByRealizadoFalseOrderByFechaDescHoraDesc();
             for (DetalleIngresoVehiculo ingreso : listaIngresos){
                 if (ingreso.getListaDetalleVentas() != null) {
                     List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
@@ -83,7 +83,7 @@ public class ServiciosController {
         return model;
     }
     public Model retornaListaRealizados(Model model) {
-        List<DetalleIngresoVehiculo> listaIngresosRealizados= detalleIngresoVehiculoRepository.findByRealizadoTrue();
+        List<DetalleIngresoVehiculo> listaIngresosRealizados= detalleIngresoVehiculoRepository.findByRealizadoTrueOrderByFechaDescHoraDesc();
         for (DetalleIngresoVehiculo ingreso : listaIngresosRealizados){
             if (ingreso.getListaDetalleVentas() != null) {
                 List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
@@ -131,11 +131,7 @@ public class ServiciosController {
         model.addAttribute("listaTipoVehiculo", listaTipoVehiculo);
         return model;
     }
-    public Model retornaListaProducto(Model model) {
-        List<Producto> listaProducto= productoRepository.findAll();
-        model.addAttribute("listaProducto", listaProducto);
-        return model;
-    }
+
     public Model retornaListaTipoItem(Model model) {
         List<TipoItem> listaTipoItem= tipoItemRepository.findAll();
         model.addAttribute("listaTipoItem", listaTipoItem);

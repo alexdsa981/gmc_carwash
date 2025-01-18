@@ -9,10 +9,11 @@ import java.util.List;
 @Repository
 public interface DetalleIngresoVehiculoRepository extends JpaRepository<DetalleIngresoVehiculo, Long> {
 
-    // Método para obtener los detalles con 'realizado' == true
-    List<DetalleIngresoVehiculo> findByRealizadoTrue();
+    // Método para obtener los detalles con 'realizado' == true, ordenados por fecha y hora descendente
+    List<DetalleIngresoVehiculo> findByRealizadoTrueOrderByFechaDescHoraDesc();
 
-    // Método para obtener los detalles con 'realizado' == false
-    List<DetalleIngresoVehiculo> findByRealizadoFalse();
+    // Método para obtener los detalles con 'realizado' == false, ordenados por fecha y hora descendente
+    List<DetalleIngresoVehiculo> findByRealizadoFalseOrderByFechaDescHoraDesc();
+
 
 }

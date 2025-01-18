@@ -17,12 +17,17 @@
 
 
 <div class="container mt-5" id="mainView">
-    <h2 class="text-center mb-4">Datos Colaborador</h2>
+    <h2 class="text-center mb-4">GMC Colaboradores</h2>
     <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="/inicio" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
+            </a>
+            <a class="btn btn-outline-secondary" href="/colaboradores/pagos">Ir a Pagos</a>
+        </div>
         <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal">
             Añadir Colaborador
         </button>
-        <a class="btn btn-outline-secondary" href="/colaboradores/pagos">Pagos</a>
     </div>
     <!-- Tabla de Colaboradores -->
     <table id="example" class="table table-striped table-bordered" style="width:100%">
@@ -221,7 +226,7 @@
                 if (result.isConfirmed) {
                     // Llamar a la API para eliminar el colaborador
                     fetch(`/app/colaboradores/eliminar/${colaboradorId}`, {
-                        method: 'DELETE'
+                        method: 'POST'
                     })
                         .then(response => {
                             if (response.ok) {

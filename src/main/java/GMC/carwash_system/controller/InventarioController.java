@@ -40,7 +40,7 @@ public class InventarioController {
     }
 
     public Model retornalistaProductos(Model model) {
-        List<Producto> listaProductos = productoRepository.findAll();
+        List<Producto> listaProductos = productoRepository.findByIsActiveTrue();
         model.addAttribute("listaProductos", listaProductos);
         return model;
     }
@@ -101,6 +101,7 @@ public class InventarioController {
         producto.setPrecio_venta(precio_venta);
         producto.setStock(stock);
         producto.setTipo_producto(tipoProductoRepository.findById(id_tipo_producto).get());
+        producto.setIsActive(Boolean.TRUE);
         productoRepository.save(producto);
 
         response.sendRedirect("/inventario/lista");
@@ -140,7 +141,7 @@ public class InventarioController {
         return ResponseEntity.ok("Producto editado correctamente");
     }
 
-    @DeleteMapping("/producto-{id}/eliminar")
+    @PostMapping("/producto-{id}/eliminar")
     public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
         // Buscar el producto por ID
         Optional<Producto> optionalProducto = productoRepository.findById(id);
@@ -149,7 +150,9 @@ public class InventarioController {
         }
 
         // Eliminar el producto
-        productoRepository.delete(optionalProducto.get());
+        Producto producto = optionalProducto.get();
+        producto.setIsActive(Boolean.FALSE);
+        productoRepository.save(producto);
 
         return ResponseEntity.ok("Producto eliminado correctamente");
     }

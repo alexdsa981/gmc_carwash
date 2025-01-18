@@ -22,6 +22,7 @@ public class Colaborador {
     private String telefono;
 
     private String descripcion;
+    private Boolean isActive;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal sueldo_fijo;

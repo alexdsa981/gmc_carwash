@@ -25,7 +25,7 @@ public class ColaboradoresController {
     ColaboradorRepository colaboradorRepository;
 
     public Model retornaListaColaboradores(Model model) {
-        List<Colaborador> listaColaboradores = colaboradorRepository.findAll();
+        List<Colaborador> listaColaboradores = colaboradorRepository.findByIsActiveTrue();
         model.addAttribute("listaColaboradores", listaColaboradores);
         return model;
     }
@@ -46,6 +46,7 @@ public class ColaboradoresController {
         colaborador.setIdentificacion(identificacion);
         colaborador.setSueldo_fijo(sueldo_fijo);
         colaborador.setDescripcion(descripcion);
+        colaborador.setIsActive(Boolean.TRUE);
 
         // Guardar el colaborador en la base de datos
         colaboradorRepository.save(colaborador);
@@ -88,14 +89,15 @@ public class ColaboradoresController {
 
 
     // Eliminar colaborador
-    @DeleteMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarColaborador(@PathVariable Long id) {
         Optional<Colaborador> optionalColaborador = colaboradorRepository.findById(id);
         if (optionalColaborador.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Colaborador no encontrado");
         }
-
-        colaboradorRepository.deleteById(id);
+        Colaborador colaborador = optionalColaborador.get();
+        colaborador.setIsActive(Boolean.FALSE);
+        colaboradorRepository.save(colaborador);
         return ResponseEntity.ok("Colaborador eliminado correctamente");
     }
 
