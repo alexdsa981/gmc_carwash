@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUADRE DE CAJA</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+</head>
+<style>
+    hr{
+        margin:0.6rem 0;
+    }
+    small p{
+        margin-bottom: 0rem;
+    }
+</style>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">CUADRE DE CAJA</h2>
+
+    <!-- Botones -->
+    <div class="mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filtroModal">FILTROS</button>
+        <button class="btn btn-secondary" id="quitarFiltro">QUITAR FILTRO</button>
+    </div>
+
+    <!-- DataTable -->
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+        <tr>
+            <th>FECHA</th>
+            <th>DÍA</th>
+            <th>VEHÍCULOS</th>
+            <th>PRODUCTOS</th>
+            <th>SERVICIOS</th>
+            <th>TOTAL</th>
+        </tr>
+        </thead>
+        <tbody id="table-body">
+        <!-- Los datos se insertarán dinámicamente desde la base de datos -->
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Modal Filtros -->
+<div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filtroModalLabel">Seleccione un filtro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="filtro">Seleccione el tipo de filtro:</label>
+                    <select class="form-select" id="filtro">
+                        <option value="semana">Semana</option>
+                        <option value="mes">Mes</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="aplicarFiltro">Aplicar Filtro</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+    const table = $('#example').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+        },
+    });
+
+});
+</script>
+<script>
+    $(document).ready(function () {
+        // Comprobar si la tabla ya está inicializada
+        const tableElement = $('#example');
+        let table;
+        if ($.fn.dataTable.isDataTable(tableElement)) {
+            // Si ya está inicializada, usar la instancia existente
+            table = tableElement.DataTable();
+        } else {
+            // Si no está inicializada, inicialízala
+            table = tableElement.DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+                },
+            });
+        }
+
+        // Función para poblar la tabla con los datos del backend
+        function populateTable(data) {
+            const totalProductos = data.productos.reduce((sum, producto) => sum + producto.recaudado, 0);
+            const totalServicios = data.servicios.reduce((sum, servicio) => sum + servicio.recaudado, 0);
+            const totalVehiculos = data.tiposVehiculos.reduce((sum, tipoVehiculo) => sum + tipoVehiculo.cantidad, 0);
+
+            // Preparar los datos para insertar en la tabla
+            const rowData = [
+                '', // Fecha (vacío)
+                '', // Día (vacío)
+                `<small><i class="bi bi-truck"></i> ${totalVehiculos} vehículos atendidos</small><br><small>${generateVehiculosList(data.tiposVehiculos)}</small>`, // Vehículos (con detalle debajo)
+                `S/. ${totalProductos.toFixed(2)} <br><small>${generateProductosList(data.productos)}</small>`, // Productos (con detalle debajo)
+                `S/. ${totalServicios.toFixed(2)} <br><small>${generateServiciosList(data.servicios)}</small>`, // Servicios (con detalle debajo)
+                `S/. ${(totalProductos + totalServicios).toFixed(2)}`, // Total general
+            ];
+
+            // Limpiar la tabla antes de añadir nuevas filas
+            table.clear();
+
+            // Añadir la nueva fila con los datos
+            table.rows.add([rowData]).draw();
+        }
+
+        // Función para generar la lista de vehículos
+        function generateVehiculosList(tiposVehiculos) {
+            let listHTML = '';
+            tiposVehiculos.forEach(tipoVehiculo => {
+                listHTML += `
+                    <p><i class="bi bi-car-front"></i> ${tipoVehiculo.tipoVehiculo}: <strong>${tipoVehiculo.cantidad}</strong> unidades</p>
+                    <hr>
+                `;
+            });
+            return listHTML;
+        }
+
+        // Función para generar la lista de productos
+        function generateProductosList(productos) {
+            let listHTML = '';
+            productos.forEach(producto => {
+                listHTML += `
+                    <p><i class="bi bi-bag"></i> ${producto.nombre}: <strong>${producto.cantidad}</strong> unidades</p>
+                    <p>Subtotal: <strong>S/. ${producto.recaudado.toFixed(2)}</strong></p>
+                    <hr>
+                `;
+            });
+            return listHTML;
+        }
+
+        // Función para generar la lista de servicios
+        function generateServiciosList(servicios) {
+            let listHTML = '';
+            servicios.forEach(servicio => {
+                listHTML += `
+                    <p><i class="bi bi-gear"></i> ${servicio.nombre}: <strong>${servicio.cantidad}</strong> unidades</p>
+                    <p>Subtotal: <strong>S/. ${servicio.recaudado.toFixed(2)}</strong></p>
+                    <hr>
+                `;
+            });
+            return listHTML;
+        }
+
+        // Obtener los datos del backend (API) y llamar a la función para poblar la tabla
+        fetch('/app/caja/cuadre-caja')  // Cambia esta URL por la correcta
+            .then(response => response.json())
+            .then(data => {
+                populateTable(data);  // Llamar a la función para poblar la tabla
+            })
+            .catch(error => {
+                console.error('Error al obtener los datos:', error);
+            });
+    });
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

@@ -386,7 +386,9 @@ public class ServiciosController {
         cliente.setTelefono(telefono);
         cliente.setIdentificacion(identificacion);
 
-        vehiculo.setTipo_vehiculo(tipoVehiculoRepository.findById(idTipoVehiculo).get());
+        if(idTipoVehiculo != null){
+            vehiculo.setTipo_vehiculo(tipoVehiculoRepository.findById(idTipoVehiculo).get());
+        }
         vehiculo.setMarca(marca);
         vehiculo.setModelo(modelo);
         vehiculo.setPlaca(placa);

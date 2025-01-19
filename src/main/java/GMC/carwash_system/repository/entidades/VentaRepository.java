@@ -1,9 +1,80 @@
 package GMC.carwash_system.repository.entidades;
 
+
 import GMC.carwash_system.model.entidades.Venta;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, Long> {
+
+
+    @Query(value = """
+            SELECT 
+                ts.nombre AS nombreServicio, 
+                SUM(dv.cantidad) AS totalCantidad, 
+                SUM(dv.precio_unitario) AS totalRecaudado
+            FROM venta v
+            INNER JOIN detalle_venta dv 
+                ON dv.id_venta = v.id
+            INNER JOIN detalle_ingreso_vehiculo div
+                ON div.id = dv.id_entrada_vehiculo
+            INNER JOIN tipo_servicio ts
+                ON ts.id = dv.id_item
+            WHERE div.realizado = 1
+              AND dv.id_tipo_item = 1
+            GROUP BY ts.nombre
+            ORDER BY totalCantidad DESC
+            """, nativeQuery = true)
+    List<Object[]> obtenerServiciosRaw();
+
+    @Query(value = """
+            SELECT 
+                p.nombre AS nombreProducto, 
+                SUM(dv.cantidad) AS totalCantidad, 
+                SUM(dv.precio_unitario) AS totalRecaudado
+            FROM venta v
+            INNER JOIN detalle_venta dv 
+                ON dv.id_venta = v.id
+            INNER JOIN detalle_ingreso_vehiculo div
+                ON div.id = dv.id_entrada_vehiculo
+            INNER JOIN producto p
+                ON p.id = dv.id_item
+            WHERE div.realizado = 1
+              AND dv.id_tipo_item = 2
+            GROUP BY p.nombre
+            ORDER BY totalCantidad DESC
+            """, nativeQuery = true)
+    List<Object[]> obtenerProductosRaw();
+
+    @Query(value = """
+    SELECT 
+        ventasUnicas.tipoVehiculo AS tipoVehiculo, 
+        COUNT(*) AS cantidad
+    FROM (
+        SELECT DISTINCT 
+            v.id AS idVenta, 
+            tv.nombre AS tipoVehiculo
+        FROM venta v
+        INNER JOIN detalle_venta dv 
+            ON dv.id_venta = v.id
+        INNER JOIN detalle_ingreso_vehiculo div
+            ON div.id = dv.id_entrada_vehiculo
+        INNER JOIN vehiculo veh
+            ON div.id_vehiculo = veh.id
+        INNER JOIN tipo_vehiculo tv
+            ON veh.id_tipo_vehiculo = tv.id
+        WHERE div.realizado = 1
+    ) AS ventasUnicas
+    GROUP BY ventasUnicas.tipoVehiculo
+    ORDER BY cantidad DESC
+    """, nativeQuery = true)
+    List<Object[]> obtenerTiposVehiculosRaw();
+
 }
+

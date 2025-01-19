@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUADRE DE CAJA</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">CUADRE DE CAJA</h2>
+    
+    <!-- Botones -->
+    <div class="mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filtroModal">FILTROS</button>
+        <button class="btn btn-secondary" id="quitarFiltro">QUITAR FILTRO</button>
+    </div>
+    
+    <!-- DataTable -->
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>FECHA</th>
+                <th>DÍA</th>
+                <th>VEHÍCULOS</th>
+                <th>PRODUCTOS Y/O SERVICIOS</th>
+                <th>TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Los datos se insertarán dinámicamente desde la base de datos -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Filtros -->
+<div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filtroModalLabel">Seleccione un filtro</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="filtro">Seleccione el tipo de filtro:</label>
+            <select class="form-select" id="filtro">
+                <option value="semana">Semana</option>
+                <option value="mes">Mes</option>
+            </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="aplicarFiltro">Aplicar Filtro</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para detalles de vehículos -->
+<div class="modal fade" id="vehiculosModal" tabindex="-1" aria-labelledby="vehiculosModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vehiculosModalLabel">Detalles de Vehículos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="vehiculosDetalle" class="list-group">
+            <!-- Detalles de vehículos se agregarán dinámicamente -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para detalles de productos y servicios -->
+<div class="modal fade" id="productosModal" tabindex="-1" aria-labelledby="productosModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productosModalLabel">Detalles de Productos y Servicios</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="productosDetalle" class="list-group">
+            <!-- Detalles de productos y servicios se agregarán dinámicamente -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+    const table = $('#example').DataTable({
+        columns: [
+            { data: 'fecha', title: 'FECHA' },
+            { data: 'dia', title: 'DÍA' },
+            {
+                data: 'vehiculos',
+                render: function (data) {
+                    return `<span class="detalle-vehiculos text-primary" style="cursor:pointer">${data}</span>`;
+                },
+            },
+            {
+                data: 'productos',
+                render: function (data) {
+                    return `<span class="detalle-productos text-primary" style="cursor:pointer">${data}</span>`;
+                },
+            },
+            { data: 'total', title: 'TOTAL' },
+        ],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+        },
+    });
+
+    // Cargar datos desde la base de datos
+    function cargarDatos() {
+        // Aquí debes hacer la llamada AJAX para obtener los datos de tu base de datos.
+        // Por ejemplo:
+        $.ajax({
+            url: 'ruta_a_tu_script_php_o_api',  // Cambia esta URL a la de tu script que devuelve los datos
+            method: 'GET',
+            success: function (data) {
+                table.clear().rows.add(data).draw();  // Rellena la tabla con los datos
+            },
+            error: function () {
+                alert("Hubo un error al cargar los datos.");
+            }
+        });
+    }
+
+    // Cargar los datos al inicio
+    cargarDatos();
+
+    // Función para agrupar datos por semana
+    function agruparPorSemana(datos) {
+        const semanas = {};
+        datos.forEach((d) => {
+            const fecha = new Date(d.fecha);
+            const inicioSemana = new Date(fecha.setDate(fecha.getDate() - fecha.getDay() + 1)); // Lunes de la semana
+            const finSemana = new Date(inicioSemana);
+            finSemana.setDate(inicioSemana.getDate() + 6); // Domingo de la semana
+
+            const claveSemana = `${inicioSemana.toISOString().split('T')[0]} a ${finSemana.toISOString().split('T')[0]}`;
+
+            if (!semanas[claveSemana]) {
+                semanas[claveSemana] = {
+                    fecha: claveSemana,
+                    dia: 'Lunes - Domingo',
+                    vehiculos: 0,
+                    productos: 0,
+                    total: 0,
+                    detallesVehiculos: [],
+                    detallesProductos: []
+                };
+            }
+
+            semanas[claveSemana].vehiculos += d.vehiculos;
+            semanas[claveSemana].productos += d.productos;
+            semanas[claveSemana].total += d.total;
+            semanas[claveSemana].detallesVehiculos.push(...d.detallesVehiculos);
+            semanas[claveSemana].detallesProductos.push(...d.detallesProductos);
+        });
+
+        return Object.values(semanas);
+    }
+
+    // Función para agrupar datos por mes
+    function agruparPorMes(datos) {
+        const meses = {};
+        datos.forEach((d) => {
+            const fecha = new Date(d.fecha);
+            const mesClave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+            const inicioMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+            const finMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+
+            if (!meses[mesClave]) {
+                meses[mesClave] = {
+                    fecha: `${inicioMes.toISOString().split('T')[0]} a ${finMes.toISOString().split('T')[0]}`,
+                    dia: 'Mes Completo',
+                    vehiculos: 0,
+                    productos: 0,
+                    total: 0,
+                    detallesVehiculos: [],
+                    detallesProductos: []
+                };
+            }
+
+            meses[mesClave].vehiculos += d.vehiculos;
+            meses[mesClave].productos += d.productos;
+            meses[mesClave].total += d.total;
+            meses[mesClave].detallesVehiculos.push(...d.detallesVehiculos);
+            meses[mesClave].detallesProductos.push(...d.detallesProductos);
+        });
+
+        return Object.values(meses);
+    }
+
+    // Aplicar filtro
+    $('#aplicarFiltro').on('click', function () {
+        const filtro = $('#filtro').val();
+        let datosFiltrados = [];
+
+        if (filtro === 'semana') {
+            datosFiltrados = agruparPorSemana(datos);
+        } else if (filtro === 'mes') {
+            datosFiltrados = agruparPorMes(datos);
+        }
+
+        table.clear().rows.add(datosFiltrados).draw();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('filtroModal'));
+        modal.hide();
+    });
+
+    // Quitar filtro
+    $('#quitarFiltro').on('click', function () {
+        cargarDatos();  // Recargar los datos de la base de datos
+    });
+
+    // Eventos de clic para vehículos y productos
+    $('#example tbody').on('click', '.detalle-vehiculos', function () {
+        const row = table.row($(this).closest('tr')).data();
+        $('#vehiculosDetalle').html(row.detallesVehiculos.map(v => `<li>${v}</li>`).join(''));
+        new bootstrap.Modal('#vehiculosModal').show();
+    });
+
+    $('#example tbody').on('click', '.detalle-productos', function () {
+        const row = table.row($(this).closest('tr')).data();
+        $('#productosDetalle').html(row.detallesProductos.map(p => `<li>${p.nombre} - S/ ${p.precio}</li>`).join(''));
+        new bootstrap.Modal('#productosModal').show();
+    });
+});
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

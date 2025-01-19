@@ -85,21 +85,12 @@ public class WebController {
         return "inventario/historial";
     }
 
-    @GetMapping("/inventario/ex")
-    public String paginaInventario() {
+    @GetMapping("/caja/cuadre")
+    public String paginaCuadreDeCaja() {
 
-        return "ex/inventario";
+        return "caja/cuadre";
     }
 
-    @GetMapping("/clientes/ex")
-    public String paginaClientes() {
 
-        return "ex/cliente";
-    }
-    @GetMapping("/servicios/ex")
-    public String paginaServiciosOriginal(Model model) {
-
-        return "ex/servicios";
-    }
 
 }

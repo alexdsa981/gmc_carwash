@@ -15,6 +15,11 @@ public class ClienteDTO {
     private String telefono;
     private List<String> placas;
 
+    // Constructor sin argumentos necesario para Jackson
+    public ClienteDTO() {
+    }
+
+    // Constructor que inicializa desde un Cliente
     public ClienteDTO(Cliente cliente) {
         this.nombre = cliente.getNombre();
         this.identificacion = cliente.getIdentificacion();
@@ -26,6 +31,4 @@ public class ClienteDTO {
             this.placas = new ArrayList<>();
         }
     }
-
-
 }
