@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CUADRE DE CAJA</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>GMC - CUADRE DE CAJA</title>
+    <link rel="icon" href="/img/logo.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
 <style>
     hr {
@@ -40,9 +41,9 @@
         <thead>
         <tr>
             <th>FECHA</th>
-            <th>VEHÍCULOS</th>
-            <th>PRODUCTOS</th>
-            <th>SERVICIOS</th>
+            <th>N° VEHÍCULOS</th>
+            <th>RESUMEN PRODUCTOS</th>
+            <th>RESUMEN SERVICIOS</th>
             <th>TOTAL</th>
         </tr>
         </thead>
@@ -106,9 +107,9 @@
                 // Preparar los datos para insertar en la tabla
                 const rowData = [
                     cuadre.fecha,  // Fecha
-                    `<small><i class="bi bi-truck"></i> ${totalVehiculos} vehículos atendidos</small><br><small>${generateVehiculosList(cuadre.tiposVehiculos)}</small>`,
-                    `S/. ${totalProductos.toFixed(2)} <br><small>${generateProductosList(cuadre.productos)}</small>`,
-                    `S/. ${totalServicios.toFixed(2)} <br><small>${generateServiciosList(cuadre.servicios)}</small>`,
+                    `<i class="bi bi-truck"></i> ${totalVehiculos} vehículos atendidos <hr><small>${generateVehiculosList(cuadre.tiposVehiculos)}</small>`,
+                    `S/. ${totalProductos.toFixed(2)} <hr><small>${generateProductosList(cuadre.productos)}</small>`,
+                    `S/. ${totalServicios.toFixed(2)} <hr><small>${generateServiciosList(cuadre.servicios)}</small>`,
                     `S/. ${(totalProductos + totalServicios).toFixed(2)}`,
                 ];
 

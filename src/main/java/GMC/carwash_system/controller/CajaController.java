@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/app/caja")
@@ -125,6 +122,7 @@ public class CajaController {
             cuadre.setTotalDinero(totalDinero);
         }
 
+        Collections.reverse(cuadres);
         return ResponseEntity.ok(cuadres); // Devolver la lista de cuadres
     }
 

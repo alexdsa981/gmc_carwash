@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SERVICIOS</title>
+    <title>GMC - ATENCIÓN</title>
+    <link rel="icon" href="/img/logo.png" type="image/png">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- DataTables CSS -->
@@ -278,7 +279,11 @@
 
                     // Validar que la placa esté presente
                     if (!placa) {
-                        alert("La placa es obligatoria.");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'La placa es obligatoria.',
+                            confirmButtonText: 'Aceptar'
+                        });
                         return;
                     }
 
@@ -301,20 +306,34 @@
                         });
 
                         if (response.ok) {
-                            alert("Detalle de servicio editado correctamente.");
-                            location.reload(); // Recargar la página
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Detalle de servicio editado correctamente.',
+                                confirmButtonText: 'Aceptar'
+                            }).then(() => {
+                                location.reload(); // Recargar la página
+                            });
                         } else {
                             const errorText = await response.text();
-                            alert("Error al editar el detalle del servicio: " + errorText);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error al editar el detalle del servicio',
+                                text: errorText,
+                                confirmButtonText: 'Aceptar'
+                            });
                         }
                     } catch (error) {
-                        alert("Ocurrió un error: " + error.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ocurrió un error',
+                            text: error.message,
+                            confirmButtonText: 'Aceptar'
+                        });
                     }
                 });
             });
-
-
         </script>
+
         <script>
             function eliminarDesdeBoton(boton) {
                 const id = boton.getAttribute("data-id");
@@ -322,26 +341,50 @@
             }
 
             function eliminarIngreso(id) {
-                if (confirm("¿Está seguro de que desea eliminar este ingreso?")) {
-                    fetch(`/app/servicios/eliminar-ingreso/${id}`, {
-                        method: 'POST'
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                alert("Ingreso eliminado correctamente.");
-                                location.reload();
-                            } else {
-                                alert("Error: No se pudo eliminar el ingreso.");
-                            }
+                Swal.fire({
+                    title: '¿Está seguro de que desea eliminar este ingreso?',
+                    text: "Esta acción no se puede deshacer.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/app/servicios/eliminar-ingreso/${id}`, {
+                            method: 'POST'
                         })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            alert("Ocurrió un error al eliminar el ingreso.");
-                        });
-                }
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Ingreso eliminado correctamente.',
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        location.reload(); // Recargar la página
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'No se pudo eliminar el ingreso.',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Error:", error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Ocurrió un error',
+                                    text: 'No se pudo eliminar el ingreso.',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            });
+                    }
+                });
             }
-
         </script>
+
 
         <!-- Modal para Añadir Ingreso -->
         <div class="modal fade" id="addIngresoModal" tabindex="-1" aria-labelledby="addIngresoModalLabel"
@@ -465,7 +508,11 @@
 
                     // Validar que la placa esté presente
                     if (!placa) {
-                        alert("La placa es obligatoria.");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'La placa es obligatoria.',
+                            confirmButtonText: 'Aceptar'
+                        });
                         return;
                     }
 
@@ -487,19 +534,34 @@
                         });
 
                         if (response.ok) {
-                            alert("Ingreso agregado correctamente.");
-                            location.reload(); // Recargar la página
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Ingreso agregado correctamente.',
+                                confirmButtonText: 'Aceptar'
+                            }).then(() => {
+                                location.reload(); // Recargar la página
+                            });
                         } else {
                             const errorText = await response.text();
-                            alert("Error al agregar el ingreso: " + errorText);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error al agregar el ingreso',
+                                text: errorText,
+                                confirmButtonText: 'Aceptar'
+                            });
                         }
                     } catch (error) {
-                        alert("Ocurrió un error: " + error.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ocurrió un error',
+                            text: error.message,
+                            confirmButtonText: 'Aceptar'
+                        });
                     }
                 });
             });
-
         </script>
+
         <!--Logica para forzar busqueda de placa antes de agregar los demás campos-->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -511,7 +573,11 @@
                     const placa = placaInput.value.trim();
 
                     if (!placa) {
-                        alert("Por favor, ingrese una placa.");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Por favor, ingrese una placa.',
+                            confirmButtonText: 'Aceptar'
+                        });
                         return;
                     }
 
@@ -541,9 +607,14 @@
                         deshabilitarCampos();
                         habilitarBotones();
                     } catch (error) {
-                        alert("Placa no encontrada. Puede ingresar nuevos datos.");
-                        habilitarCampos();
-                    }
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Placa no encontrada.',
+                                text: 'Puede ingresar nuevos datos.',
+                                confirmButtonText: 'Aceptar'
+                            });
+                            habilitarCampos();
+                        }
                 });
 
                 function deshabilitarCamposInicialmente() {
@@ -882,7 +953,11 @@
                 if (!metodoPago || detalleVentaIds.length === 0) {
                     console.log('Método de pago seleccionado:', metodoPago);
                     console.log('Lista id detalle venta:', detalleVentaIds);
-                    alert('Debe seleccionar un método de pago y tener al menos un detalle para pagar.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Debe seleccionar un método de pago y tener al menos un detalle para pagar.',
+                        confirmButtonText: 'Aceptar'
+                    });
                     return;
                 }
 
@@ -912,12 +987,24 @@
                     } else {
                         const error = await response.json();
                         console.error('Error al realizar el pago:', error);
-                        alert('Error al realizar el pago: ' + error.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al realizar el pago',
+                            text: error.message,
+                            confirmButtonText: 'Aceptar'
+                        });
                     }
+
                 } catch (error) {
                     console.error('Error en la solicitud:', error);
-                    alert('Ocurrió un error inesperado. Inténtelo de nuevo más tarde.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Ocurrió un error inesperado',
+                        text: 'Inténtelo de nuevo más tarde.',
+                        confirmButtonText: 'Aceptar'
+                    });
                 }
+
             });
 
         </script>
@@ -1015,6 +1102,7 @@
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script>

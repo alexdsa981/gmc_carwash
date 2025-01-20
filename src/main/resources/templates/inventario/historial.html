@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial</title>
+    <title>GMC - HISTORIAL INVENTARIO</title>
+    <link rel="icon" href="/img/logo.png" type="image/png">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- DataTables CSS -->
@@ -64,32 +65,54 @@
     function eliminarHistorial(button) {
         const id = button.getAttribute('data-id');
 
-        if (confirm("¿Estás seguro de que deseas eliminar este historial?")) {
-            fetch(`/app/inventario/eliminar-historial/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Si la eliminación fue exitosa, eliminamos la fila de la tabla
-                    const row = button.closest('tr');
-                    row.remove();
-                    alert("Historial eliminado exitosamente.");
-                } else {
-                    alert("Error al eliminar el historial.");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Error al eliminar el historial.");
-            });
-        }
+        Swal.fire({
+            icon: 'warning',
+            title: '¿Estás seguro de que deseas eliminar este historial?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            focusCancel: true
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/app/inventario/eliminar-historial/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Si la eliminación fue exitosa, eliminamos la fila de la tabla
+                        const row = button.closest('tr');
+                        row.remove();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Historial eliminado exitosamente',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al eliminar el historial.',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al eliminar el historial.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            }
+        });
     }
-
-
 </script>
+
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -98,6 +121,8 @@
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     $(document).ready(function () {
         var table = $('#example').DataTable({
