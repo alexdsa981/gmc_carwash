@@ -195,4 +195,36 @@ public class InventarioController {
     }
 
 
+    @DeleteMapping("/eliminar-historial/{id}")
+    public ResponseEntity<Void> eliminarHistorial(@PathVariable Long id) {
+        Optional<HistorialAlmacen> historialOpt = historialAlmacenRepository.findById(id);
+        if (historialOpt.isPresent()) {
+            HistorialAlmacen historial = historialOpt.get();
+
+            // Obtener la cantidad del historial
+            int cantidad = historial.getCantidad();
+            Producto producto = historial.getProducto();
+
+            // Ajustar el stock según la cantidad del historial
+            if (cantidad > 0) {
+                // Si la cantidad es positiva (entrada), se resta al stock
+                producto.setStock(producto.getStock() - cantidad);
+            } else {
+                // Si la cantidad es negativa (salida), se suma al stock
+                producto.setStock(producto.getStock() + Math.abs(cantidad));
+            }
+
+            // Guardar el producto con el nuevo stock
+            productoRepository.save(producto);
+
+            // Eliminar el historial de almacén
+            historialAlmacenRepository.delete(historial);
+
+            return ResponseEntity.noContent().build(); // Devuelve 204 No Content si se eliminó correctamente
+        }
+        return ResponseEntity.notFound().build(); // Devuelve 404 si no se encuentra el historial
+    }
+
+
+
 }

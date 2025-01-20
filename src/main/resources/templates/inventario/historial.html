@@ -34,6 +34,7 @@
             <th>Fecha</th>
             <th>Hora</th>
             <th>Precio Unitario (S/.)</th>
+            <th>Acciones</th> <!-- Columna para el botón -->
         </tr>
         </thead>
         <tbody>
@@ -47,14 +48,48 @@
             <td th:text="${historial.formattedFecha}"></td>
             <td th:text="${historial.formattedHora}"></td>
             <td th:text="${historial.precioUnitario}"></td>
+            <td>
+                <!-- Botón de eliminar -->
+                <button class="btn btn-danger" th:data-id="${historial.id}" onclick="eliminarHistorial(this)"><i class="bi bi-trash"></i></button>
+            </td>
         </tr>
         </tbody>
     </table>
 
 
+
 </div>
 
+<script>
+    function eliminarHistorial(button) {
+        const id = button.getAttribute('data-id');
 
+        if (confirm("¿Estás seguro de que deseas eliminar este historial?")) {
+            fetch(`/app/inventario/eliminar-historial/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Si la eliminación fue exitosa, eliminamos la fila de la tabla
+                    const row = button.closest('tr');
+                    row.remove();
+                    alert("Historial eliminado exitosamente.");
+                } else {
+                    alert("Error al eliminar el historial.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Error al eliminar el historial.");
+            });
+        }
+    }
+
+
+</script>
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
