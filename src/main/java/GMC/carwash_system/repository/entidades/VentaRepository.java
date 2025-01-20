@@ -15,6 +15,98 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
 
 
     @Query(value = """
+    SELECT 
+        ts.nombre AS nombreServicio, 
+        SUM(dv.cantidad) AS totalCantidad, 
+        SUM(dv.precio_unitario) AS totalRecaudado,
+        CAST(v.fecha AS DATE) AS fecha  -- Cambié a CAST para SQL Server
+    FROM venta v
+    INNER JOIN detalle_venta dv 
+        ON dv.id_venta = v.id
+    INNER JOIN detalle_ingreso_vehiculo div
+        ON div.id = dv.id_entrada_vehiculo
+    INNER JOIN tipo_servicio ts
+        ON ts.id = dv.id_item
+    WHERE div.realizado = 1
+      AND dv.id_tipo_item = 1
+    GROUP BY ts.nombre, CAST(v.fecha AS DATE)  -- Cambié a CAST también aquí
+    ORDER BY totalCantidad DESC
+""", nativeQuery = true)
+    List<Object[]> obtenerServiciosPorDia();
+
+
+    @Query(value = """
+    SELECT 
+        p.nombre AS nombreProducto, 
+        SUM(dv.cantidad) AS totalCantidad, 
+        SUM(dv.precio_unitario * dv.cantidad) AS totalRecaudado,
+        CAST(v.fecha AS DATE) AS fecha  -- Cambié a CAST para SQL Server
+    FROM venta v
+    INNER JOIN detalle_venta dv 
+        ON dv.id_venta = v.id
+    INNER JOIN detalle_ingreso_vehiculo div
+        ON div.id = dv.id_entrada_vehiculo
+    INNER JOIN producto p
+        ON p.id = dv.id_item
+    WHERE div.realizado = 1
+      AND dv.id_tipo_item = 2
+    GROUP BY p.nombre, CAST(v.fecha AS DATE)  -- Cambié a CAST también aquí
+    ORDER BY totalCantidad DESC
+""", nativeQuery = true)
+    List<Object[]> obtenerProductosPorDia();
+
+
+    @Query(value = """
+    SELECT 
+        ventasUnicas.tipoVehiculo AS tipoVehiculo, 
+        COUNT(*) AS cantidad,
+        CONVERT(VARCHAR, ventasUnicas.fecha, 23) AS fecha  -- Convertir la fecha a formato 'YYYY-MM-DD'
+    FROM (
+        SELECT DISTINCT 
+            v.id AS idVenta, 
+            tv.nombre AS tipoVehiculo,
+            v.fecha AS fecha  -- Seleccionar la fecha en la subconsulta
+        FROM venta v
+        INNER JOIN detalle_venta dv 
+            ON dv.id_venta = v.id
+        INNER JOIN detalle_ingreso_vehiculo div
+            ON div.id = dv.id_entrada_vehiculo
+        INNER JOIN vehiculo veh
+            ON div.id_vehiculo = veh.id
+        LEFT JOIN tipo_vehiculo tv
+            ON veh.id_tipo_vehiculo = tv.id
+        WHERE div.realizado = 1
+    ) AS ventasUnicas
+    GROUP BY ventasUnicas.tipoVehiculo, CONVERT(VARCHAR, ventasUnicas.fecha, 23)  -- Convertir la fecha a formato adecuado
+    ORDER BY cantidad DESC
+""", nativeQuery = true)
+    List<Object[]> obtenerTiposVehiculosPorDia();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //GENERAL:
+    @Query(value = """
             SELECT 
                 ts.nombre AS nombreServicio, 
                 SUM(dv.cantidad) AS totalCantidad, 

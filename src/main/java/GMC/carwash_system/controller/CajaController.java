@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/app/caja")
@@ -22,69 +26,107 @@ public class CajaController {
     VentaRepository ventaRepository;
 
 
-
-
-
     @GetMapping("/cuadre-caja")
-    public ResponseEntity<CuadreCajaDTO> obtenerCuadreCaja() {
-        // Obtener la información de los servicios
-        List<Object[]> resultadosServicios = ventaRepository.obtenerServiciosRaw();
-        List<ServicioDTO> servicios = resultadosServicios.stream()
-                .map(obj -> new ServicioDTO(
-                        (String) obj[0],          // nombreServicio
-                        ((Number) obj[1]).intValue(), // totalCantidad
-                        ((Number) obj[2]).doubleValue() // totalRecaudado
-                ))
-                .toList();
+    public ResponseEntity<List<CuadreCajaDTO>> obtenerCuadresCaja() {
+        // Obtener la información por día para cada tipo de datos
+        List<Object[]> resultadosServicios = ventaRepository.obtenerServiciosPorDia();
+        List<Object[]> resultadosProductos = ventaRepository.obtenerProductosPorDia();
+        List<Object[]> resultadosTiposVehiculos = ventaRepository.obtenerTiposVehiculosPorDia();
 
-        // Obtener la información de los productos
-        List<Object[]> resultadosProductos = ventaRepository.obtenerProductosRaw();
-        List<ProductoDTO> productos = resultadosProductos.stream()
-                .map(obj -> new ProductoDTO(
-                        (String) obj[0],          // nombreProducto
-                        ((Number) obj[1]).intValue(), // totalCantidad
-                        ((Number) obj[2]).doubleValue() // totalRecaudado
-                ))
-                .toList();
+        // Crear un mapa para almacenar los cuadres de caja por día
+        Map<String, CuadreCajaDTO> cuadresPorDia = new HashMap<>();
 
-        // Obtener la información de los tipos de vehículos
-        List<Object[]> resultadosTiposVehiculos = ventaRepository.obtenerTiposVehiculosRaw();
-        List<TipoVehiculoDTO> tiposVehiculos = resultadosTiposVehiculos.stream()
-                .map(obj -> new TipoVehiculoDTO(
-                        (String) obj[0],          // tipoVehiculo
-                        ((Number) obj[1]).intValue() // cantidad
-                ))
-                .toList();
+        // Crear un formateador de fecha
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // Formato de fecha que deseas
 
-        // Calcular el total de vehículos (puedes modificar esto según la lógica que necesites)
-        Integer totalVehiculos = tiposVehiculos.stream()
-                .mapToInt(TipoVehiculoDTO::getCantidad)
-                .sum();
+        // Procesar los servicios
+        for (Object[] row : resultadosServicios) {
+            String fecha = "";
+            if (row[3] instanceof java.sql.Date) {
+                fecha = sdf.format((java.sql.Date) row[3]); // Convertir la fecha a String usando el formato
+            } else if (row[3] instanceof String) {
+                fecha = (String) row[3]; // Si ya es String, lo dejamos como está
+            }
+            CuadreCajaDTO cuadre = cuadresPorDia.computeIfAbsent(fecha, k -> new CuadreCajaDTO());
+            cuadre.setFecha(fecha);  // Asignar la fecha al DTO
 
-        // Calcular el total de dinero (sumar todos los recaudos de servicios y productos)
-        Double totalDinero = servicios.stream()
-                .mapToDouble(ServicioDTO::getRecaudado)
-                .sum() + productos.stream()
-                .mapToDouble(ProductoDTO::getRecaudado)
-                .sum();
+            // Agregar los servicios a este cuadre de caja
+            ServicioDTO servicio = new ServicioDTO(
+                    (String) row[0],  // nombreServicio
+                    ((Number) row[1]).intValue(), // totalCantidad
+                    ((Number) row[2]).doubleValue() // totalRecaudado
+            );
+            cuadre.getServicios().add(servicio);
+        }
 
-        // Crear el objeto CuadreCajaDTO con los datos obtenidos
-        CuadreCajaDTO cuadreCajaDTO = new CuadreCajaDTO();
-        cuadreCajaDTO.setTotalVehiculos(totalVehiculos);
-        cuadreCajaDTO.setTiposVehiculos(tiposVehiculos);
-        cuadreCajaDTO.setProductos(productos);
-        cuadreCajaDTO.setServicios(servicios);
-        cuadreCajaDTO.setTotalDinero(totalDinero);
+        // Procesar los productos
+        for (Object[] row : resultadosProductos) {
+            String fecha = "";
+            if (row[3] instanceof java.sql.Date) {
+                fecha = sdf.format((java.sql.Date) row[3]); // Convertir la fecha a String usando el formato
+            } else if (row[3] instanceof String) {
+                fecha = (String) row[3]; // Si ya es String, lo dejamos como está
+            }
+            CuadreCajaDTO cuadre = cuadresPorDia.computeIfAbsent(fecha, k -> new CuadreCajaDTO());
+            cuadre.setFecha(fecha);  // Asignar la fecha al DTO
 
-        return ResponseEntity.ok(cuadreCajaDTO);
+            // Agregar los productos a este cuadre de caja
+            ProductoDTO producto = new ProductoDTO(
+                    (String) row[0],  // nombreProducto
+                    ((Number) row[1]).intValue(), // totalCantidad
+                    ((Number) row[2]).doubleValue() // totalRecaudado
+            );
+            cuadre.getProductos().add(producto);
+        }
+
+        // Procesar los tipos de vehículos
+        for (Object[] row : resultadosTiposVehiculos) {
+            String fecha = "";
+            if (row[2] instanceof java.sql.Date) {
+                fecha = sdf.format((java.sql.Date) row[2]); // Convertir la fecha a String usando el formato
+            } else if (row[2] instanceof String) {
+                fecha = (String) row[2]; // Si ya es String, lo dejamos como está
+            }
+            CuadreCajaDTO cuadre = cuadresPorDia.computeIfAbsent(fecha, k -> new CuadreCajaDTO());
+            cuadre.setFecha(fecha);  // Asignar la fecha al DTO
+
+            // Verificar y asignar un valor por defecto en caso de que tipoVehiculo sea null o vacío
+            String tipoVehiculoStr = (String) row[0];
+            if (tipoVehiculoStr == null || tipoVehiculoStr.trim().isEmpty()) {
+                tipoVehiculoStr = "No especificado"; // Valor por defecto si tipoVehiculo es null o vacío
+            }
+
+            // Agregar los tipos de vehículos a este cuadre de caja
+            TipoVehiculoDTO tipoVehiculo = new TipoVehiculoDTO(
+                    tipoVehiculoStr, // Asignar tipoVehiculo con el valor verificado
+                    ((Number) row[1]).intValue() // cantidad
+            );
+            cuadre.getTiposVehiculos().add(tipoVehiculo);
+        }
+
+
+        // Convertir el mapa a una lista
+        List<CuadreCajaDTO> cuadres = new ArrayList<>(cuadresPorDia.values());
+
+        // Calcular el total de vehículos y el total de dinero por cada cuadre
+        for (CuadreCajaDTO cuadre : cuadres) {
+            // Calcular totalVehiculos
+            int totalVehiculos = cuadre.getTiposVehiculos().stream()
+                    .mapToInt(TipoVehiculoDTO::getCantidad)
+                    .sum();
+            cuadre.setTotalVehiculos(totalVehiculos);
+
+            // Calcular totalDinero
+            double totalDinero = cuadre.getServicios().stream()
+                    .mapToDouble(ServicioDTO::getRecaudado)
+                    .sum() + cuadre.getProductos().stream()
+                    .mapToDouble(ProductoDTO::getRecaudado)
+                    .sum();
+            cuadre.setTotalDinero(totalDinero);
+        }
+
+        return ResponseEntity.ok(cuadres); // Devolver la lista de cuadres
     }
-
-
-
-
-
-
-
 
 
     @GetMapping("/servicios")

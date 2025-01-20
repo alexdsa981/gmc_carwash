@@ -36,7 +36,7 @@ public class ClienteController {
     private ObjectMapper objectMapper;
 
     public Model retornaListaClientes(Model model) {
-        List<Cliente> listaClientes = clienteRepository.findAll();
+        List<Cliente> listaClientes = clienteRepository.findByIsActiveTrue();
 
         // Convertir las listas de placas de los clientes a JSON
         for (Cliente cliente : listaClientes) {
@@ -70,6 +70,7 @@ public class ClienteController {
         cliente.setNombre(nombre);
         cliente.setTelefono(telefono);
         cliente.setIdentificacion(identificacion);
+        cliente.setIsActive(Boolean.TRUE);
 
         List<Vehiculo> listaVehiculos = new ArrayList<>();
         for (String placa : placas) {
@@ -154,14 +155,15 @@ public class ClienteController {
 
 
     // Eliminar un cliente
-    @DeleteMapping("/eliminar/{id}")
+    @PutMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarCliente(@PathVariable Long id) {
         Optional<Cliente> optionalCliente = clienteRepository.findById(id);
         if (optionalCliente.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente no encontrado");
         }
-
-        clienteRepository.deleteById(id);
+        Cliente cliente = optionalCliente.get();
+        cliente.setIsActive(Boolean.FALSE);
+        clienteRepository.save(cliente);
         return ResponseEntity.ok("Cliente eliminado correctamente");
     }
 

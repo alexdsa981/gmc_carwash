@@ -10,20 +10,27 @@
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 <style>
-    hr{
-        margin:0.6rem 0;
+    hr {
+        margin: 0.6rem 0;
     }
-    small p{
+    small p {
         margin-bottom: 0rem;
     }
 </style>
 <body>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">CUADRE DE CAJA</h2>
+    <h2 class="text-center mb-4">GMC - Cuadre De Caja</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="/inicio" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
+            </a>
+        </div>
+    </div>
 
     <!-- Botones -->
-    <div class="mb-3">
+    <div class="mb-3 d-none">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filtroModal">FILTROS</button>
         <button class="btn btn-secondary" id="quitarFiltro">QUITAR FILTRO</button>
     </div>
@@ -33,7 +40,6 @@
         <thead>
         <tr>
             <th>FECHA</th>
-            <th>DÍA</th>
             <th>VEHÍCULOS</th>
             <th>PRODUCTOS</th>
             <th>SERVICIOS</th>
@@ -45,7 +51,6 @@
         </tbody>
     </table>
 </div>
-
 
 <!-- Modal Filtros -->
 <div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
@@ -72,29 +77,6 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 5 JS -->
@@ -104,52 +86,35 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function () {
-    const table = $('#example').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-        },
-    });
-
-});
-</script>
-<script>
-    $(document).ready(function () {
-        // Comprobar si la tabla ya está inicializada
-        const tableElement = $('#example');
-        let table;
-        if ($.fn.dataTable.isDataTable(tableElement)) {
-            // Si ya está inicializada, usar la instancia existente
-            table = tableElement.DataTable();
-        } else {
-            // Si no está inicializada, inicialízala
-            table = tableElement.DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-                },
-            });
-        }
+        const table = $('#example').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+            },
+        });
 
         // Función para poblar la tabla con los datos del backend
         function populateTable(data) {
-            const totalProductos = data.productos.reduce((sum, producto) => sum + producto.recaudado, 0);
-            const totalServicios = data.servicios.reduce((sum, servicio) => sum + servicio.recaudado, 0);
-            const totalVehiculos = data.tiposVehiculos.reduce((sum, tipoVehiculo) => sum + tipoVehiculo.cantidad, 0);
-
-            // Preparar los datos para insertar en la tabla
-            const rowData = [
-                '', // Fecha (vacío)
-                '', // Día (vacío)
-                `<small><i class="bi bi-truck"></i> ${totalVehiculos} vehículos atendidos</small><br><small>${generateVehiculosList(data.tiposVehiculos)}</small>`, // Vehículos (con detalle debajo)
-                `S/. ${totalProductos.toFixed(2)} <br><small>${generateProductosList(data.productos)}</small>`, // Productos (con detalle debajo)
-                `S/. ${totalServicios.toFixed(2)} <br><small>${generateServiciosList(data.servicios)}</small>`, // Servicios (con detalle debajo)
-                `S/. ${(totalProductos + totalServicios).toFixed(2)}`, // Total general
-            ];
-
             // Limpiar la tabla antes de añadir nuevas filas
             table.clear();
 
-            // Añadir la nueva fila con los datos
-            table.rows.add([rowData]).draw();
+            // Iterar sobre cada cuadre de caja
+            data.forEach(cuadre => {
+                const totalProductos = cuadre.productos.reduce((sum, producto) => sum + producto.recaudado, 0);
+                const totalServicios = cuadre.servicios.reduce((sum, servicio) => sum + servicio.recaudado, 0);
+                const totalVehiculos = cuadre.tiposVehiculos.reduce((sum, tipoVehiculo) => sum + tipoVehiculo.cantidad, 0);
+
+                // Preparar los datos para insertar en la tabla
+                const rowData = [
+                    cuadre.fecha,  // Fecha
+                    `<small><i class="bi bi-truck"></i> ${totalVehiculos} vehículos atendidos</small><br><small>${generateVehiculosList(cuadre.tiposVehiculos)}</small>`,
+                    `S/. ${totalProductos.toFixed(2)} <br><small>${generateProductosList(cuadre.productos)}</small>`,
+                    `S/. ${totalServicios.toFixed(2)} <br><small>${generateServiciosList(cuadre.servicios)}</small>`,
+                    `S/. ${(totalProductos + totalServicios).toFixed(2)}`,
+                ];
+
+                // Añadir la nueva fila con los datos
+                table.rows.add([rowData]).draw();
+            });
         }
 
         // Función para generar la lista de vehículos
@@ -190,11 +155,11 @@
             return listHTML;
         }
 
-        // Obtener los datos del backend (API) y llamar a la función para poblar la tabla
-        fetch('/app/caja/cuadre-caja')  // Cambia esta URL por la correcta
+        // Obtener los datos del backend (API)
+        fetch('/app/caja/cuadre-caja')
             .then(response => response.json())
             .then(data => {
-                populateTable(data);  // Llamar a la función para poblar la tabla
+                populateTable(data);
             })
             .catch(error => {
                 console.error('Error al obtener los datos:', error);
@@ -202,17 +167,5 @@
     });
 </script>
 
-
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-

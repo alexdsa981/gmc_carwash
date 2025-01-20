@@ -91,7 +91,6 @@ public class InventarioController {
             @RequestParam("precio_costo")BigDecimal precio_costo,
             @RequestParam("precio_venta")BigDecimal precio_venta,
             @RequestParam("id_tipo_producto")Long id_tipo_producto,
-            @RequestParam("stock")Integer stock,
             HttpServletResponse response
     ) throws IOException {
 
@@ -99,7 +98,7 @@ public class InventarioController {
         producto.setNombre(nombre);
         producto.setPrecio_costo(precio_costo);
         producto.setPrecio_venta(precio_venta);
-        producto.setStock(stock);
+        producto.setStock(0);
         producto.setTipo_producto(tipoProductoRepository.findById(id_tipo_producto).get());
         producto.setIsActive(Boolean.TRUE);
         productoRepository.save(producto);
