@@ -57,36 +57,43 @@ public class ClienteController {
     }
 
 
-    // Crear un nuevo cliente
     @PostMapping("/crear")
     public ResponseEntity<String> crearCliente(
             @RequestParam("nombre") String nombre,
             @RequestParam("telefono") String telefono,
             @RequestParam("identificacion") String identificacion,
-            @RequestParam("placas") List<String> placas,
-            HttpServletResponse response
-    ) throws IOException {
-        Cliente cliente = new Cliente();
-        cliente.setNombre(nombre);
-        cliente.setTelefono(telefono);
-        cliente.setIdentificacion(identificacion);
-        cliente.setIsActive(Boolean.TRUE);
+            @RequestParam("placas") List<String> placas
+    ) {
+        try {
+            Cliente cliente = new Cliente();
+            cliente.setNombre(nombre);
+            cliente.setTelefono(telefono);
+            cliente.setIdentificacion(identificacion);
+            cliente.setIsActive(Boolean.TRUE);
 
-        List<Vehiculo> listaVehiculos = new ArrayList<>();
-        for (String placa : placas) {
-            Vehiculo vehiculo = new Vehiculo();
-            vehiculo.setPlaca(placa);
-            vehiculo.setCliente(cliente);
-            listaVehiculos.add(vehiculo);
+            List<Vehiculo> listaVehiculos = new ArrayList<>();
+            for (String placa : placas) {
+                if (vehiculoRepository.existsByPlaca(placa)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("La placa " + placa + " ya está registrada.");
+                }
+                Vehiculo vehiculo = new Vehiculo();
+                vehiculo.setPlaca(placa);
+                vehiculo.setCliente(cliente);
+                listaVehiculos.add(vehiculo);
+            }
+
+            cliente.setListaVehiculos(listaVehiculos);
+            clienteRepository.save(cliente);
+            vehiculoRepository.saveAll(listaVehiculos);
+
+            return ResponseEntity.ok("Cliente creado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al crear el cliente: " + e.getMessage());
         }
-
-        cliente.setListaVehiculos(listaVehiculos);
-        clienteRepository.save(cliente);
-        vehiculoRepository.saveAll(listaVehiculos);
-
-        response.sendRedirect("/clientes/lista");
-        return ResponseEntity.ok("Cliente creado correctamente");
     }
+
 
     @PutMapping("/editar/{id}")
     public ResponseEntity<Map<String, String>> editarCliente(
