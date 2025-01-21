@@ -742,7 +742,7 @@
                                 <div class="mb-3">
                                     <label for="tipoServicio" class="form-label">Tipo de Servicio</label>
                                     <select class="form-select" id="tipoServicio" name="tipoServicio">
-                                        <option selected disabled>Seleccione un tipo de servicio</option>
+                                        <option value="" selected disabled>Seleccione un tipo de servicio</option>
                                         <option value="Basico">Servicio Básico</option>
                                         <option value="Especial">Servicio Especial</option>
                                     </select>
@@ -812,6 +812,21 @@
                     });
                 });
             document.addEventListener('DOMContentLoaded', function () {
+                const productoSelect = document.getElementById('producto');
+                const cantidadInput = document.getElementById('cantidad');
+                const tipoServicioSelect = document.getElementById('tipoServicio');
+                const servicioBasicoSelect = document.getElementById('servicioBasico');
+                const servicioEspecialSelect = document.getElementById('servicioEspecial');
+                // Resetea los atributos `required`
+                function resetRequired(inputs) {
+                    inputs.forEach(input => input.removeAttribute('required'));
+                }
+
+                // Asigna los atributos `required`
+                function setRequired(inputs) {
+                    inputs.forEach(input => input.setAttribute('required', ''));
+                }
+
                 // Cambios dinámicos en el tipo de venta
                 const tipoVentaSelect = document.getElementById('tipoVenta');
                 const productoContainer = document.getElementById('productoContainer');
@@ -825,17 +840,23 @@
                     // Si se muestra el contenedor de producto o servicio, selecciona el primer option
                     if (tipo === '2') { // Producto
                         document.getElementById('producto').selectedIndex = 0; // Selecciona el primer producto
+
+                        setRequired([productoSelect, cantidadInput]);
+                        resetRequired([tipoServicioSelect, servicioBasicoSelect, servicioEspecialSelect]);
+
                     }
                     if (tipo === '1') { // Servicio
                         document.getElementById('tipoServicio').selectedIndex = 0; // Selecciona el primer tipo de servicio
                         // Resetea los servicios básicos y especiales a su primer opción
                         document.getElementById('servicioBasico').selectedIndex = 0;
                         document.getElementById('servicioEspecial').selectedIndex = 0;
+                        resetRequired([cantidadInput, productoSelect]);
+                        setRequired([tipoServicioSelect]);
+
                     }
                 });
 
                 // Cambios dinámicos en el tipo de servicio
-                const tipoServicioSelect = document.getElementById('tipoServicio');
                 const servicioBasicoContainer = document.getElementById('servicioBasicoContainer');
                 const servicioEspecialContainer = document.getElementById('servicioEspecialContainer');
 
@@ -847,9 +868,11 @@
                     // Resetea los servicios a su primer opción al mostrar un contenedor
                     if (tipoServicio === 'Basico') {
                         document.getElementById('servicioBasico').selectedIndex = 0;
+                        setRequired([servicioBasicoSelect]);
                     }
                     if (tipoServicio === 'Especial') {
                         document.getElementById('servicioEspecial').selectedIndex = 0;
+                        setRequired([servicioEspecialSelect]);
                     }
                 });
             });

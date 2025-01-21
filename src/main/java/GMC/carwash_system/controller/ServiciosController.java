@@ -332,6 +332,8 @@ public class ServiciosController {
         cliente.setNombre(nombre);
         cliente.setTelefono(telefono);
         cliente.setIdentificacion(identificacion);
+        cliente.setIsActive(Boolean.TRUE);
+        cliente.setIsActive(Boolean.TRUE);
         clienteRepository.save(cliente);
 
         // Actualizar los datos del vehículo
