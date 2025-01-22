@@ -20,6 +20,7 @@ public class DetalleVentaDTO {
 
     private Long id;
     private Venta venta;
+    private Long idItem;
     private String tipoItemNombre;
     private String nombreItem; //se coloca el id del Producto o Servicio
     private Integer cantidad;
@@ -28,6 +29,7 @@ public class DetalleVentaDTO {
     private Colaborador colaborador;
     public DetalleVentaDTO(DetalleVenta detalleVenta) {
         this.id = detalleVenta.getId();
+        this.idItem = detalleVenta.getIdItem();
         this.tipoItemNombre = detalleVenta.getTipoItem() != null ? detalleVenta.getTipoItem().getNombre() : "N/A";
         this.cantidad = detalleVenta.getCantidad();
         this.precio_unitario = detalleVenta.getPrecio_unitario();

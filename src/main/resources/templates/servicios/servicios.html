@@ -27,7 +27,23 @@
         display: block;
     }
 </style>
+<style>
+    .detalle-item {
+    position: relative;
+}
 
+.detalle-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+}
+
+.detalle-item:hover .detalle-btn {
+    display: inline-block;
+}
+
+</style>
 <body>
 
 <div class="container mt-5">
@@ -93,30 +109,52 @@
                             <!-- Servicios -->
                             <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
                                 <strong><i class="bi bi-tools"></i> Servicios:</strong>
-                                <div th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
-                                     th:if="${detalleVenta.tipoItemNombre == 'Servicio'}">
+                                <div th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}" th:if="${detalleVenta.tipoItemNombre == 'Servicio'}" class="detalle-item">
                                     <i class="bi bi-check-circle-fill text-success"></i>
                                     <span th:text="${detalleVenta.nombreItem}"></span>
                                     - <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
                                     <br>
-                                    <small>Atendido por: <span
-                                            th:text="${detalleVenta.colaborador.nombre}"></span></small>
+                                    <small>Atendido por: <span th:text="${detalleVenta.colaborador.nombre}"></span></small>
+                                    <button class="btn btn-outline-secondary btn-sm detalle-btn edit-servicio-btn"
+                                            th:data-id="${detalleVenta.id}"
+                                            th:data-servicio="${detalleVenta.idItem}"
+                                            th:data-precio="${detalleVenta.precio_unitario}"
+                                            th:data-colaborador="${detalleVenta.colaborador.id}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editServicioModal">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
                                 </div>
                             </div>
+
                             <hr style="margin: 10px 0;">
 
                             <!-- Productos -->
                             <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
                                 <strong><i class="bi bi-box"></i> Productos:</strong>
                                 <div th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
-                                     th:if="${detalleVenta.tipoItemNombre == 'Producto'}">
+                                     th:if="${detalleVenta.tipoItemNombre == 'Producto'}"
+                                     class="detalle-item">
                                     <i class="bi bi-cart-fill text-primary"></i>
                                     <span th:text="${detalleVenta.nombreItem}"></span>,
                                     x<span th:text="${detalleVenta.cantidad}"></span>
                                     <br>
                                     Subtotal: <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
+                                    <!-- Botón para Abrir el Modal -->
+                                    <button class="btn btn-outline-secondary btn-sm detalle-btn edit-product-btn"
+                                            th:data-id="${detalleVenta.id}"
+                                            th:data-producto="${detalleVenta.idItem}"
+                                            th:data-cantidad="${detalleVenta.cantidad}"
+                                            th:data-precio="${detalleVenta.precio_unitario}"
+                                            th:data-colaborador="${detalleVenta.colaborador.id}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editProductoModal">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
                                 </div>
                             </div>
+
+
                         </td>
 
 
@@ -167,6 +205,329 @@
             </table>
 
         </div>
+
+        <!-- Modal para Editar Producto -->
+        <div class="modal fade" id="editProductoModal" tabindex="-1" aria-labelledby="editProductoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProductoModalLabel">Editar Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProductoForm">
+                            <!-- Producto -->
+                            <div class="mb-3">
+                                <input type="hidden" name="idDetalle" id="editDetalleId">
+                                <label for="editProducto" class="form-label">Producto</label>
+                                <select class="form-select" id="editProducto" name="producto">
+                                    <option value="" selected disabled>Seleccione una opción</option>
+                                    <option th:each="producto : ${listaProductos}" th:value="${producto.id}" th:text="${producto.nombre}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Cantidad -->
+                            <div class="mb-3">
+                                <label for="editCantidad" class="form-label">Cantidad</label>
+                                <input type="number" name="cantidad" id="editCantidad" class="form-control" placeholder="Ingresa la cantidad" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPrecio" class="form-label">Precio</label>
+                                <input class="form-control" type="number" name="precio" id="editPrecio" min="0.01"
+                                       step="0.01" placeholder="Precio por unidad" required>
+                            </div>
+                            <!-- Colaborador -->
+                            <div class="mb-3">
+                                <label for="editColaborador" class="form-label">Colaborador</label>
+                                <select class="form-select" id="editColaborador" name="idColaborador" required>
+                                    <option value="" selected disabled>Seleccione una opción</option>
+                                    <th:block th:each="colaborador : ${listaColaboradores}">
+                                        <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger" id="deleteProductoBtn">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" id="saveProductoBtn">Guardar</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const editProductButtons = document.querySelectorAll('.edit-product-btn');
+                const saveProductoBtn = document.getElementById('saveProductoBtn');
+                const editProductoForm = document.getElementById('editProductoForm');
+
+                // Llenar los campos del modal al abrirlo
+                editProductButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        document.getElementById('editDetalleId').value = this.dataset.id;
+                        document.getElementById('editProducto').value = this.dataset.producto;
+                        document.getElementById('editPrecio').value = this.dataset.precio;
+                        document.getElementById('editCantidad').value = this.dataset.cantidad;
+                        document.getElementById('editColaborador').value = this.dataset.colaborador;
+                    });
+                });
+
+                // Manejar el envío del formulario
+                saveProductoBtn.addEventListener('click', function () {
+                    const formData = new FormData(editProductoForm);
+
+                    fetch('/app/servicios/editar-detalleventa/producto', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Mostrar confirmación con SweetAlert
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: 'El producto se actualizó correctamente.',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    location.reload(); // Recargar la página después de cerrar el aviso
+                                });
+                            } else {
+                                throw new Error('Error al guardar el producto');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            // Mostrar error con SweetAlert
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Hubo un problema al actualizar el producto. Inténtalo de nuevo.',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        });
+                });
+            });
+        </script>
+
+        <!-- Modal para Editar Servicio -->
+        <div class="modal fade" id="editServicioModal" tabindex="-1" aria-labelledby="editServicioModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editServicioModalLabel">Editar Servicio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editServicioForm">
+                            <input type="hidden" name="idDetalle" id="editDetalleIdS">
+                            <div id="editServicioBContainer" class="mb-3">
+                                <label for="editServicio" class="form-label">Servicio</label>
+                                <select class="form-select" id="editServicio" name="servicio">
+                                    <option value="" selected disabled>Seleccione una opción</option>
+                                    <option th:each="servicio : ${listaTipoServicio}" th:value="${servicio.id}" th:text="${servicio.nombre}">
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Precio -->
+                            <div class="mb-3">
+                                <label for="editPrecio" class="form-label">Precio</label>
+                                <input class="form-control" type="number" name="precio" id="editPrecioS" min="0.01" step="0.01"
+                                       placeholder="Precio por unidad" required>
+                            </div>
+                            <!-- Colaborador -->
+                            <div class="mb-3">
+                                <label for="editColaborador" class="form-label">Colaborador</label>
+                                <select class="form-select" id="editColaboradorS" name="idColaborador" required>
+                                    <option value="" selected disabled>Seleccione un colaborador</option>
+                                    <th:block th:each="colaborador : ${listaColaboradores}">
+                                        <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-danger" id="deleteServicioBtn">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" id="saveServicioBtn" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const editServicioButtons = document.querySelectorAll('.edit-servicio-btn');
+                const saveServicioBtn = document.getElementById('saveServicioBtn');
+                const editServicioForm = document.getElementById('editServicioForm');
+
+                // Llenar los campos al abrir el modal
+                editServicioButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        document.getElementById('editDetalleIdS').value = this.dataset.id;
+                        document.getElementById('editServicio').value = this.dataset.servicio;
+                        document.getElementById('editPrecioS').value = this.dataset.precio;
+                        document.getElementById('editColaboradorS').value = this.dataset.colaborador;
+                    });
+                });
+
+                // Manejar el envío del formulario
+                saveServicioBtn.addEventListener('click', function () {
+                    const formData = new FormData(editServicioForm);
+
+                    fetch('/app/servicios/editar-detalleventa/servicio', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Confirmación con SweetAlert
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: 'El servicio se actualizó correctamente.',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    location.reload(); // Recargar página
+                                });
+                            } else {
+                                throw new Error('Error al guardar el servicio');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            // Notificación de error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Hubo un problema al actualizar el servicio. Inténtalo de nuevo.',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        });
+                });
+            });
+        </script>
+
+
+        <script>
+            //ELIMINAR DETALLE VENTA
+            document.addEventListener('DOMContentLoaded', function () {
+                const deleteProductoBtn = document.getElementById('deleteProductoBtn'); // Botón Eliminar Producto
+                const deleteServicioBtn = document.getElementById('deleteServicioBtn'); // Botón Eliminar Servicio
+
+                // Funcionalidad para eliminar Producto
+                deleteProductoBtn.addEventListener('click', function () {
+                    const detalleId = document.getElementById('editDetalleId').value; // Obtener el ID del detalleVenta
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '¿Estás seguro?',
+                        text: 'No podrás revertir esta acción.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/app/servicios/eliminar-detalleventa/${detalleId}`, {
+                                method: 'DELETE',
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Producto Eliminado',
+                                        text: 'El producto se eliminó correctamente.',
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        location.reload(); // Recargar la página después de eliminar
+                                    });
+                                } else {
+                                    throw new Error('Error al eliminar el producto');
+                                }
+                            })
+                            .catch(error => {
+                                console.error(error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Hubo un problema al eliminar el producto. Inténtalo de nuevo.',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            });
+                        }
+                    });
+                });
+
+                // Funcionalidad para eliminar Servicio
+                deleteServicioBtn.addEventListener('click', function () {
+                    const detalleId = document.getElementById('editDetalleId').value; // Obtener el ID del detalleVenta
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '¿Estás seguro?',
+                        text: 'No podrás revertir esta acción.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/app/servicios/eliminar-detalleventa/${detalleId}`, {
+                                method: 'DELETE',
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Servicio Eliminado',
+                                        text: 'El servicio se eliminó correctamente.',
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        location.reload(); // Recargar la página después de eliminar
+                                    });
+                                } else {
+                                    throw new Error('Error al eliminar el servicio');
+                                }
+                            })
+                            .catch(error => {
+                                console.error(error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Hubo un problema al eliminar el servicio. Inténtalo de nuevo.',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            });
+                        }
+                    });
+                });
+
+                // Asegúrate de asignar el ID del detalle al modal de servicio cuando se haga clic en el botón de editar
+                const editServicioButtons = document.querySelectorAll('.detalle-btn');
+                editServicioButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const detalleId = this.dataset.id; // Obtener el ID de detalle desde el botón
+                        document.getElementById('editDetalleId').value = detalleId; // Asignar al campo oculto
+                    });
+                });
+            });
+
+
+        </script>
+
+
 
         <div class="modal fade" id="editIngresoModal" tabindex="-1" aria-labelledby="editIngresoModalLabel"
              aria-hidden="true">
@@ -1032,7 +1393,8 @@
 
         </script>
 
-        <div class="tab-pane fade" id="realizados" role="tabpanel" aria-labelledby="realizados-tab" style="margin-bottom:100px;">
+        <div class="tab-pane fade" id="realizados" role="tabpanel" aria-labelledby="realizados-tab"
+             style="margin-bottom:100px;">
             <h4 class="text-center mb-4">Servicios y Productos Realizados</h4>
             <table id="realizadosTable" class="table table-striped table-bordered" style="width:100%">
                 <thead>
@@ -1066,9 +1428,12 @@
 
                         <!-- Cliente -->
                         <td>
-                            <i class="bi bi-person"></i> <strong th:text="${detalle.cliente != null ? detalle.cliente.nombre : ''}">CLIENTE</strong><br>
-                            <i class="bi bi-telephone"></i> <span th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELÉFONO</span><br>
-                            <i class="bi bi-card-text"></i> <span th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">IDENTIFICACIÓN</span>
+                            <i class="bi bi-person"></i> <strong
+                                th:text="${detalle.cliente != null ? detalle.cliente.nombre : ''}">CLIENTE</strong><br>
+                            <i class="bi bi-telephone"></i> <span
+                                th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELÉFONO</span><br>
+                            <i class="bi bi-card-text"></i> <span
+                                th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">IDENTIFICACIÓN</span>
                         </td>
 
                         <!-- Servicios/Productos -->
@@ -1077,7 +1442,8 @@
                             <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
                                 <strong><i class="bi bi-tools"></i> Servicios:</strong>
                                 <ul style="list-style: none; padding-left: 1em;">
-                                    <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}" th:if="${detalleVenta.tipoItemNombre == 'Servicio'}">
+                                    <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
+                                        th:if="${detalleVenta.tipoItemNombre == 'Servicio'}">
                                         <i class="bi bi-check-circle-fill text-success"></i>
                                         <span th:text="${detalleVenta.nombreItem}"></span>
                                         - <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong><br>
@@ -1091,7 +1457,8 @@
                             <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
                                 <strong><i class="bi bi-box"></i> Productos:</strong>
                                 <ul style="list-style: none; padding-left: 1em;">
-                                    <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}" th:if="${detalleVenta.tipoItemNombre == 'Producto'}">
+                                    <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
+                                        th:if="${detalleVenta.tipoItemNombre == 'Producto'}">
                                         <i class="bi bi-cart-fill text-primary"></i>
                                         <span th:text="${detalleVenta.nombreItem}"></span>,
                                         x<span th:text="${detalleVenta.cantidad}"></span><br>

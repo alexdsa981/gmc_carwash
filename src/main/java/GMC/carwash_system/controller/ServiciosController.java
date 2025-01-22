@@ -58,43 +58,44 @@ public class ServiciosController {
     VentaRepository ventaRepository;
 
     public Model retornaListaIngresoClientes(Model model) {
-        List<DetalleIngresoVehiculo> listaIngresos= detalleIngresoVehiculoRepository.findByRealizadoFalseOrderByFechaDescHoraDesc();
-            for (DetalleIngresoVehiculo ingreso : listaIngresos){
-                if (ingreso.getListaDetalleVentas() != null) {
-                    List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
-                    for (DetalleVenta detalleVenta: ingreso.getListaDetalleVentas()){
-                        DetalleVentaDTO detalleVentaDTO = new DetalleVentaDTO(detalleVenta);
+        List<DetalleIngresoVehiculo> listaIngresos = detalleIngresoVehiculoRepository.findByRealizadoFalseOrderByFechaDescHoraDesc();
+        for (DetalleIngresoVehiculo ingreso : listaIngresos) {
+            if (ingreso.getListaDetalleVentas() != null) {
+                List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
+                for (DetalleVenta detalleVenta : ingreso.getListaDetalleVentas()) {
+                    DetalleVentaDTO detalleVentaDTO = new DetalleVentaDTO(detalleVenta);
 
-                        if (detalleVenta.getTipoItem().getId() == 1){
-                            detalleVentaDTO.setNombreItem(tipoServicioRepository.findById(detalleVenta.getIdItem()).get().getNombre());
-                        } else if (detalleVenta.getTipoItem().getId() == 2){
-                            detalleVentaDTO.setNombreItem(productoRepository.findById(detalleVenta.getIdItem()).get().getNombre());
-                        }else{
-                            detalleVentaDTO.setNombreItem("N/D");
-                        }
-
-
-                        listaDetallesDTO.add(detalleVentaDTO);
+                    if (detalleVenta.getTipoItem().getId() == 1) {
+                        detalleVentaDTO.setNombreItem(tipoServicioRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+                    } else if (detalleVenta.getTipoItem().getId() == 2) {
+                        detalleVentaDTO.setNombreItem(productoRepository.findById(detalleVenta.getIdItem()).get().getNombre());
+                    } else {
+                        detalleVentaDTO.setNombreItem("N/D");
                     }
-                    ingreso.setListaDetalleVentasDTO(listaDetallesDTO);
+
+
+                    listaDetallesDTO.add(detalleVentaDTO);
                 }
+                ingreso.setListaDetalleVentasDTO(listaDetallesDTO);
+            }
         }
         model.addAttribute("listaIngresos", listaIngresos);
         return model;
     }
+
     public Model retornaListaRealizados(Model model) {
-        List<DetalleIngresoVehiculo> listaIngresosRealizados= detalleIngresoVehiculoRepository.findByRealizadoTrueOrderByFechaDescHoraDesc();
-        for (DetalleIngresoVehiculo ingreso : listaIngresosRealizados){
+        List<DetalleIngresoVehiculo> listaIngresosRealizados = detalleIngresoVehiculoRepository.findByRealizadoTrueOrderByFechaDescHoraDesc();
+        for (DetalleIngresoVehiculo ingreso : listaIngresosRealizados) {
             if (ingreso.getListaDetalleVentas() != null) {
                 List<DetalleVentaDTO> listaDetallesDTO = new ArrayList<>();
-                for (DetalleVenta detalleVenta: ingreso.getListaDetalleVentas()){
+                for (DetalleVenta detalleVenta : ingreso.getListaDetalleVentas()) {
                     DetalleVentaDTO detalleVentaDTO = new DetalleVentaDTO(detalleVenta);
 
-                    if (detalleVenta.getTipoItem().getId() == 1){
+                    if (detalleVenta.getTipoItem().getId() == 1) {
                         detalleVentaDTO.setNombreItem(tipoServicioRepository.findById(detalleVenta.getIdItem()).get().getNombre());
-                    } else if (detalleVenta.getTipoItem().getId() == 2){
+                    } else if (detalleVenta.getTipoItem().getId() == 2) {
                         detalleVentaDTO.setNombreItem(productoRepository.findById(detalleVenta.getIdItem()).get().getNombre());
-                    }else{
+                    } else {
                         detalleVentaDTO.setNombreItem("N/D");
                     }
                     listaDetallesDTO.add(detalleVentaDTO);
@@ -107,13 +108,12 @@ public class ServiciosController {
     }
 
 
-
-
     public Model retornaListaTipoServicio(Model model) {
         List<TipoServicio> listaTipoServicio = tipoServicioRepository.findAll();
         model.addAttribute("listaTipoServicio", listaTipoServicio);
         return model;
     }
+
     public Model retornaListaTipoServicio_Especial_Basico(Model model) {
         List<TipoServicio> listaTipoServicioBasico = tipoServicioRepository.findByIsEspecialFalse();
         model.addAttribute("listaTipoServicioBasico", listaTipoServicioBasico);
@@ -121,24 +121,27 @@ public class ServiciosController {
         model.addAttribute("listaTipoServicioEspecial", listaTipoServicioEspecial);
         return model;
     }
+
     public Model retornaListaPrecioServicio(Model model) {
         List<PrecioServicio> listaPrecioServicio = precioServicioRepository.findAll();
         model.addAttribute("listaPrecioServicio", listaPrecioServicio);
         return model;
     }
+
     public Model retornaListaTipoVehiculo(Model model) {
-        List<TipoVehiculo> listaTipoVehiculo= tipoVehiculoRepository.findAll();
+        List<TipoVehiculo> listaTipoVehiculo = tipoVehiculoRepository.findAll();
         model.addAttribute("listaTipoVehiculo", listaTipoVehiculo);
         return model;
     }
 
     public Model retornaListaTipoItem(Model model) {
-        List<TipoItem> listaTipoItem= tipoItemRepository.findAll();
+        List<TipoItem> listaTipoItem = tipoItemRepository.findAll();
         model.addAttribute("listaTipoItem", listaTipoItem);
         return model;
     }
+
     public Model retornaListaMetodoPago(Model model) {
-        List<MetodoPago> ListaMetodoPago= metodoPagoRepository.findAll();
+        List<MetodoPago> ListaMetodoPago = metodoPagoRepository.findAll();
         model.addAttribute("ListaMetodoPago", ListaMetodoPago);
         return model;
     }
@@ -192,7 +195,7 @@ public class ServiciosController {
             venta.setHora(LocalTime.now());
             ventaRepository.save(venta);
 
-            for (Long id : detalleVentaIds){
+            for (Long id : detalleVentaIds) {
                 DetalleVenta detalleVenta = detalleVentaRepository.findById(id).get();
                 detalleVenta.setVenta(venta);
                 detalleVentaRepository.save(detalleVenta);
@@ -204,8 +207,6 @@ public class ServiciosController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", e.getMessage()));
         }
     }
-
-
 
 
     @GetMapping("/ingreso/{idIngreso}")
@@ -230,6 +231,7 @@ public class ServiciosController {
 
 
 
+
     @PostMapping("/agregar-detalle-venta")
     public String addServicio(
             @RequestParam("tipoVenta") Long idTipoVenta,
@@ -244,41 +246,42 @@ public class ServiciosController {
         DetalleIngresoVehiculo detalleIngresoVehiculo = detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get();
         TipoVehiculo tipoVehiculo = detalleIngresoVehiculo.getVehiculo().getTipo_vehiculo();
         DetalleVenta detalleVenta = new DetalleVenta();
-        if (idTipoVenta == 1){ //SERVICIO
+        if (idTipoVenta == 1) { //SERVICIO
             detalleVenta.setCantidad(1);
-            if (IDservicioBasico != null){
+            if (IDservicioBasico != null) {
                 detalleVenta.setIdItem(IDservicioBasico);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(1L).get());
                 //si no se agrega precio, puede usarse uno personalizado
-                if (precioUnitarioPersonalizado == null){
+                if (precioUnitarioPersonalizado == null) {
                     detalleVenta.setPrecio_unitario(precioServicioRepository.buscarPorTipoServicioYVehiculo(IDservicioBasico, tipoVehiculo.getId()).get().getPrecio());
                     detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario());
-                }else{
+                } else {
                     detalleVenta.setPrecio_unitario(precioUnitarioPersonalizado);
                     detalleVenta.setSubtotal(precioUnitarioPersonalizado);
                 }
             }
-            if (IDservicioEspecial != null){
+            if (IDservicioEspecial != null) {
                 detalleVenta.setIdItem(IDservicioEspecial);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(1L).get());
                 //si no se agrega precio, puede usarse uno personalizado
-                if (precioUnitarioPersonalizado == null){
+                if (precioUnitarioPersonalizado == null) {
                     detalleVenta.setPrecio_unitario(precioServicioRepository.buscarPorTipoServicioYVehiculo(IDservicioBasico, tipoVehiculo.getId()).get().getPrecio());
                     detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario());
-                }else{
+                } else {
                     detalleVenta.setPrecio_unitario(precioUnitarioPersonalizado);
                     detalleVenta.setSubtotal(precioUnitarioPersonalizado);
                 }
             }
-        }if (idTipoVenta == 2){ //PRODUCTO
+        }
+        if (idTipoVenta == 2) { //PRODUCTO
             detalleVenta.setColaborador(null);
-            if (IDproducto != null){
+            if (IDproducto != null) {
                 detalleVenta.setIdItem(IDproducto);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(2L).get());
                 detalleVenta.setCantidad(cantidad);
-                if (precioUnitarioPersonalizado == null){
+                if (precioUnitarioPersonalizado == null) {
                     detalleVenta.setPrecio_unitario(productoRepository.findById(IDproducto).get().getPrecio_venta());
-                }else{
+                } else {
                     detalleVenta.setPrecio_unitario(precioUnitarioPersonalizado);
                 }
                 detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario().multiply(BigDecimal.valueOf(cantidad)));
@@ -288,28 +291,79 @@ public class ServiciosController {
         detalleVenta.setDetalleIngresoVehiculo(detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get());
         detalleVentaRepository.save(detalleVenta);
 
-        // Imprimir los valores enviados
-        System.out.println("-------------Recibidos-------------");
-        System.out.println("Tipo de Venta: " + idTipoVenta);
-        System.out.println("id detalle" + idDetalleIngreso);
-        System.out.println("Producto: " + IDproducto);
-        System.out.println("cantidad: " + cantidad);
-        System.out.println("Servicio Básico: " + IDservicioBasico);
-        System.out.println("Servicio Especial: " + IDservicioEspecial);
-        System.out.println("precio: " + precioUnitarioPersonalizado);
-        System.out.println("Colaborador ID: " + idColaborador);
-        System.out.println("-------------Detalle Venta-------------");
-        System.out.println("TIPO DE VENTA:" + detalleVenta.getTipoItem().getNombre());
-        System.out.println("id detalle ingreso" + idDetalleIngreso);
-        System.out.println("ID ITEM:" + detalleVenta.getIdItem());
-        System.out.println("CANTIDAD: " + detalleVenta.getCantidad());
-        System.out.println("PRECIO UNITARIO:" + detalleVenta.getPrecio_unitario());
-        System.out.println("SUBTOTAL: " + detalleVenta.getSubtotal());
-        System.out.println("ID COLABORADOR: " + detalleVenta.getColaborador().getId());
-        System.out.println("VENTA: " + detalleVenta.getVenta());
-
         return "redirect:/servicios";
     }
+
+    @PostMapping("/editar-detalleventa/producto")
+    public ResponseEntity<String> editarProducto(
+            @RequestParam("idDetalle") Long idDetalle,
+            @RequestParam("precio") BigDecimal precio,
+            @RequestParam("producto") Long productoId,
+            @RequestParam("cantidad") Integer cantidad,
+            @RequestParam("idColaborador") Long colaboradorId) {
+        // Lógica para editar el producto en la base de datos
+        try {
+            // Ejemplo: Lógica de actualización
+            DetalleVenta detalle = detalleVentaRepository.findById(idDetalle).get();
+            detalle.setIdItem(productoId);
+            detalle.setCantidad(cantidad);
+            detalle.setPrecio_unitario(precio);
+            detalle.setSubtotal(detalle.getPrecio_unitario().multiply(BigDecimal.valueOf(cantidad)));
+            detalle.setColaborador(colaboradorRepository.findById(colaboradorId).get());
+            detalleVentaRepository.save(detalle);
+            return ResponseEntity.ok("Producto actualizado con éxito");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el producto");
+        }
+    }
+
+
+
+    @PostMapping("/editar-detalleventa/servicio")
+    @ResponseBody
+    public ResponseEntity<String> editarDetalleVentaServicio(
+            @RequestParam Long idDetalle,
+            @RequestParam Long servicio,
+            @RequestParam BigDecimal precio,
+            @RequestParam Long idColaborador
+    ) {
+        try {
+            DetalleVenta detalleVenta = detalleVentaRepository.findById(idDetalle)
+                    .orElseThrow(() -> new IllegalArgumentException("Detalle no encontrado"));
+
+            detalleVenta.setIdItem(servicio);
+            detalleVenta.setPrecio_unitario(precio);
+            detalleVenta.setSubtotal(precio);
+            detalleVenta.setColaborador(colaboradorRepository.findById(idColaborador).orElseThrow());
+            detalleVentaRepository.save(detalleVenta);
+
+            return ResponseEntity.ok("Servicio actualizado con éxito");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el servicio");
+        }
+    }
+
+    @DeleteMapping("/eliminar-detalleventa/{idDetalle}")
+    @ResponseBody
+    public ResponseEntity<String> eliminarDetalleVenta(@PathVariable("idDetalle") Long idDetalle) {
+        try {
+            // Verificar si el detalle existe
+            Optional<DetalleVenta> detalleVentaOptional = detalleVentaRepository.findById(idDetalle);
+
+            if (!detalleVentaOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Detalle no encontrado.");
+            }
+
+            detalleVentaRepository.deleteById(idDetalle);
+
+            return ResponseEntity.ok("Detalle eliminado exitosamente.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el detalle.");
+        }
+    }
+
+
+
 
 
     @PostMapping("/agregar-ingreso/{placa}")
@@ -368,7 +422,6 @@ public class ServiciosController {
     }
 
 
-
     @PostMapping("/editar-detalle-servicio/{id}")
     public ResponseEntity<String> editarDetalleIngreso(
             @PathVariable("id") Long idDetalle,
@@ -388,7 +441,7 @@ public class ServiciosController {
         cliente.setTelefono(telefono);
         cliente.setIdentificacion(identificacion);
 
-        if(idTipoVehiculo != null){
+        if (idTipoVehiculo != null) {
             vehiculo.setTipo_vehiculo(tipoVehiculoRepository.findById(idTipoVehiculo).get());
         }
         vehiculo.setMarca(marca);
@@ -414,12 +467,10 @@ public class ServiciosController {
     }
 
 
-
-
     @PostMapping("/crear-tipo-servicio")
     public ResponseEntity<String> crearTipoServicio(
-            @RequestParam("nombre")String nombre,
-            @RequestParam("descripcion")String descripcion,
+            @RequestParam("nombre") String nombre,
+            @RequestParam("descripcion") String descripcion,
             HttpServletResponse response
     ) throws IOException {
         TipoServicio tipoServicio = new TipoServicio();
@@ -433,8 +484,8 @@ public class ServiciosController {
     @PostMapping("/editar-tipo-servicio")
     public ResponseEntity<String> editarTipoServicio(
             @PathVariable Long id,
-            @RequestParam("nombre")String nombre,
-            @RequestParam("descripcion")String descripcion,
+            @RequestParam("nombre") String nombre,
+            @RequestParam("descripcion") String descripcion,
             HttpServletResponse response
     ) throws IOException {
         // Buscar al colaborador
@@ -458,8 +509,8 @@ public class ServiciosController {
     @PostMapping("/crear-precio-servicio")
     public ResponseEntity<String> crearPrecioServicio(
             @RequestParam("precio") BigDecimal precio,
-            @RequestParam("idTipoServicio")Long idTipoServicio,
-            @RequestParam("idTipoVehiculo")Long idTipoVehiculo,
+            @RequestParam("idTipoServicio") Long idTipoServicio,
+            @RequestParam("idTipoVehiculo") Long idTipoVehiculo,
             HttpServletResponse response
     ) throws IOException {
 
@@ -476,12 +527,12 @@ public class ServiciosController {
     public ResponseEntity<String> editarPrecioServicio(
             @PathVariable Long id,
             @RequestParam("precio") BigDecimal precio,
-            @RequestParam("idTipoServicio")Long idTipoServicio,
-            @RequestParam("idTipoVehiculo")Long idTipoVehiculo,
+            @RequestParam("idTipoServicio") Long idTipoServicio,
+            @RequestParam("idTipoVehiculo") Long idTipoVehiculo,
             HttpServletResponse response
     ) throws IOException {
         // Buscar al colaborador
-        Optional<PrecioServicio> optionalPrecioServicio= precioServicioRepository.findById(id);
+        Optional<PrecioServicio> optionalPrecioServicio = precioServicioRepository.findById(id);
         if (optionalPrecioServicio.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PrecioServicio no encontrado");
         }
