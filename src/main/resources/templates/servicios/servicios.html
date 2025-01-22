@@ -957,7 +957,7 @@
                         const vehiculo = await vehiculoResponse.json();
                         document.getElementById("marca").value = vehiculo.marca;
                         document.getElementById("modelo").value = vehiculo.modelo;
-                        const tipoVehiculoId = vehiculo.tipoVehiculo.id;
+                        const tipoVehiculoId = vehiculo.tipo_vehiculo.id;
                         const select = document.getElementById("tipoVehiculo");
                         for (let option of select.options) {
                             if (option.value == tipoVehiculoId) {

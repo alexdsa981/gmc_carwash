@@ -1,17 +1,13 @@
 package GMC.carwash_system.controller;
 
-import GMC.carwash_system.model.dto.ClienteDTO;
-import GMC.carwash_system.model.dto.VehiculoDTO;
+import GMC.carwash_system.model.dto.ClienteVehiculosDTO;
 import GMC.carwash_system.model.entidades.Cliente;
-import GMC.carwash_system.model.entidades.Colaborador;
 import GMC.carwash_system.model.entidades.Vehiculo;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.ClienteRepository;
 import GMC.carwash_system.repository.entidades.VehiculoRepository;
-import ch.qos.logback.core.net.server.Client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,22 +32,25 @@ public class ClienteController {
 
     public Model retornaListaClientes(Model model) {
         List<Cliente> listaClientes = clienteRepository.findByIsActiveTrue();
-
+        List<ClienteVehiculosDTO> listaClientesDTO = new ArrayList<>();
         // Convertir las listas de placas de los clientes a JSON
         for (Cliente cliente : listaClientes) {
-            // Asegurarse de que listaPlacas esté correctamente inicializada
-            List<String> listaPlacas = cliente.getListaPlacas(); // Obtener la lista de placas
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository);
+            listaClientesDTO.add(clienteVehiculosDTO);
+
+             //Asegurarse de que listaPlacas esté correctamente inicializada
+            List<String> listaPlacas = clienteVehiculosDTO.getListaPlacas(); // Obtener la lista de placas
             try {
                 // Convertir la lista de placas a JSON
                 String placasJson = objectMapper.writeValueAsString(listaPlacas);
-                cliente.setListaPlacasJson(placasJson);  // Establecer el JSON en una nueva propiedad
+                clienteVehiculosDTO.setListaPlacasJson(placasJson);  // Establecer el JSON en una nueva propiedad
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
         }
 
         // Agregar la lista de clientes con los JSON de placas al modelo
-        model.addAttribute("listaClientes", listaClientes);
+        model.addAttribute("listaClientes", listaClientesDTO);
         return model;
     }
 
@@ -98,16 +96,24 @@ public class ClienteController {
     @PutMapping("/editar/{id}")
     public ResponseEntity<Map<String, String>> editarCliente(
             @PathVariable("id") Long id,
-            @RequestBody ClienteDTO clienteDTO
+            @RequestBody ClienteVehiculosDTO clienteVehiculosDTO
     ) {
+        System.out.println(id);
+        System.out.println(clienteVehiculosDTO.getNombre());
+        System.out.println(clienteVehiculosDTO.getIdentificacion());
+        System.out.println(clienteVehiculosDTO.getTelefono());
+        System.out.println(clienteVehiculosDTO.getListaVehiculos());
+        System.out.println(clienteVehiculosDTO.getListaPlacas());
+        System.out.println(clienteVehiculosDTO.getListaPlacasJson());
+
         // Buscar al cliente existente
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         // Actualizar los datos básicos del cliente
-        cliente.setNombre(clienteDTO.getNombre());
-        cliente.setTelefono(clienteDTO.getTelefono());
-        cliente.setIdentificacion(clienteDTO.getIdentificacion());
+        cliente.setNombre(clienteVehiculosDTO.getNombre());
+        cliente.setTelefono(clienteVehiculosDTO.getTelefono());
+        cliente.setIdentificacion(clienteVehiculosDTO.getIdentificacion());
 
         // Obtener los vehículos actuales del cliente
         List<Vehiculo> vehiculosActuales = vehiculoRepository.findByCliente(cliente);
@@ -117,7 +123,13 @@ public class ClienteController {
                 .collect(Collectors.toMap(Vehiculo::getPlaca, vehiculo -> vehiculo));
 
         // Lista de placas recibidas desde el frontend
-        List<String> placasRecibidas = clienteDTO.getPlacas();
+//        List<String> placasRecibidas = new ArrayList<>();
+//        List<Vehiculo> vehiculos = clienteVehiculosDTO.getListaVehiculos();
+//        for (Vehiculo vehiculo : vehiculos){
+//            placasRecibidas.add(vehiculo.getPlaca());
+//        }
+
+        List<String> placasRecibidas = clienteVehiculosDTO.getListaPlacas();
 
         // Crear una lista para los vehículos finales
         List<Vehiculo> vehiculosFinales = new ArrayList<>();
@@ -176,22 +188,22 @@ public class ClienteController {
 
 
     @GetMapping("/buscar-cliente-por-placa/{placa}")
-    public ResponseEntity<ClienteDTO> buscarClientePorPlaca(@PathVariable String placa) {
+    public ResponseEntity<ClienteVehiculosDTO> buscarClientePorPlaca(@PathVariable String placa) {
         Optional<Vehiculo> vehiculo = vehiculoRepository.findByPlaca(placa);
         if (vehiculo.isPresent()) {
-            ClienteDTO clienteDTO = new ClienteDTO(vehiculo.get().getCliente());
-            return ResponseEntity.ok(clienteDTO);
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(vehiculo.get().getCliente(), vehiculoRepository);
+            return ResponseEntity.ok(clienteVehiculosDTO);
         }
         return ResponseEntity.notFound().build();
     }
 
 
     @GetMapping("/buscar-vehiculo-por-placa/{placa}")
-    public ResponseEntity<VehiculoDTO> buscarVehiculoPorPlaca(@PathVariable String placa) {
+    public ResponseEntity<Vehiculo> buscarVehiculoPorPlaca(@PathVariable String placa) {
         Optional<Vehiculo> vehiculo = vehiculoRepository.findByPlaca(placa);
         if (vehiculo.isPresent()) {
-            VehiculoDTO vehiculoDTO = new VehiculoDTO(vehiculo.get());
-            return ResponseEntity.ok(vehiculoDTO);
+            Vehiculo vehiculoEncontrado = vehiculo.get();
+            return ResponseEntity.ok(vehiculoEncontrado);
         }
         return ResponseEntity.notFound().build();
     }

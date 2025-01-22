@@ -29,18 +29,5 @@ public class Cliente {
     @OneToMany(mappedBy = "cliente")
     private List<Vehiculo> listaVehiculos;
 
-    @Transient
-    private List<String> listaPlacas;
-
-    @Transient
-    private String listaPlacasJson;  // Nueva propiedad para almacenar la lista de placas como JSON
-
-    public List<String> getListaPlacas(){
-        List<String> listaPlacas = new ArrayList<>();
-        for (Vehiculo vehiculo : listaVehiculos){
-            listaPlacas.add(vehiculo.getPlaca());
-        }
-        return listaPlacas;
-    }
 
 }

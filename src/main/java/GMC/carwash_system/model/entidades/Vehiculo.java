@@ -1,6 +1,7 @@
 package GMC.carwash_system.model.entidades;
 
 import GMC.carwash_system.model.clasificadores.TipoVehiculo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,11 +28,13 @@ public class Vehiculo {
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
+    @JsonIgnore
     private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_vehiculo")
     private TipoVehiculo tipo_vehiculo;
+
 
 
 }
