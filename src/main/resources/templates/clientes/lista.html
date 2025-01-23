@@ -96,7 +96,7 @@
                                                 th:data-placa="${vehiculo.placa}"
                                                 th:data-marca="${vehiculo.marca}"
                                                 th:data-modelo="${vehiculo.modelo}"
-                                                th:data-tipo="${vehiculo.tipo_vehiculo != null ? vehiculo.tipo_vehiculo.nombre : 'N/D'}">
+                                                th:data-id-tipo="${vehiculo.tipo_vehiculo != null ? vehiculo.tipo_vehiculo.id : ''}">
                                             <i class="bi bi-gear"></i>
                                         </button>
 
@@ -144,25 +144,32 @@
                             <!-- Placa -->
                             <div class="mb-3">
                                 <label for="editPlaca" class="form-label">Placa</label>
-                                <input type="text" class="form-control" id="editPlaca" required>
+                                <input type="text" class="form-control" id="editPlaca" name="placa" required>
                             </div>
 
                             <!-- Marca -->
                             <div class="mb-3">
                                 <label for="editMarca" class="form-label">Marca</label>
-                                <input type="text" class="form-control" id="editMarca" required>
+                                <input type="text" class="form-control" id="editMarca" name="marca">
                             </div>
 
                             <!-- Modelo -->
                             <div class="mb-3">
                                 <label for="editModelo" class="form-label">Modelo</label>
-                                <input type="text" class="form-control" id="editModelo" required>
+                                <input type="text" class="form-control" id="editModelo"  name="modelo">
                             </div>
 
                             <!-- Tipo de Vehículo -->
                             <div class="mb-3">
                                 <label for="editTipo" class="form-label">Tipo de Vehículo</label>
-                                <input type="text" class="form-control" id="editTipo" required>
+                                <select class="form-select" id="editTipo" name="tipoVehiculoId">
+                                    <option value="" disabled>Seleccione el tipo de vehículo</option>
+                                    <option th:each="tipoVehiculo : ${listaTipoVehiculo}"
+                                            th:value="${tipoVehiculo.id}" th:text="${tipoVehiculo.nombre}">
+                                    </option>
+                                </select>
+
+
                             </div>
                         </form>
                     </div>
@@ -195,7 +202,7 @@
             const placa = this.getAttribute('data-placa');
             const marca = this.getAttribute('data-marca');
             const modelo = this.getAttribute('data-modelo');
-            const tipo = this.getAttribute('data-tipo');
+            const tipo = this.getAttribute('data-id-tipo');
 
             // Rellenar el modal con estos datos
             editVehiculoId.value = vehiculoId;
@@ -214,7 +221,7 @@
     saveVehiculoBtn.addEventListener('click', function () {
         const vehiculoData = new FormData(editVehiculoForm);
 
-        fetch(`/app/vehiculos/editar/${editVehiculoId.value}`, {
+        fetch(`/app/cliente/vehiculo/editar/${editVehiculoId.value}`, {
             method: 'POST',
             body: vehiculoData
         })

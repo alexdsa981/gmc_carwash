@@ -1,5 +1,6 @@
 package GMC.carwash_system.controller;
 
+import GMC.carwash_system.model.clasificadores.TipoVehiculo;
 import GMC.carwash_system.model.dto.ClienteVehiculosDTO;
 import GMC.carwash_system.model.entidades.Cliente;
 import GMC.carwash_system.model.entidades.Vehiculo;
@@ -207,6 +208,53 @@ public class ClienteController {
         }
         return ResponseEntity.notFound().build();
     }
+
+
+    @PostMapping("/vehiculo/editar/{id}")
+    public ResponseEntity<String> editarVehiculo(
+            @PathVariable Long id,
+            @RequestParam String placa,
+            @RequestParam(required = false) String marca,
+            @RequestParam(required = false) String modelo,
+            @RequestParam(required = false) Long tipoVehiculoId) {
+
+        try {
+            // Buscar el vehículo por su ID
+            Vehiculo vehiculo = vehiculoRepository.findById(id).orElse(null);
+
+            if (vehiculo == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehículo no encontrado.");
+            }
+
+            // Actualizar los datos del vehículo
+            vehiculo.setPlaca(placa);
+
+            // Manejar valores nulos o vacíos para marca y modelo
+            vehiculo.setMarca(marca != null && !marca.trim().isEmpty() ? marca : null);
+            vehiculo.setModelo(modelo != null && !modelo.trim().isEmpty() ? modelo : null);
+
+            // Manejar el tipo de vehículo
+            if (tipoVehiculoId != null) {
+                TipoVehiculo tipoVehiculo = tipoVehiculoRepository.findById(tipoVehiculoId).orElse(null);
+                if (tipoVehiculo != null) {
+                    vehiculo.setTipo_vehiculo(tipoVehiculo);
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tipo de vehículo inválido.");
+                }
+            } else {
+                vehiculo.setTipo_vehiculo(null); // Permitir valores nulos para el tipo de vehículo
+            }
+
+            // Guardar los cambios
+            vehiculoRepository.save(vehiculo);
+
+            return ResponseEntity.ok("Vehículo actualizado correctamente.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar el vehículo.");
+        }
+    }
+
+
 
 
 

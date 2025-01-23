@@ -63,6 +63,7 @@ public class WebController {
     //PAGINAS DE CLIENTES
     @GetMapping("/clientes/lista")
     public String paginaListaClientes(Model model) {
+        serviciosController.retornaListaTipoVehiculo(model);
         clienteController.retornaListaClientes(model);
         return "clientes/lista";
     }
