@@ -101,7 +101,7 @@
                             <i class="bi bi-telephone"></i> <span
                                 th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELÉFONO</span><br>
                             <i class="bi bi-card-text"></i> <span
-                                th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">IDENTIFICACIÓN</span>
+                                th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">RUC</span>
                         </td>
 
 
@@ -558,7 +558,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="editIdentificacion" class="form-label">Identificación</label>
+                                <label for="editIdentificacion" class="form-label">RUC</label>
                                 <input type="text" id="editIdentificacion" class="form-control" required>
                             </div>
 
@@ -760,7 +760,7 @@
                         <form id="addIngresoForm">
                             <!-- Campo Placa -->
                             <div class="mb-3">
-                                <small class="text-muted">Placa</small>
+                                <strong>Placa*</strong>
                                 <div class="input-group">
                                     <input type="text" id="placa" class="form-control" placeholder="Ingrese la placa"
                                            required>
@@ -770,7 +770,7 @@
                             </div>
 
                             <!-- Sección Datos del Cliente -->
-                            <h6 class="mt-4">Datos del Cliente</h6>
+                            <h6 class="mt-4">Datos del Cliente <small>(opcional)</small></h6>
 
                             <div class="mb-3">
                                 <small class="text-muted">Nombre</small>
@@ -802,7 +802,7 @@
                             </div>
 
                             <!-- Sección Datos del Vehículo -->
-                            <h6 class="mt-4">Datos del Vehículo</h6>
+                            <h6 class="mt-4">Datos del Vehículo <small>(opcional)</small></h6>
 
                             <div class="mb-3">
                                 <small class="text-muted">Marca</small>
@@ -965,8 +965,17 @@
                                 break;
                             }
                         }
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Placa encontrada.',
+                        text: 'Los datos se han cargado correctamente.',
+                        confirmButtonText: 'Aceptar'
+                    });
+
                         deshabilitarCampos();
                         habilitarBotones();
+
+
                     } catch (error) {
                             Swal.fire({
                                 icon: 'info',
@@ -1433,7 +1442,7 @@
                             <i class="bi bi-telephone"></i> <span
                                 th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELÉFONO</span><br>
                             <i class="bi bi-card-text"></i> <span
-                                th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">IDENTIFICACIÓN</span>
+                                th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">RUC</span>
                         </td>
 
                         <!-- Servicios/Productos -->
