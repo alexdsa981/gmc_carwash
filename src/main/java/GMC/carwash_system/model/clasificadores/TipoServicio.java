@@ -19,5 +19,6 @@ public class TipoServicio {
     private String nombre;
     private String descripcion;
     private Boolean isEspecial;
+    private Boolean isActive;
 
 }

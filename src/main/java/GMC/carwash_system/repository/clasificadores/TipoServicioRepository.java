@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface TipoServicioRepository extends JpaRepository<TipoServicio, Long> {
 
+    List<TipoServicio> findByIsActiveTrue();
     // Obtener lista de servicios especiales (isEspecial = true)
     List<TipoServicio> findByIsEspecialTrue();
 

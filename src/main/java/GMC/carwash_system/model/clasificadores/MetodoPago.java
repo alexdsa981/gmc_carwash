@@ -16,4 +16,5 @@ public class MetodoPago {
 
     @Column(nullable = false)
     private String nombre;
+    private Boolean isActive;
 }

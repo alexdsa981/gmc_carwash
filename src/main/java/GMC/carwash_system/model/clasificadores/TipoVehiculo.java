@@ -16,4 +16,5 @@ public class TipoVehiculo {
 
     @Column(nullable = false)
     private String nombre;
+    private Boolean isActive;
 }

@@ -19,4 +19,5 @@ public class ConceptoPago { //Adelantos, Descuentos, Pago de Sueldo, Horas extra
 
     @Column(nullable = false)
     private Boolean dentro_sueldo;
+    private Boolean isActive;
 }

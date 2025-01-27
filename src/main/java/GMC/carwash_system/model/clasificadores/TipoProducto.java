@@ -16,4 +16,5 @@ public class TipoProducto {
 
     @Column(nullable = false)
     private String nombre;
+    private Boolean isActive;
 }

@@ -16,6 +16,6 @@ public class TipoTransaccion {
 
     @Column(nullable = false)
     String nombre;
-
+    private Boolean isActive;
 
 }
