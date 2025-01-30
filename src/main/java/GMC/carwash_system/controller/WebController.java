@@ -19,6 +19,8 @@ public class WebController {
     ServiciosController serviciosController;
     @Autowired
     InventarioController inventarioController;
+    @Autowired
+    ClasificadoresController clasificadoresController;
 
     @GetMapping("/")
     public String redirectToInicio() {
@@ -77,7 +79,6 @@ public class WebController {
         return "inventario/lista";
     }
 
-    //PAGINAS DE INVENTARIO
     @GetMapping("/inventario/historial")
     public String paginaListaHistorialInventario(Model model) {
         inventarioController.retornaHistorialAlmacen(model);
@@ -86,6 +87,7 @@ public class WebController {
         return "inventario/historial";
     }
 
+    //PAGINAS DE Cuadre
     @GetMapping("/caja/cuadre")
     public String paginaCuadreDeCaja() {
 
@@ -93,5 +95,18 @@ public class WebController {
     }
 
 
+    //PAGINAS DE Clasificadores
+    @GetMapping("/clasificadores/lista")
+    public String paginaClasificadores(Model model) {
+        clasificadoresController.getListaConceptoPagoActivos(model);
+        clasificadoresController.getListaMetodoPagoActivos(model);
+        clasificadoresController.getListaTipoProductoActivos(model);
+        clasificadoresController.getListaTipoVehiculoActivos(model);
+        clasificadoresController.getListaTipoTransaccionActivos(model);
+        clasificadoresController.getListaTipoServicioActivos(model);
+        return "clasificadores/lista";
+    }
+
 
 }
+
