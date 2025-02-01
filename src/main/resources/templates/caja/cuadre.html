@@ -110,7 +110,8 @@
                     `<i class="bi bi-truck"></i> ${totalVehiculos} vehículos atendidos <hr><small>${generateVehiculosList(cuadre.tiposVehiculos)}</small>`,
                     `S/. ${totalProductos.toFixed(2)} <hr><small>${generateProductosList(cuadre.productos)}</small>`,
                     `S/. ${totalServicios.toFixed(2)} <hr><small>${generateServiciosList(cuadre.servicios)}</small>`,
-                    `S/. ${(totalProductos + totalServicios).toFixed(2)}`,
+                    `S/. ${(totalProductos + totalServicios).toFixed(2)} <hr> <small>${generateMetodosList(cuadre.metodosPago)}</small>`, // Métodos de pago
+
                 ];
 
                 // Añadir la nueva fila con los datos
@@ -150,6 +151,18 @@
                 listHTML += `
                     <p><i class="bi bi-gear"></i> ${servicio.nombre}: <strong>${servicio.cantidad}</strong> unidades</p>
                     <p>Subtotal: <strong>S/. ${servicio.recaudado.toFixed(2)}</strong></p>
+                    <hr>
+                `;
+            });
+            return listHTML;
+        }
+
+
+        function generateMetodosList(metodosPago) {
+            let listHTML = '';
+            metodosPago.forEach(metodo => {
+                listHTML += `
+                    <p><i class="bi bi-credit-card"></i> ${metodo.nombre}: S/. <strong>${metodo.total.toFixed(2)}</strong></p>
                     <hr>
                 `;
             });

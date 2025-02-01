@@ -83,7 +83,18 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     List<Object[]> obtenerTiposVehiculosPorDia();
 
 
-
+    @Query(value = """
+            SELECT
+                mp.nombre AS metodoPago,
+                SUM(v.total) AS total,
+            	CAST(v.fecha AS DATE) AS fecha
+            FROM venta v
+            INNER JOIN metodo_pago mp
+            	ON mp.id = v.id_metodo_pago
+            GROUP BY mp.nombre, CAST(v.fecha AS DATE)
+            ORDER BY total DESC
+""", nativeQuery = true)
+    List<Object[]> obtenerMetodosPagoPorDia();
 
 
 
@@ -167,6 +178,20 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     ORDER BY cantidad DESC
     """, nativeQuery = true)
     List<Object[]> obtenerTiposVehiculosRaw();
+
+
+    @Query(value = """
+            SELECT
+                mp.nombre AS metodoPago,
+                SUM(v.total) AS total
+            FROM venta v
+            INNER JOIN metodo_pago mp
+            	ON mp.id = v.id_metodo_pago
+            GROUP BY mp.nombre
+            ORDER BY total DESC
+    """, nativeQuery = true)
+    List<Object[]> obtenerMetodosPagoRaw();
+
 
 }
 

@@ -1,9 +1,6 @@
 package GMC.carwash_system.controller;
 
-import GMC.carwash_system.model.dto.caja.CuadreCajaDTO;
-import GMC.carwash_system.model.dto.caja.ProductoDTO;
-import GMC.carwash_system.model.dto.caja.ServicioDTO;
-import GMC.carwash_system.model.dto.caja.TipoVehiculoDTO;
+import GMC.carwash_system.model.dto.caja.*;
 import GMC.carwash_system.repository.entidades.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +26,7 @@ public class CajaController {
         List<Object[]> resultadosServicios = ventaRepository.obtenerServiciosPorDia();
         List<Object[]> resultadosProductos = ventaRepository.obtenerProductosPorDia();
         List<Object[]> resultadosTiposVehiculos = ventaRepository.obtenerTiposVehiculosPorDia();
+        List<Object[]> resultadosMetodosPago = ventaRepository.obtenerMetodosPagoPorDia();
 
         // Crear un mapa para almacenar los cuadres de caja por día
         Map<String, CuadreCajaDTO> cuadresPorDia = new HashMap<>();
@@ -75,6 +73,30 @@ public class CajaController {
             );
             cuadre.getProductos().add(producto);
         }
+
+
+
+
+
+        // Procesar los metodoPago
+        for (Object[] row : resultadosMetodosPago) {
+            String fecha = "";
+            if (row[2] instanceof java.sql.Date) {
+                fecha = sdf.format((java.sql.Date) row[2]); // Convertir la fecha a String usando el formato
+            } else if (row[2] instanceof String) {
+                fecha = (String) row[2]; // Si ya es String, lo dejamos como está
+            }
+            CuadreCajaDTO cuadre = cuadresPorDia.computeIfAbsent(fecha, k -> new CuadreCajaDTO());
+            cuadre.setFecha(fecha);  // Asignar la fecha al DTO
+
+            // Agregar los servicios a este cuadre de caja
+            MetodoPagoDTO metodoPago = new MetodoPagoDTO(
+                    (String) row[0],  // nombreMetodoPago
+                    ((Number) row[1]).doubleValue() // total
+            );
+            cuadre.getMetodosPago().add(metodoPago);
+        }
+
 
         // Procesar los tipos de vehículos
         for (Object[] row : resultadosTiposVehiculos) {
@@ -126,50 +148,65 @@ public class CajaController {
         return ResponseEntity.ok(cuadres); // Devolver la lista de cuadres
     }
 
+    @GetMapping("/metodos-pago")
+    public ResponseEntity<List<MetodoPagoDTO>> obtenerMetodosPago() {
+        List<Object[]> resultados = ventaRepository.obtenerMetodosPagoRaw();
 
-    @GetMapping("/servicios")
-    public ResponseEntity<List<ServicioDTO>> obtenerServicios() {
-        List<Object[]> resultados = ventaRepository.obtenerServiciosRaw();
-
-        List<ServicioDTO> servicios = resultados.stream()
-                .map(obj -> new ServicioDTO(
-                        (String) obj[0],          // nombreServicio
-                        ((Number) obj[1]).intValue(), // totalCantidad
-                        ((Number) obj[2]).doubleValue() // totalRecaudado
+        List<MetodoPagoDTO> metodos = resultados.stream()
+                .map(obj -> new MetodoPagoDTO(
+                        (String) obj[0],          // nombre
+                        ((Number) obj[1]).doubleValue() // total
                 ))
                 .toList();
 
-        return ResponseEntity.ok(servicios);
+        return ResponseEntity.ok(metodos);
     }
 
-    @GetMapping("/productos")
-    public ResponseEntity<List<ProductoDTO>> obtenerProductos() {
-        List<Object[]> resultados = ventaRepository.obtenerProductosRaw();
 
-        List<ProductoDTO> productos = resultados.stream()
-                .map(obj -> new ProductoDTO(
-                        (String) obj[0],          // nombreProducto
-                        ((Number) obj[1]).intValue(), // totalCantidad
-                        ((Number) obj[2]).doubleValue() // totalRecaudado bn
-                ))
-                .toList();
 
-        return ResponseEntity.ok(productos);
-    }
-
-    @GetMapping("/tipos-vehiculos")
-    public ResponseEntity<List<TipoVehiculoDTO>> obtenerTiposVehiculos() {
-        List<Object[]> resultados = ventaRepository.obtenerTiposVehiculosRaw();
-
-        List<TipoVehiculoDTO> tiposVehiculos = resultados.stream()
-                .map(obj -> new TipoVehiculoDTO(
-                        (String) obj[0],          // tipoVehiculo
-                        ((Number) obj[1]).intValue() // cantidad
-                ))
-                .toList();
-
-        return ResponseEntity.ok(tiposVehiculos);
-    }
+//    @GetMapping("/servicios")
+//    public ResponseEntity<List<ServicioDTO>> obtenerServicios() {
+//        List<Object[]> resultados = ventaRepository.obtenerServiciosRaw();
+//
+//        List<ServicioDTO> servicios = resultados.stream()
+//                .map(obj -> new ServicioDTO(
+//                        (String) obj[0],          // nombreServicio
+//                        ((Number) obj[1]).intValue(), // totalCantidad
+//                        ((Number) obj[2]).doubleValue() // totalRecaudado
+//                ))
+//                .toList();
+//
+//        return ResponseEntity.ok(servicios);
+//    }
+//
+//    @GetMapping("/productos")
+//    public ResponseEntity<List<ProductoDTO>> obtenerProductos() {
+//        List<Object[]> resultados = ventaRepository.obtenerProductosRaw();
+//
+//        List<ProductoDTO> productos = resultados.stream()
+//                .map(obj -> new ProductoDTO(
+//                        (String) obj[0],          // nombreProducto
+//                        ((Number) obj[1]).intValue(), // totalCantidad
+//                        ((Number) obj[2]).doubleValue() // totalRecaudado bn
+//                ))
+//                .toList();
+//
+//        return ResponseEntity.ok(productos);
+//    }
+//
+//    @GetMapping("/tipos-vehiculos")
+//    public ResponseEntity<List<TipoVehiculoDTO>> obtenerTiposVehiculos() {
+//        List<Object[]> resultados = ventaRepository.obtenerTiposVehiculosRaw();
+//
+//        List<TipoVehiculoDTO> tiposVehiculos = resultados.stream()
+//                .map(obj -> new TipoVehiculoDTO(
+//                        (String) obj[0],          // tipoVehiculo
+//                        ((Number) obj[1]).intValue() // cantidad
+//                ))
+//                .toList();
+//
+//        return ResponseEntity.ok(tiposVehiculos);
+//    }
 
 
 }

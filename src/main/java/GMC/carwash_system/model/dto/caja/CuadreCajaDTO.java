@@ -15,6 +15,7 @@ public class CuadreCajaDTO {
     private List<TipoVehiculoDTO> tiposVehiculos = new ArrayList<>(); // Inicialización
     private List<ProductoDTO> productos = new ArrayList<>(); // Inicialización
     private List<ServicioDTO> servicios = new ArrayList<>(); // Inicialización
+    private List<MetodoPagoDTO> metodosPago = new ArrayList<>(); // Inicialización
     private Double totalDinero;
 
     // Otros métodos si es necesario
