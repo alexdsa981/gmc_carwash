@@ -1,6 +1,5 @@
 package GMC.carwash_system.controller;
 
-import ch.qos.logback.core.net.server.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +15,7 @@ public class WebController {
     @Autowired
     ClienteController clienteController;
     @Autowired
-    ServiciosController serviciosController;
+    AtencionController atencionController;
     @Autowired
     InventarioController inventarioController;
     @Autowired
@@ -33,19 +32,19 @@ public class WebController {
     }
 
     //PAGINAS DE SERVICIOS
-    @GetMapping("/servicios")
+    @GetMapping("/atencion")
     public String paginaServicios(Model model) {
-        serviciosController.retornaListaTipoVehiculo(model);
-        serviciosController.retornaListaPrecioServicio(model);
-        serviciosController.retornaListaTipoServicio(model);
+        atencionController.retornaListaTipoVehiculo(model);
+        atencionController.retornaListaPrecioServicio(model);
+        atencionController.retornaListaTipoServicio(model);
         inventarioController.retornalistaProductos(model);
-        serviciosController.retornaListaIngresoClientes(model);
-        serviciosController.retornaListaTipoItem(model);
+        atencionController.retornaListaIngresoClientes(model);
+        atencionController.retornaListaTipoItem(model);
         colaboradoresController.retornaListaColaboradores(model);
-        serviciosController.retornaListaTipoServicio_Especial_Basico(model);
-        serviciosController.retornaListaMetodoPago(model);
-        serviciosController.retornaListaRealizados(model);
-        return "servicios/servicios";
+        atencionController.retornaListaTipoServicio_Especial_Basico(model);
+        atencionController.retornaListaMetodoPago(model);
+        atencionController.retornaListaRealizados(model);
+        return "atencion/atencion";
     }
 
     //PAGINAS DE COLABORADORES
@@ -65,7 +64,7 @@ public class WebController {
     //PAGINAS DE CLIENTES
     @GetMapping("/clientes/lista")
     public String paginaListaClientes(Model model) {
-        serviciosController.retornaListaTipoVehiculo(model);
+        atencionController.retornaListaTipoVehiculo(model);
         clienteController.retornaListaClientes(model);
         return "clientes/lista";
     }

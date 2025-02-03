@@ -59,11 +59,14 @@ body {
     height: 80%;
     object-fit: contain;
 }
+
 .ventas { grid-column: 1 / 2; grid-row: 1 / 2; }
 .clientes { grid-column: 3 / 4; grid-row: 1 / 2; }
 .productos { grid-column: 1 / 2; grid-row: 3 / 4; }
 .colaborador { grid-column: 3 / 4; grid-row: 3 / 4; }
 .cuadre { grid-column: 2 / 3; grid-row: 3 / 4; }
+
+
 a {
     text-decoration: none;
     color: inherit;

@@ -14,7 +14,6 @@ import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +28,8 @@ import java.time.LocalTime;
 import java.util.*;
 
 @Controller
-@RequestMapping("/app/servicios")
-public class ServiciosController {
+@RequestMapping("/app/atencion")
+public class AtencionController {
 
     @Autowired
     TipoServicioRepository tipoServicioRepository;
@@ -291,7 +290,7 @@ public class ServiciosController {
         detalleVenta.setDetalleIngresoVehiculo(detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get());
         detalleVentaRepository.save(detalleVenta);
 
-        return "redirect:/servicios";
+        return "redirect:/atencion";
     }
 
     @PostMapping("/editar-detalleventa/producto")
@@ -477,7 +476,7 @@ public class ServiciosController {
         tipoServicio.setDescripcion(descripcion);
         tipoServicio.setNombre(nombre);
         tipoServicioRepository.save(tipoServicio);
-        response.sendRedirect("/servicios/lista");
+        response.sendRedirect("/atencion/lista");
         return ResponseEntity.ok("Tipo Servicio creado correctamente");
     }
 
@@ -519,7 +518,7 @@ public class ServiciosController {
         nuevoPrecioServicio.setTipo_servicio(tipoServicioRepository.findById(idTipoServicio).get());
         nuevoPrecioServicio.setTipo_vehiculo(tipoVehiculoRepository.findById(idTipoVehiculo).get());
         precioServicioRepository.save(nuevoPrecioServicio);
-        response.sendRedirect("/servicios/lista");
+        response.sendRedirect("/atencion/lista");
         return ResponseEntity.ok("Tipo Servicio creado correctamente");
     }
 
@@ -542,7 +541,7 @@ public class ServiciosController {
         precioServicio.setPrecio(precio);
         precioServicioRepository.save(precioServicio);
 
-        response.sendRedirect("/servicios/lista");
+        response.sendRedirect("/atencion/lista");
         return ResponseEntity.ok("PrecioServicio editado correctamente");
     }
 

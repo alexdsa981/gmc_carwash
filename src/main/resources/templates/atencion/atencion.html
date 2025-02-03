@@ -284,7 +284,7 @@
                 saveProductoBtn.addEventListener('click', function () {
                     const formData = new FormData(editProductoForm);
 
-                    fetch('/app/servicios/editar-detalleventa/producto', {
+                    fetch('/app/atencion/editar-detalleventa/producto', {
                         method: 'POST',
                         body: formData
                     })
@@ -388,7 +388,7 @@
                 saveServicioBtn.addEventListener('click', function () {
                     const formData = new FormData(editServicioForm);
 
-                    fetch('/app/servicios/editar-detalleventa/servicio', {
+                    fetch('/app/atencion/editar-detalleventa/servicio', {
                         method: 'POST',
                         body: formData
                     })
@@ -441,7 +441,7 @@
                         cancelButtonText: 'Cancelar'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            fetch(`/app/servicios/eliminar-detalleventa/${detalleId}`, {
+                            fetch(`/app/atencion/eliminar-detalleventa/${detalleId}`, {
                                 method: 'DELETE',
                             })
                             .then(response => {
@@ -484,7 +484,7 @@
                         cancelButtonText: 'Cancelar'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            fetch(`/app/servicios/eliminar-detalleventa/${detalleId}`, {
+                            fetch(`/app/atencion/eliminar-detalleventa/${detalleId}`, {
                                 method: 'DELETE',
                             })
                             .then(response => {
@@ -650,7 +650,7 @@
 
                     try {
                         // Enviar los datos al backend mediante fetch
-                        const response = await fetch(`/app/servicios/editar-detalle-servicio/${id}`, {
+                        const response = await fetch(`/app/atencion/editar-detalle-servicio/${id}`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/x-www-form-urlencoded"
@@ -711,7 +711,7 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/app/servicios/eliminar-ingreso/${id}`, {
+                        fetch(`/app/atencion/eliminar-ingreso/${id}`, {
                             method: 'POST'
                         })
                             .then(response => {
@@ -879,7 +879,7 @@
 
                     try {
                         // Enviar los datos al backend mediante fetch
-                        const response = await fetch(`/app/servicios/agregar-ingreso/${placa}`, {
+                        const response = await fetch(`/app/atencion/agregar-ingreso/${placa}`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/x-www-form-urlencoded"
@@ -1052,7 +1052,7 @@
                         input.readOnly = false;
                         input.classList.remove("disabled-input");
                     });
-                    deshabilitarBotones();
+                    deshabilitarCamposInicialmente();
                 });
 
                 function habilitarCampo(campo) {
@@ -1074,7 +1074,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addServicioForm" action="/app/servicios/agregar-detalle-venta" method="POST">
+                        <form id="addServicioForm" action="/app/atencion/agregar-detalle-venta" method="POST">
                             <!-- Tipo de Venta -->
                             <div class="mb-3">
                                 <input type="hidden" name="idDetalle" id="detalleId">
@@ -1299,7 +1299,7 @@
                 const detalleId = button.getAttribute('data-id');  // ID del detalle ingreso
 
                 try {
-                    const response = await fetch(`/app/servicios/ingreso/${detalleId}`);
+                    const response = await fetch(`/app/atencion/ingreso/${detalleId}`);
                     const servicios = await response.json();
 
                     const detallePago = document.getElementById('detallePago');
@@ -1366,7 +1366,7 @@
                     console.log('Datos a enviar:', JSON.stringify(data));
 
                     // Realizar la solicitud POST con el objeto JSON
-                    const response = await fetch('/app/servicios/venta', {
+                    const response = await fetch('/app/atencion/venta', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json' // Establecemos el tipo de contenido a JSON
@@ -1515,8 +1515,55 @@
     });
 
 
-</script>
 
+
+
+</script>
+<script>
+
+    let bloquearEnterBusqueda = false; // Variable de control
+
+// SweetAlert se cierra con Enter
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && Swal.isVisible()) {
+        Swal.clickConfirm(); // Simula clic en el botón de confirmación
+    }
+});
+
+    // Capturar la búsqueda de placas con Enter, pero bloquearla si SweetAlert está abierto
+document.getElementById("placa").addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !bloquearEnterBusqueda) { // Solo se activa si no está bloqueado
+        event.preventDefault(); // Evita que el formulario se envíe automáticamente
+        bloquearEnterBusqueda = true; // Bloquea la búsqueda hasta que se cierre el SweetAlert
+
+        document.querySelector("#addIngresoForm .btn-secondary").click(); // Simula el clic en el botón
+
+        // Esperamos a que se abra un SweetAlert y lo desbloqueamos al cerrarse
+        setTimeout(() => {
+            const observer = new MutationObserver((mutations, obs) => {
+                if (!Swal.isVisible()) { // Detecta cuando se ha cerrado el SweetAlert
+                    bloquearEnterBusqueda = false; // Desbloquea la búsqueda
+                    obs.disconnect(); // Deja de observar
+                }
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
+        }, 100);
+    }
+});
+//evita que haya conflicto al usar enter dentro del modal
+    document.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && document.getElementById("addIngresoModal").classList.contains("show")) {
+        event.preventDefault(); // Evita que "Enter" haga que el modal se abra de nuevo
+    }
+});
+
+    //focus en el input de placa en modal añadir ingreso:
+    document.getElementById("addIngresoModal").addEventListener("shown.bs.modal", function () {
+    document.getElementById("placa").focus(); // Selecciona automáticamente el input de Placa
+});
+
+</script>
 </body>
 
 </html>
