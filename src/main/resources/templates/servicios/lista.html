@@ -15,77 +15,37 @@
 <body>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">GMC - Lista Productos</h2>
+    <h2 class="text-center mb-4">GMC - Lista Servicios</h2>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <a href="/inicio" class="btn btn-outline-primary">
                 <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
             </a>
-            <a href="/inventario/historial" class="btn btn-outline-secondary">
-                <i class="bi bi-clock me-2"></i> Ir a Historial
-            </a>
         </div>
-        <button class="btn btn-primary" id="addProductBtn" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            AÑADIR PRODUCTO
+        <button class="btn btn-primary" id="addServicioBtn" data-bs-toggle="modal" data-bs-target="#addServicioModal">
+            AÑADIR SERVICIOS
         </button>
     </div>
-    <table id="example" class="table table-striped table-bordered" style="width:100%">
+    <!-- Tabla de Tipo de Servicio -->
+    <table class="table table-striped">
         <thead>
         <tr>
-            <th>N°</th>
-            <th>Nombre Producto</th>
-            <th>Categoría</th>
-            <th>Precio Costo (S/.)</th>
-            <th>Precio Venta (S/.)</th>
-            <th>Stock</th>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Especial</th>
             <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <!-- Iteramos sobre la lista de productos -->
-        <tr th:each="producto, iterStat : ${listaProductos}">
-            <td th:text="${iterStat.index + 1}"></td>
-            <td th:text="${producto.nombre}"></td>
-            <td th:text="${producto.tipo_producto.nombre}"></td>
-            <td th:text="${producto.precio_costo}"></td>
-            <td th:text="${producto.precio_venta}"></td>
-            <td th:text="${producto.stock}"></td>
+        <tr th:each="servicio : ${ListaTipoServicio}">
+            <td th:text="${servicio.id}"></td>
+            <td th:text="${servicio.nombre}"></td>
+            <td th:text="${servicio.descripcion}"></td>
+            <td th:text="${servicio.isEspecial ? 'Sí' : 'No'}"></td>
             <td>
-
-                <!-- Botón para abrir el modal de cambio de stock -->
-                <button
-                        class="btn btn-warning btn-sm"
-                        th:attr="data-id=${producto.id},
-                             data-nombre=${producto.nombre},
-                             data-stock=${producto.stock},
-                             data-precio-venta=${producto.precio_venta}"
-                        data-bs-toggle="modal"
-                        data-bs-target="#changeStockModal"
-                        onclick="cargarDatosModal(this)">
-                    <i class="bi bi-arrow-down-up"></i>
-                </button>
-
-
-                <button
-                        class="btn btn-primary btn-sm"
-                        th:attr="data-id=${producto.id},
-                         data-nombre=${producto.nombre},
-                         data-categoria=${producto.tipo_producto.id},
-                         data-precio-costo=${producto.precio_costo},
-                         data-precio-venta=${producto.precio_venta},
-                         data-stock=${producto.stock}"
-                        data-bs-toggle="modal"
-                        data-bs-target="#editProductModal">
-                    <i class="bi bi-pencil"></i>
-                </button>
-
-
-                <button
-                        class="btn btn-danger btn-sm"
-                        th:attr="data-id=${producto.id}"
-                        onclick="eliminarProducto(this)">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <button class="btn btn-warning btn-sm">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarServicio(this)" data-id="${servicio.id}"><i class="bi bi-trash"></i></button>
             </td>
         </tr>
         </tbody>
@@ -93,138 +53,28 @@
 
 </div>
 
-<!-- Modal para Cambiar Stock -->
-<div class="modal fade" id="changeStockModal" tabindex="-1" aria-labelledby="changeStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="changeStockModalLabel">Actualizar Stock</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- El formulario es reemplazado por un modal interactivo con JS -->
-                <div class="mb-3">
-                    <label for="cantidad" class="form-label">Cantidad</label>
-                    <input type="number" class="form-control" id="cantidad" required>
-                </div>
-                <div class="mb-3">
-                    <label for="motivo" class="form-label">Motivo</label>
-                    <input type="text" class="form-control" id="motivo" required>
-                </div>
-                <div class="mb-3">
-                    <label for="precioUnitario" class="form-label">Precio Unitario (S/.)</label>
-                    <input type="number" class="form-control" id="precioUnitario" step="0.01" required>
-                </div>
-                <button type="button" class="btn btn-primary" id="submitStockChange">Actualizar Stock</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<script>
-    function cargarDatosModal(button) {
-        const productId = button.getAttribute('data-id');
-        const productName = button.getAttribute('data-nombre');
-        const productStock = button.getAttribute('data-stock');
-        const productPrice = button.getAttribute('data-precio-venta');
-
-        // Llenar los campos del modal con los datos del producto
-        document.getElementById('cantidad').value = ''; // Limpiar el campo de cantidad
-        document.getElementById('motivo').value = ''; // Limpiar el campo de motivo
-        document.getElementById('precioUnitario').value = productPrice; // Establecer el precio de venta
-
-        // Establecer el evento para el botón de "Actualizar Stock"
-        document.getElementById('submitStockChange').onclick = function() {
-            actualizarStock(productId);
-        };
-    }
-
-    function actualizarStock(productId) {
-        const cantidad = document.getElementById('cantidad').value;
-        const motivo = document.getElementById('motivo').value;
-        const precioUnitario = document.getElementById('precioUnitario').value;
-
-        if (!cantidad || !motivo || !precioUnitario) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Por favor, complete todos los campos.',
-                confirmButtonText: 'Aceptar'
-            });
-            return;
-        }
-
-        // Realizar la solicitud fetch al endpoint
-        fetch(`/app/inventario/producto-${productId}/stock`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                'cantidad': cantidad,
-                'motivo': motivo,
-                'precio_venta': precioUnitario
-            })
-        })
-        .then(response => {
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Stock actualizado correctamente',
-                    confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    window.location.reload(); // Recargar la página para reflejar los cambios
-                });
-            } else {
-                response.text().then(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error,
-                        confirmButtonText: 'Aceptar'
-                    });
-                });
-            }
-        })
-        .catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error al actualizar el stock',
-                text: error,
-                confirmButtonText: 'Aceptar'
-            });
-        });
-    }
-</script>
-
-
-
-
-
-
 <script>
     // Eliminación
-    function eliminarProducto(button) {
-        const productId = button.getAttribute("data-id");
+    function eliminarServicio(button) {
+        const servicioId = button.getAttribute("data-id");
 
         Swal.fire({
             icon: 'warning',
-            title: '¿Estás seguro de que deseas eliminar este producto?',
+            title: '¿Estás seguro de que deseas eliminar este servicio?',
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
             focusCancel: true
         }).then(result => {
             if (result.isConfirmed) {
-                fetch(`/app/inventario/producto-${productId}/eliminar`, {
+                fetch(`/app/servicio/desactivar/Tipo-Servicio/${servicioId}`, {
                     method: "POST",
                 })
                 .then(response => {
                     if (response.ok) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Producto eliminado correctamente',
+                            title: 'Servicio eliminado correctamente',
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
                             location.reload(); // Recargar la página para reflejar los cambios
@@ -241,10 +91,10 @@
                     }
                 })
                 .catch(error => {
-                    console.error("Error al eliminar el producto:", error);
+                    console.error("Error al eliminar el servicio:", error);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error al eliminar el producto',
+                        title: 'Error al eliminar el servicio',
                         text: error,
                         confirmButtonText: 'Aceptar'
                     });
@@ -255,11 +105,11 @@
 </script>
 
 <!-- Modal para Añadir Producto -->
-<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+<div class="modal fade" id="addServicioModal" tabindex="-1" aria-labelledby="addServicioModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addProductModalLabel">Añadir Producto</h5>
+                <h5 class="modal-title" id="addServicioModalLabel">Añadir Producto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
