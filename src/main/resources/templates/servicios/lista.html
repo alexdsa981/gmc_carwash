@@ -44,8 +44,16 @@
             <td th:text="${servicio.descripcion}"></td>
             <td th:text="${servicio.isEspecial ? 'Sí' : 'No'}"></td>
             <td>
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="eliminarServicio(this)" data-id="${servicio.id}"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editServiceModal"
+                        th:attr="data-id=${servicio.id},
+                         data-nombre=${servicio.nombre},
+                         data-descripcion=${servicio.descripcion},
+                         data-isEspecial=${servicio.isEspecial ? 'Sí' : 'No'}">
+                    Editar
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarServicio(this)" th:data-id="${servicio.id}"><i class="bi bi-trash"></i></button>
             </td>
         </tr>
         </tbody>
@@ -109,35 +117,26 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addServicioModalLabel">Añadir Producto</h5>
+                <h5 class="modal-title" id="addServicioModalLabel">Añadir Servicio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Formulario que envía datos al backend -->
-                <form action="/app/inventario/producto/crear" method="post">
+                <form action="/app/servicio/Tipo-Servicio/nuevo" method="post">
                     <div class="mb-3">
-                        <label for="productName" class="form-label">Nombre de Producto</label>
-                        <input type="text" class="form-control" id="productName" name="nombre" required>
+                        <label for="serviceName" class="form-label">Nombre del Servicio</label>
+                        <input type="text" class="form-control" id="serviceName" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="productCategory" class="form-label">Categoría</label>
-                        <select class="form-select" id="productCategory" name="id_tipo_producto" required>
-                            <option value="" disabled selected>Seleccione una categoría</option>
-                            <option th:each="tipoProducto : ${listaTipoProductos}"
-                                    th:value="${tipoProducto.id}"
-                                    th:text="${tipoProducto.nombre}">
-                            </option>
-                        </select>
+                        <label>
+                            <input type="checkbox" id="especial" name="isEspecial">
+                            Es especial
+                        </label>
                     </div>
                     <div class="mb-3">
-                        <label for="productCost" class="form-label">Precio Costo (S/.)</label>
-                        <input type="number" class="form-control" id="productCost" name="precio_costo" step="0.01" required>
+                        <label for="descripcion" class="form-label">Descripcion del Servicio</label>
+                        <textarea name="descripcion" id="descripcion" class="form-control rounded-3" rows="4" placeholder="Escribe una breve descripción..."></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="productPrice" class="form-label">Precio Venta (S/.)</label>
-                        <input type="number" class="form-control" id="productPrice" name="precio_venta" step="0.01" required>
-                    </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Guardar Producto</button>
@@ -149,97 +148,81 @@
 </div>
 
 
-<!-- Modal para Editar Producto -->
-<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+<!-- Modal para Editar Servicio -->
+<div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editProductModalLabel">Editar Producto</h5>
+                <h5 class="modal-title" id="editServiceModalLabel">Editar Servicio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editProductForm">
+                <form id="editServiceForm">
                     <div class="mb-3">
-                        <label for="editProductName" class="form-label">Nombre de Producto</label>
-                        <input type="text" class="form-control" id="editProductName" required>
+                        <label for="editServiceName" class="form-label">Nombre del Servicio</label>
+                        <input type="text" class="form-control" id="editServiceName" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editProductCategory" class="form-label">Categoría</label>
-                        <select class="form-select" id="editProductCategory" name="tipoProductoId" required>
-                            <option value="" disabled selected>Seleccione una categoría</option>
-                            <option th:each="tipoProducto : ${listaTipoProductos}"
-                                    th:value="${tipoProducto.id}"
-                                    th:text="${tipoProducto.nombre}">
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="editProductCost" class="form-label">Precio Costo (S/.)</label>
-                        <input type="number" class="form-control" id="editProductCost" step="0.01" required>
+                        <label>
+                            <input type="checkbox" id="editIsEspecial" name="isEspecial">
+                            Es especial
+                        </label>
                     </div>
                     <div class="mb-3">
-                        <label for="editProductPrice" class="form-label">Precio Venta (S/.)</label>
-                        <input type="number" class="form-control" id="editProductPrice" step="0.01" required>
+                        <label for="editDescripcion" class="form-label">Descripción del Servicio</label>
+                        <textarea name="descripcion" id="editDescripcion" class="form-control rounded-3" rows="4" placeholder="Escribe una breve descripción..."></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="editProductForm" class="btn btn-primary">Guardar Cambios</button>
+                <button type="submit" form="editServiceForm" class="btn btn-primary">Guardar Cambios</button>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Selecciona todos los botones "Editar"
-        const editButtons = document.querySelectorAll('button[data-bs-target="#editProductModal"]');
+        // Selecciona todos los botones "Editar Servicio"
+        const editButtons = document.querySelectorAll('button[data-bs-target="#editServiceModal"]');
 
         editButtons.forEach(button => {
             button.addEventListener("click", function () {
                 // Obtener los datos del botón
                 const id = this.getAttribute("data-id");
                 const nombre = this.getAttribute("data-nombre");
-                const categoriaId = this.getAttribute("data-categoria"); // ID de la categoría
-                const precioCosto = this.getAttribute("data-precio-costo");
-                const precioVenta = this.getAttribute("data-precio-venta");
+                const descripcion = this.getAttribute("data-descripcion");
+                const isEspecial = this.getAttribute("data-isEspecial") === "Sí"; // Convertir a booleano
 
                 // Llenar los campos del modal con los datos obtenidos
-                document.getElementById("editProductName").value = nombre;
-                document.getElementById("editProductCost").value = precioCosto;
-                document.getElementById("editProductPrice").value = precioVenta;
+                document.getElementById("editServiceName").value = nombre;
+                document.getElementById("editDescripcion").value = descripcion;
+                document.getElementById("editIsEspecial").checked = isEspecial;
 
-                // Preseleccionar la categoría en el <select>
-                const categorySelect = document.getElementById("editProductCategory");
-                Array.from(categorySelect.options).forEach(option => {
-                    option.selected = option.value === categoriaId;
-                });
-
-                // Si necesitas el ID del producto para guardar cambios
-                document.getElementById("editProductForm").setAttribute("data-id", id);
+                // Guardar el ID del servicio en el formulario
+                document.getElementById("editServiceForm").setAttribute("data-id", id);
             });
         });
     });
 
-</script>
-<script>
-    // Para enviar los datos al endpoint:
-    document.getElementById("editProductForm").addEventListener("submit", function (event) {
+    // Enviar los datos al backend al guardar cambios
+    document.getElementById("editServiceForm").addEventListener("submit", function (event) {
         event.preventDefault(); // Evitar el envío predeterminado del formulario
 
-        // Obtener el ID del producto
-        const productId = this.getAttribute("data-id");
+        // Obtener el ID del servicio
+        const serviceId = this.getAttribute("data-id");
 
         // Crear los datos a enviar
-        const data = new FormData(this);
-        data.append("nombre", document.getElementById("editProductName").value);
-        data.append("precio_costo", document.getElementById("editProductCost").value);
-        data.append("precio_venta", document.getElementById("editProductPrice").value);
-        data.append("id_tipo_producto", document.getElementById("editProductCategory").value);
+        const data = new FormData();
+        data.append("nombre", document.getElementById("editServiceName").value);
+        data.append("descripcion", document.getElementById("editDescripcion").value);
+        if (document.getElementById("editIsEspecial").checked) {
+            data.append("isEspecial", "on"); // Mantiene el mismo formato del backend
+        }
 
-        // Enviar los datos al endpoint
-        fetch(`/app/inventario/producto-${productId}/editar`, {
+        // Enviar los datos al endpoint correcto
+        fetch(`/app/servicio/actualizar/Tipo-Servicio/${serviceId}`, {
             method: "POST",
             body: data,
         })
@@ -247,7 +230,7 @@
             if (response.ok) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Producto editado correctamente',
+                    title: 'Servicio editado correctamente',
                     confirmButtonText: 'Aceptar'
                 }).then(() => {
                     location.reload(); // Recargar la página para reflejar cambios
@@ -264,10 +247,10 @@
             }
         })
         .catch(error => {
-            console.error("Error al editar el producto:", error);
+            console.error("Error al editar el servicio:", error);
             Swal.fire({
                 icon: 'error',
-                title: 'Error al editar el producto',
+                title: 'Error al editar el servicio',
                 text: error,
                 confirmButtonText: 'Aceptar'
             });

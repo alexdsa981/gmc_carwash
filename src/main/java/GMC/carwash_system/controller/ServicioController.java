@@ -36,36 +36,54 @@ public class ServicioController {
         return model;
     }
 
-    // Crear TipoServicio nuevo
+
+        // Crear TipoServicio nuevo
     @PostMapping("/Tipo-Servicio/nuevo")
     public ResponseEntity<String> crearTipoServicio(
             @RequestParam("nombre") String nombre,
+            @RequestParam(name = "descripcion", required = false, defaultValue = "") String descripcion,
+            @RequestParam(name = "isEspecial", required = false, defaultValue = "") String isEspecial,
             HttpServletResponse response) throws IOException {
         TipoServicio tipoServicio = new TipoServicio();
         tipoServicio.setNombre(nombre);
+        tipoServicio.setDescripcion(descripcion);
+        if (isEspecial.equals("on")){
+            tipoServicio.setIsEspecial(Boolean.TRUE);
+        }else{
+            tipoServicio.setIsEspecial(Boolean.FALSE);
+        }
         tipoServicio.setIsActive(Boolean.TRUE);
         tipoServicioRepository.save(tipoServicio);
-        response.sendRedirect("/clasificadores");
+        response.sendRedirect("/servicios/lista");
         return ResponseEntity.ok("Clasificación TipoServicio creada correctamente");
     }
 
     // Actualizar un TipoServicio existente
     @PostMapping("/actualizar/Tipo-Servicio/{id}")
-    public String actualizarTipoServicio(@PathVariable Long id,
-                                         @RequestParam("nombre") String nombre) {
+    public String actualizarTipoServicio(
+            @PathVariable Long id,
+            @RequestParam("nombre") String nombre,
+            @RequestParam(name = "descripcion", required = false, defaultValue = "") String descripcion,
+            @RequestParam(name = "isEspecial", required = false, defaultValue = "") String isEspecial) {
         TipoServicio tipoServicio = tipoServicioRepository.findById(id).get();
         tipoServicio.setNombre(nombre);
+        tipoServicio.setDescripcion(descripcion);
+        if (isEspecial.equals("on")){
+            tipoServicio.setIsEspecial(Boolean.TRUE);
+        }else{
+            tipoServicio.setIsEspecial(Boolean.FALSE);
+        }
         tipoServicio.setIsActive(Boolean.TRUE);
         tipoServicioRepository.save(tipoServicio);
-        return "redirect:/clasificadores";
+        return "redirect:/servicios/lista";
     }
 
     // Desactivar TipoServicio
-    @GetMapping("/desactivar/Tipo-Servicio/{id}")
+    @PostMapping("/desactivar/Tipo-Servicio/{id}")
     public String desactivarTipoServicio(@PathVariable Long id) {
         TipoServicio tipoServicio = tipoServicioRepository.findById(id).get();
         tipoServicio.setIsActive(Boolean.FALSE);
         tipoServicioRepository.save(tipoServicio);
-        return "redirect:/clasificadores";
+        return "redirect:/servicios/lista";
     }
 }
