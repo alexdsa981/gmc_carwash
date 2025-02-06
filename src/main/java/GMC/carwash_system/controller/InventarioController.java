@@ -39,7 +39,7 @@ public class InventarioController {
         return model;
     }
 
-    public Model retornalistaProductos(Model model) {
+    public Model retornalistaProductosActivos(Model model) {
         List<Producto> listaProductos = productoRepository.findByIsActiveTrue();
         model.addAttribute("listaProductos", listaProductos);
         return model;

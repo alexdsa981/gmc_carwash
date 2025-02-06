@@ -107,19 +107,6 @@ public class AtencionController {
     }
 
 
-    public Model retornaListaTipoServicio(Model model) {
-        List<TipoServicio> listaTipoServicio = tipoServicioRepository.findAll();
-        model.addAttribute("listaTipoServicio", listaTipoServicio);
-        return model;
-    }
-
-    public Model retornaListaTipoServicio_Especial_Basico(Model model) {
-        List<TipoServicio> listaTipoServicioBasico = tipoServicioRepository.findByIsEspecialFalse();
-        model.addAttribute("listaTipoServicioBasico", listaTipoServicioBasico);
-        List<TipoServicio> listaTipoServicioEspecial = tipoServicioRepository.findByIsEspecialTrue();
-        model.addAttribute("listaTipoServicioEspecial", listaTipoServicioEspecial);
-        return model;
-    }
 
     public Model retornaListaPrecioServicio(Model model) {
         List<PrecioServicio> listaPrecioServicio = precioServicioRepository.findAll();

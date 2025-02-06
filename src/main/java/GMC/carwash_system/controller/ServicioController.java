@@ -35,6 +35,13 @@ public class ServicioController {
         model.addAttribute("ListaTipoServicio", listaTipoServicio);
         return model;
     }
+    public Model retornaListaTipoServicio_Especial_Basico(Model model) {
+        List<TipoServicio> listaTipoServicioBasico = tipoServicioRepository.findByIsEspecialFalseAndIsActiveTrue();
+        model.addAttribute("listaTipoServicioBasico", listaTipoServicioBasico);
+        List<TipoServicio> listaTipoServicioEspecial = tipoServicioRepository.findByIsEspecialTrueAndIsActiveTrue();
+        model.addAttribute("listaTipoServicioEspecial", listaTipoServicioEspecial);
+        return model;
+    }
 
 
         // Crear TipoServicio nuevo

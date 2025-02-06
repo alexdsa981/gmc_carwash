@@ -36,15 +36,14 @@ public class WebController {
 
     //PAGINAS DE SERVICIOS
     @GetMapping("/atencion")
-    public String paginaServicios(Model model) {
+    public String paginaAtencion(Model model) {
         atencionController.retornaListaTipoVehiculo(model);
         atencionController.retornaListaPrecioServicio(model);
-        atencionController.retornaListaTipoServicio(model);
-        inventarioController.retornalistaProductos(model);
+        inventarioController.retornalistaProductosActivos(model);
         atencionController.retornaListaIngresoClientes(model);
         atencionController.retornaListaTipoItem(model);
         colaboradoresController.retornaListaColaboradores(model);
-        atencionController.retornaListaTipoServicio_Especial_Basico(model);
+        servicioController.retornaListaTipoServicio_Especial_Basico(model);
         atencionController.retornaListaMetodoPago(model);
         atencionController.retornaListaRealizados(model);
         return "atencion/atencion";
@@ -76,7 +75,7 @@ public class WebController {
     //PAGINAS DE INVENTARIO
     @GetMapping("/inventario/lista")
     public String paginaListaInventario(Model model) {
-        inventarioController.retornalistaProductos(model);
+        inventarioController.retornalistaProductosActivos(model);
         inventarioController.retornalistaTipoProductos(model);
         return "inventario/lista";
     }
@@ -84,7 +83,7 @@ public class WebController {
     @GetMapping("/inventario/historial")
     public String paginaListaHistorialInventario(Model model) {
         inventarioController.retornaHistorialAlmacen(model);
-        inventarioController.retornalistaProductos(model);
+        inventarioController.retornalistaProductosActivos(model);
         inventarioController.retornalistaTipoProductos(model);
         return "inventario/historial";
     }
