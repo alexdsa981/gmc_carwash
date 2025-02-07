@@ -6,6 +6,7 @@ import GMC.carwash_system.model.entidades.Cliente;
 import GMC.carwash_system.model.entidades.Vehiculo;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.ClienteRepository;
+import GMC.carwash_system.repository.entidades.HistorialVisitasClienteRepository;
 import GMC.carwash_system.repository.entidades.VehiculoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,8 @@ public class ClienteController {
     @Autowired
     TipoVehiculoRepository tipoVehiculoRepository;
     @Autowired
+    HistorialVisitasClienteRepository historialVisitasClienteRepository;
+    @Autowired
     private ObjectMapper objectMapper;
 
     public Model retornaListaClientes(Model model) {
@@ -36,7 +39,7 @@ public class ClienteController {
         List<ClienteVehiculosDTO> listaClientesDTO = new ArrayList<>();
         // Convertir las listas de placas de los clientes a JSON
         for (Cliente cliente : listaClientes) {
-            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository);
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository, historialVisitasClienteRepository);
             listaClientesDTO.add(clienteVehiculosDTO);
 
              //Asegurarse de que listaPlacas esté correctamente inicializada
@@ -192,7 +195,7 @@ public class ClienteController {
     public ResponseEntity<ClienteVehiculosDTO> buscarClientePorPlaca(@PathVariable String placa) {
         Optional<Vehiculo> vehiculo = vehiculoRepository.findByPlaca(placa);
         if (vehiculo.isPresent()) {
-            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(vehiculo.get().getCliente(), vehiculoRepository);
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(vehiculo.get().getCliente());
             return ResponseEntity.ok(clienteVehiculosDTO);
         }
         return ResponseEntity.notFound().build();

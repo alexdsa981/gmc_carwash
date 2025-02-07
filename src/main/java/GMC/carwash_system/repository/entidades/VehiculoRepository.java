@@ -17,14 +17,4 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
 
     boolean existsByPlaca(String placa);
 
-
-
-    @Query("SELECT c.id, COUNT(distinct v.id) " +
-            "FROM Cliente c " +
-            "INNER JOIN DetalleIngresoVehiculo div ON div.cliente.id = c.id " +
-            "INNER JOIN Venta v ON v.cliente.id = div.cliente.id " +
-            "WHERE div.realizado = true AND c.id = :clienteId " +
-            "GROUP BY c.id")
-    Object obtenerNumeroDeVisitas(@Param("clienteId") Long clienteId);
-
 }

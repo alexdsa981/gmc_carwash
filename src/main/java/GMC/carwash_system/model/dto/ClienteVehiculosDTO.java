@@ -2,6 +2,7 @@ package GMC.carwash_system.model.dto;
 
 import GMC.carwash_system.model.entidades.Cliente;
 import GMC.carwash_system.model.entidades.Vehiculo;
+import GMC.carwash_system.repository.entidades.HistorialVisitasClienteRepository;
 import GMC.carwash_system.repository.entidades.VehiculoRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,28 +27,30 @@ public class ClienteVehiculosDTO {
     }
 
     // Constructor que inicializa desde un Cliente
-    public ClienteVehiculosDTO(Cliente cliente, VehiculoRepository vehiculoRepository) {
+    public ClienteVehiculosDTO(Cliente cliente) {
+        this.id = cliente.getId();
+        this.nombre = cliente.getNombre();
+        this.identificacion = cliente.getIdentificacion();
+        this.telefono = cliente.getTelefono();
+
+    }
+    public ClienteVehiculosDTO(Cliente cliente, VehiculoRepository vehiculoRepository, HistorialVisitasClienteRepository historialVisitasClienteRepository) {
         this.id = cliente.getId();
         this.nombre = cliente.getNombre();
         this.identificacion = cliente.getIdentificacion();
         this.telefono = cliente.getTelefono();
         this.listaVehiculos = new ArrayList<>();
         this.listaPlacas = new ArrayList<>();
-
-        Object resultado = vehiculoRepository.obtenerNumeroDeVisitas(this.id);
-        if (resultado != null) {
-            Object[] data = (Object[]) resultado;
-            this.visitas = ((Number) data[1]).intValue();
+        if (historialVisitasClienteRepository.contarVisitasPorCliente(this.id) != null){
+            this.visitas = historialVisitasClienteRepository.contarVisitasPorCliente(this.id);
         }else{
-            visitas=0;
+            this.visitas = 0;
         }
-
         if (cliente.getListaVehiculos() != null){
             this.listaVehiculos = vehiculoRepository.findByCliente(cliente);
             for (Vehiculo vehiculo : listaVehiculos){
                 this.listaPlacas.add(vehiculo.getPlaca());
             }
         }
-
     }
 }

@@ -55,6 +55,8 @@ public class AtencionController {
     MetodoPagoRepository metodoPagoRepository;
     @Autowired
     VentaRepository ventaRepository;
+    @Autowired
+    HistorialVisitasClienteRepository historialVisitasClienteRepository;
 
     public Model retornaListaIngresoClientes(Model model) {
         List<DetalleIngresoVehiculo> listaIngresos = detalleIngresoVehiculoRepository.findByRealizadoFalseOrderByFechaDescHoraDesc();
@@ -186,6 +188,13 @@ public class AtencionController {
                 detalleVenta.setVenta(venta);
                 detalleVentaRepository.save(detalleVenta);
             }
+
+            //Crea visita de cliente en tabla Historial Visita Cliente
+            HistorialVisitasCliente historialVisitasCliente = new HistorialVisitasCliente();
+            historialVisitasCliente.setCliente(cliente);
+            historialVisitasCliente.setFecha(venta.getFecha());
+            historialVisitasCliente.setHora(venta.getHora());
+            historialVisitasClienteRepository.save(historialVisitasCliente);
 
             // Respuesta de éxito
             return ResponseEntity.ok().build();  // Respuesta vacía, solo éxito
