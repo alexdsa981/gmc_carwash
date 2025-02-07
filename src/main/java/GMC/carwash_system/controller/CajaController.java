@@ -148,21 +148,21 @@ public class CajaController {
         return ResponseEntity.ok(cuadres); // Devolver la lista de cuadres
     }
 
-    @GetMapping("/metodos-pago")
-    public ResponseEntity<List<MetodoPagoDTO>> obtenerMetodosPago() {
-        List<Object[]> resultados = ventaRepository.obtenerMetodosPagoRaw();
-
-        List<MetodoPagoDTO> metodos = resultados.stream()
-                .map(obj -> new MetodoPagoDTO(
-                        (String) obj[0],          // nombre
-                        ((Number) obj[1]).doubleValue() // total
-                ))
-                .toList();
-
-        return ResponseEntity.ok(metodos);
-    }
-
-
+//    @GetMapping("/metodos-pago")
+//    public ResponseEntity<List<MetodoPagoDTO>> obtenerMetodosPago() {
+//        List<Object[]> resultados = ventaRepository.obtenerMetodosPagoRaw();
+//
+//        List<MetodoPagoDTO> metodos = resultados.stream()
+//                .map(obj -> new MetodoPagoDTO(
+//                        (String) obj[0],          // nombre
+//                        ((Number) obj[1]).doubleValue() // total
+//                ))
+//                .toList();
+//
+//        return ResponseEntity.ok(metodos);
+//    }
+//
+//
 
 //    @GetMapping("/servicios")
 //    public ResponseEntity<List<ServicioDTO>> obtenerServicios() {
