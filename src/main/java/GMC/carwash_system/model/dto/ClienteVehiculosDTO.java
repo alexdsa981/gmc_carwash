@@ -35,18 +35,13 @@ public class ClienteVehiculosDTO {
         this.telefono = cliente.getTelefono();
 
     }
-    public ClienteVehiculosDTO(Cliente cliente, VehiculoRepository vehiculoRepository, HistorialVisitasClienteRepository historialVisitasClienteRepository) {
+    public ClienteVehiculosDTO(Cliente cliente, VehiculoRepository vehiculoRepository) {
         this.id = cliente.getId();
         this.nombre = cliente.getNombre();
         this.identificacion = cliente.getIdentificacion();
         this.telefono = cliente.getTelefono();
         this.listaVehiculos = new ArrayList<>();
         this.listaPlacas = new ArrayList<>();
-        if (historialVisitasClienteRepository.contarVisitasPorClienteYMes(this.id, LocalDate.now().getMonthValue(), LocalDate.now().getYear()) != null){
-            this.visitas = historialVisitasClienteRepository.contarVisitasPorClienteYMes(this.id, LocalDate.now().getMonthValue(), LocalDate.now().getYear());
-        }else{
-            this.visitas = 0;
-        }
         if (cliente.getListaVehiculos() != null){
             this.listaVehiculos = vehiculoRepository.findByCliente(cliente);
             for (Vehiculo vehiculo : listaVehiculos){

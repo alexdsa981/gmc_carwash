@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,12 @@ public class ClienteController {
         List<ClienteVehiculosDTO> listaClientesDTO = new ArrayList<>();
         // Convertir las listas de placas de los clientes a JSON
         for (Cliente cliente : listaClientes) {
-            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository, historialVisitasClienteRepository);
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository);
+            if (historialVisitasClienteRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), LocalDate.now().getMonthValue(), LocalDate.now().getYear()) != null){
+                clienteVehiculosDTO.setVisitas(historialVisitasClienteRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), LocalDate.now().getMonthValue(), LocalDate.now().getYear()));
+            }else{
+                clienteVehiculosDTO.setVisitas(0);
+            }
             listaClientesDTO.add(clienteVehiculosDTO);
 
              //Asegurarse de que listaPlacas esté correctamente inicializada
@@ -57,6 +63,34 @@ public class ClienteController {
         model.addAttribute("listaClientes", listaClientesDTO);
         return model;
     }
+
+    @GetMapping("/clientes")
+    @ResponseBody
+    public List<ClienteVehiculosDTO> obtenerClientesFiltrados(@RequestParam int mes, @RequestParam int anio) {
+        List<Cliente> listaClientes = clienteRepository.findByIsActiveTrue();
+        List<ClienteVehiculosDTO> listaClientesDTO = new ArrayList<>();
+
+        for (Cliente cliente : listaClientes) {
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository);
+            Integer visitas = historialVisitasClienteRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), mes, anio);
+            clienteVehiculosDTO.setVisitas(visitas != null ? visitas : 0);
+
+            try {
+                String placasJson = objectMapper.writeValueAsString(clienteVehiculosDTO.getListaPlacas());
+                clienteVehiculosDTO.setListaPlacasJson(placasJson);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+            listaClientesDTO.add(clienteVehiculosDTO);
+        }
+
+        return listaClientesDTO;
+    }
+
+
+
+
 
 
     @PostMapping("/crear")
