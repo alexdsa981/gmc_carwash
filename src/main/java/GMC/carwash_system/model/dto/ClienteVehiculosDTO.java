@@ -7,6 +7,7 @@ import GMC.carwash_system.repository.entidades.VehiculoRepository;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +42,8 @@ public class ClienteVehiculosDTO {
         this.telefono = cliente.getTelefono();
         this.listaVehiculos = new ArrayList<>();
         this.listaPlacas = new ArrayList<>();
-        if (historialVisitasClienteRepository.contarVisitasPorCliente(this.id) != null){
-            this.visitas = historialVisitasClienteRepository.contarVisitasPorCliente(this.id);
+        if (historialVisitasClienteRepository.contarVisitasPorClienteYMes(this.id, LocalDate.now().getMonthValue(), LocalDate.now().getYear()) != null){
+            this.visitas = historialVisitasClienteRepository.contarVisitasPorClienteYMes(this.id, LocalDate.now().getMonthValue(), LocalDate.now().getYear());
         }else{
             this.visitas = 0;
         }

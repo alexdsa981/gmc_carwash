@@ -12,6 +12,11 @@ import java.util.List;
 @Repository
 public interface HistorialVisitasClienteRepository extends JpaRepository<HistorialVisitasCliente, Long> {
 
-    @Query("SELECT COUNT(h) FROM HistorialVisitasCliente h WHERE h.cliente.id = :idCliente")
-    Integer contarVisitasPorCliente(@Param("idCliente") Long idCliente);
+    @Query("SELECT COUNT(h) FROM HistorialVisitasCliente h " +
+            "WHERE h.cliente.id = :idCliente " +
+            "AND MONTH(h.fecha) = :mes " +
+            "AND YEAR(h.fecha) = :anio")
+    Integer contarVisitasPorClienteYMes(@Param("idCliente") Long idCliente,
+                                        @Param("mes") Integer mes,
+                                        @Param("anio") Integer anio);
 }
