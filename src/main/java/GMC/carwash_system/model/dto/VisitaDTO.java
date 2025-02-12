@@ -14,7 +14,7 @@ public class VisitaDTO {
     // Constructor que recibe una Venta
     public VisitaDTO(Venta venta) {
         this.idCliente = venta.getCliente().getId();
-        this.fecha = venta.getFecha().toString(); 
+        this.fecha = venta.getFecha().toString();
         this.hora = venta.getHora().toString();
     }
 }
