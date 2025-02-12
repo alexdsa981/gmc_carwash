@@ -112,6 +112,18 @@ public class WebController {
         return "clasificadores/lista";
     }
 
+    @GetMapping("/original/balance")
+    public String paginaBalance() {
 
+        return "original/balance";
+    }
+
+
+    @GetMapping("/original/ingresos")
+    public String paginaIngresos() {
+
+        return "original/ingreso";
+    }
+    
 }
 
