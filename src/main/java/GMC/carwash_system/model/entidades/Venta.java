@@ -1,12 +1,14 @@
 package GMC.carwash_system.model.entidades;
 
 import GMC.carwash_system.model.clasificadores.MetodoPago;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @NoArgsConstructor
@@ -21,6 +23,7 @@ public class Venta {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
@@ -36,4 +39,5 @@ public class Venta {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
+
 }

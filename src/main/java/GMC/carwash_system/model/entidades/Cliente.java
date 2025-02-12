@@ -26,8 +26,12 @@ public class Cliente {
     private String telefono;
     private Boolean isActive;
 
+
     @OneToMany(mappedBy = "cliente")
     private List<Vehiculo> listaVehiculos;
+
+    @OneToMany(mappedBy = "cliente")
+    private List<Venta> listaCompras;
 
 
 }

@@ -13,6 +13,16 @@ import java.util.List;
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, Long> {
 
+    @Query("SELECT COUNT(v) FROM Venta v " +
+            "WHERE v.cliente.id = :idCliente " +
+            "AND MONTH(v.fecha) = :mes " +
+            "AND YEAR(v.fecha) = :anio")
+    Integer contarVisitasPorClienteYMes(@Param("idCliente") Long idCliente,
+                                        @Param("mes") Integer mes,
+                                        @Param("anio") Integer anio);
+
+
+
 
     @Query(value = """
     SELECT 

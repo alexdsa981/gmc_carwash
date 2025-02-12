@@ -6,8 +6,8 @@ import GMC.carwash_system.model.entidades.Cliente;
 import GMC.carwash_system.model.entidades.Vehiculo;
 import GMC.carwash_system.repository.clasificadores.TipoVehiculoRepository;
 import GMC.carwash_system.repository.entidades.ClienteRepository;
-import GMC.carwash_system.repository.entidades.HistorialVisitasClienteRepository;
 import GMC.carwash_system.repository.entidades.VehiculoRepository;
+import GMC.carwash_system.repository.entidades.VentaRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,7 @@ public class ClienteController {
     @Autowired
     TipoVehiculoRepository tipoVehiculoRepository;
     @Autowired
-    HistorialVisitasClienteRepository historialVisitasClienteRepository;
+    VentaRepository ventaRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -40,12 +39,7 @@ public class ClienteController {
         List<ClienteVehiculosDTO> listaClientesDTO = new ArrayList<>();
         // Convertir las listas de placas de los clientes a JSON
         for (Cliente cliente : listaClientes) {
-            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository);
-            if (historialVisitasClienteRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), LocalDate.now().getMonthValue(), LocalDate.now().getYear()) != null){
-                clienteVehiculosDTO.setVisitas(historialVisitasClienteRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), LocalDate.now().getMonthValue(), LocalDate.now().getYear()));
-            }else{
-                clienteVehiculosDTO.setVisitas(0);
-            }
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente);
             listaClientesDTO.add(clienteVehiculosDTO);
 
              //Asegurarse de que listaPlacas esté correctamente inicializada
@@ -71,8 +65,11 @@ public class ClienteController {
         List<ClienteVehiculosDTO> listaClientesDTO = new ArrayList<>();
 
         for (Cliente cliente : listaClientes) {
-            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente, vehiculoRepository);
-            Integer visitas = historialVisitasClienteRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), mes, anio);
+            ClienteVehiculosDTO clienteVehiculosDTO = new ClienteVehiculosDTO(cliente);
+
+
+            //usar ventas
+            Integer visitas = ventaRepository.contarVisitasPorClienteYMes(clienteVehiculosDTO.getId(), mes, anio);
             clienteVehiculosDTO.setVisitas(visitas != null ? visitas : 0);
 
             try {
