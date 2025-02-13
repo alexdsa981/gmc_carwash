@@ -113,17 +113,38 @@ public class WebController {
     }
 
     @GetMapping("/original/balance")
-    public String paginaBalance() {
+    public String paginaOriBalance() {
 
         return "original/balance";
     }
 
 
     @GetMapping("/original/ingresos")
-    public String paginaIngresos() {
+    public String paginaOriIngresos() {
 
         return "original/ingreso";
     }
-    
+
+
+    @GetMapping("/balance/")
+    public String paginaBalance() {
+
+        return "balance/balance";
+    }
+
+
+    @GetMapping("/balance/ingresos")
+    public String paginaIngresos() {
+
+        return "balance/ingresos";
+    }
+
+    @GetMapping("/balance/egresos")
+    public String paginaEgresos() {
+
+        return "balance/egresos";
+    }
+
+
 }
 

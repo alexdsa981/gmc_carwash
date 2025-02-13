@@ -15,4 +15,5 @@ public class IngresosDTO {
     private List<String> serviciosEspeciales;
 
 
+
 }
