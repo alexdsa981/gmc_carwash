@@ -1,6 +1,7 @@
 package GMC.carwash_system.repository.entidades;
 
 
+import GMC.carwash_system.model.dto.balance.IngresosDTO;
 import GMC.carwash_system.model.entidades.Venta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,51 @@ import java.util.List;
 
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, Long> {
+
+
+    @Query(value = "SELECT " +
+            "CONVERT(VARCHAR, F.Fecha, 23) AS fecha, " +
+            "DATENAME(WEEKDAY, F.Fecha) AS subDia, " +
+            "DAY(F.Fecha) AS dia, " +
+            "COALESCE(SUM(va.SubTotal), 0) AS subtotal, " +
+            "COUNT(DISTINCT v.id) AS cantidad, " +
+            "COUNT(DISTINCT CASE WHEN ve.id_tipo_vehiculo NOT IN (7, 8) THEN v.id END) AS autos, " +
+            "COUNT(DISTINCT CASE WHEN ve.id_tipo_vehiculo = 7 THEN v.id END) AS motosL, " +
+            "COUNT(DISTINCT CASE WHEN ve.id_tipo_vehiculo = 8 THEN v.id END) AS motosT " +
+            "FROM " +
+            "(SELECT DATEADD(DAY, value - 1, DATEFROMPARTS(:year, :month, 1)) AS Fecha " +
+            " FROM GENERATE_SERIES(1, DAY(EOMONTH(DATEFROMPARTS(:year, :month, 1))))) AS F " +
+            "LEFT JOIN venta v ON F.Fecha = v.fecha " +
+            "LEFT JOIN (SELECT DISTINCT id_cliente, id_vehiculo FROM detalle_ingreso_vehiculo) div ON v.id_cliente = div.id_cliente " +
+            "LEFT JOIN vehiculo ve ON ve.id = div.id_vehiculo " +
+            "LEFT JOIN (SELECT id_venta, SUM(subtotal) AS SubTotal FROM detalle_venta WHERE id_tipo_item = 1 GROUP BY id_venta) va ON va.id_venta = v.id " +
+            "GROUP BY F.Fecha " +
+            "ORDER BY F.Fecha",
+            nativeQuery = true)
+    List<Object[]> obtenerIngresos(@Param("year") int year, @Param("month") int month);
+
+
+    @Query(value = """
+        SELECT 
+            CONVERT(VARCHAR, v.fecha, 23) AS fecha,
+            ts.nombre
+        FROM venta v
+        INNER JOIN detalle_venta dv ON dv.id_venta = v.id
+        INNER JOIN tipo_servicio ts ON ts.id = dv.id_item
+        WHERE 
+            dv.id_tipo_item = 1 
+            AND ts.is_especial = 1
+            AND YEAR(v.fecha) = :year
+            AND MONTH(v.fecha) = :month
+        ORDER BY v.fecha
+    """, nativeQuery = true)
+    List<Object[]> obtenerServiciosEspeciales(@Param("year") int year, @Param("month") int month);
+
+
+
+
+
+
 
     @Query("SELECT COUNT(v) FROM Venta v " +
             "WHERE v.cliente.id = :idCliente " +

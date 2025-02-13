@@ -9,19 +9,5 @@ $(document).ready(function() {
                 total += parseFloat(valor);
             }
         });
-        $('#totalMes').text('S/ ' + total.toFixed(2));
-    }
-
-    $('#openFilterModal').click(function() {
-        $('#filterModal').modal('show');
-    });
-
-    $('#applyFilter').click(function() {
-        var selectedMonth = $('#monthSelect').val();
-        table.column(0).search(selectedMonth + '/2025', true, false).draw();
-        $('#filterModal').modal('hide');
-        setTimeout(actualizarTotal, 500);
-    });
-
-    actualizarTotal();
 });
+}
