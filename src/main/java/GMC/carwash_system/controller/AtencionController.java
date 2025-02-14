@@ -389,6 +389,8 @@ public class AtencionController {
                                 throw new IllegalArgumentException("El tipo de vehículo no existe");
                             }
                     );
+        }else{
+            vehiculo.setTipo_vehiculo(tipoVehiculoRepository.findById(9L).get());
         }
 
 
