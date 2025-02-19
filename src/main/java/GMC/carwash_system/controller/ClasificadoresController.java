@@ -23,8 +23,6 @@ public class ClasificadoresController {
     TipoProductoRepository productoRepository;
 
     @Autowired
-    TipoTransaccionRepository tipoTransaccionRepository;
-    @Autowired
     TipoVehiculoRepository tipoVehiculoRepository;
 
 
@@ -49,12 +47,6 @@ public class ClasificadoresController {
 
 
 
-    // TipoTransaccion
-    public Model getListaTipoTransaccionActivos(Model model) {
-        List<TipoTransaccion> listaTipoTransaccion = tipoTransaccionRepository.findByIsActiveTrue();
-        model.addAttribute("ListaTipoTransaccion", listaTipoTransaccion);
-        return model;
-    }
 
     // TipoVehiculo
     public Model getListaTipoVehiculoActivos(Model model) {
@@ -103,20 +95,6 @@ public class ClasificadoresController {
         return ResponseEntity.ok("Clasificación TipoProducto creada correctamente");
     }
 
-
-
-    // Crear TipoTransaccion nuevo
-    @PostMapping("/Tipo-Transaccion/nuevo")
-    public ResponseEntity<String> crearTipoTransaccion(
-            @RequestParam("nombre") String nombre,
-            HttpServletResponse response) throws IOException {
-        TipoTransaccion tipoTransaccion = new TipoTransaccion();
-        tipoTransaccion.setNombre(nombre);
-        tipoTransaccion.setIsActive(Boolean.TRUE);
-        tipoTransaccionRepository.save(tipoTransaccion);
-        response.sendRedirect("/clasificadores");
-        return ResponseEntity.ok("Clasificación TipoTransaccion creada correctamente");
-    }
 
     // Crear TipoVehiculo nuevo
     @PostMapping("/Tipo-Vehiculo/nuevo")
@@ -170,18 +148,6 @@ public class ClasificadoresController {
         return "redirect:/clasificadores";
     }
 
-
-    // Actualizar un TipoTransaccion existente
-    @PostMapping("/actualizar/Tipo-Transaccion/{id}")
-    public String actualizarTipoTransaccion(@PathVariable Long id,
-                                            @RequestParam("nombre") String nombre) {
-        TipoTransaccion tipoTransaccion = tipoTransaccionRepository.findById(id).get();
-        tipoTransaccion.setNombre(nombre);
-        tipoTransaccion.setIsActive(Boolean.TRUE);
-        tipoTransaccionRepository.save(tipoTransaccion);
-        return "redirect:/clasificadores";
-    }
-
     // Desactivar ConceptoPago
     @GetMapping("/desactivar/Concepto-Pago/{id}")
     public String desactivarConceptoPago(@PathVariable Long id) {
@@ -209,16 +175,6 @@ public class ClasificadoresController {
         return "redirect:/clasificadores";
     }
 
-
-
-    // Desactivar TipoTransaccion
-    @GetMapping("/desactivar/Tipo-Transaccion/{id}")
-    public String desactivarTipoTransaccion(@PathVariable Long id) {
-        TipoTransaccion tipoTransaccion = tipoTransaccionRepository.findById(id).get();
-        tipoTransaccion.setIsActive(Boolean.FALSE);
-        tipoTransaccionRepository.save(tipoTransaccion);
-        return "redirect:/clasificadores";
-    }
 
     // Desactivar TipoVehiculo
     @GetMapping("/desactivar/Tipo-Vehiculo/{id}")

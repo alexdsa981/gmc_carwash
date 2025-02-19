@@ -108,7 +108,6 @@ public class WebController {
         clasificadoresController.getListaMetodoPagoActivos(model);
         clasificadoresController.getListaTipoProductoActivos(model);
         clasificadoresController.getListaTipoVehiculoActivos(model);
-        clasificadoresController.getListaTipoTransaccionActivos(model);
         return "clasificadores/lista";
     }
 

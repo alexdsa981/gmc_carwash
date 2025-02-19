@@ -90,29 +90,6 @@
     </table>
 
 
-
-    <!-- Tabla de Tipo de Transacción -->
-    <h3>Tipos de Transacción</h3>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="transaccion : ${ListaTipoTransaccion}">
-            <td th:text="${transaccion.id}"></td>
-            <td th:text="${transaccion.nombre}"></td>
-            <td>
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
     <!-- Tabla de Tipo de Vehículo -->
     <h3>Tipos de Vehículo</h3>
     <table class="table table-striped">
