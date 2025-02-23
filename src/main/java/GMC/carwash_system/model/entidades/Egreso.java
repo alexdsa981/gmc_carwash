@@ -1,5 +1,7 @@
 package GMC.carwash_system.model.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,18 +28,20 @@ public class Egreso {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
 
-
+    @JsonIgnore
     @Column(nullable = false)
     private LocalDate fecha;
-
+    @JsonIgnore
     @Column(nullable = false)
     private LocalTime hora;
 
     @Transient
-    private String formattedFecha;  // Este campo no será persistido en la base de datos
+    @JsonProperty("formattedFecha")
+    private String formattedFecha;
 
     @Transient
-    private String formattedHora;   // Campo para la hora formateada
+    @JsonProperty("formattedHora")
+    private String formattedHora;
 
     public String getFormattedFecha() {
         if (fecha != null) {

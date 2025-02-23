@@ -36,6 +36,26 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
             nativeQuery = true)
     List<Object[]> obtenerIngresos(@Param("year") int year, @Param("month") int month);
 
+    @Query(value = "SELECT " +
+            "CONVERT(VARCHAR, F.Fecha, 23) AS fecha, " +
+            "DATENAME(WEEKDAY, F.Fecha) AS subDia, " +
+            "DAY(F.Fecha) AS dia, " +
+            "COALESCE(SUM(va.SubTotal), 0) AS ingresos, " +
+            "COALESCE(SUM(e.monto), 0) AS egresos, " +
+            "(COALESCE(SUM(va.SubTotal), 0) - COALESCE(SUM(e.monto), 0)) AS balance " +
+            "FROM " +
+            "(SELECT DATEADD(DAY, value - 1, DATEFROMPARTS(:year, :month, 1)) AS Fecha " +
+            " FROM GENERATE_SERIES(1, DAY(EOMONTH(DATEFROMPARTS(:year, :month, 1))))) AS F " +
+            "LEFT JOIN venta v ON F.Fecha = v.fecha " +
+            "LEFT JOIN (SELECT id_venta, SUM(subtotal) AS SubTotal FROM detalle_venta WHERE id_tipo_item = 1 GROUP BY id_venta) va ON va.id_venta = v.id " +
+            "LEFT JOIN egreso e ON F.Fecha = e.fecha " +
+            "GROUP BY F.Fecha " +
+            "ORDER BY F.Fecha",
+            nativeQuery = true)
+    List<Object[]> obtenerBalances(@Param("year") int year, @Param("month") int month);
+
+
+
 
     @Query(value = """
         SELECT 

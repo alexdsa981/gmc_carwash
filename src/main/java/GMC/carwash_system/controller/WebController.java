@@ -22,7 +22,8 @@ public class WebController {
     ClasificadoresController clasificadoresController;
     @Autowired
     ServicioController servicioController;
-
+    @Autowired
+    EgresoControlller egresoControlller;
 
     @GetMapping("/")
     public String redirectToInicio() {
@@ -111,19 +112,6 @@ public class WebController {
         return "clasificadores/lista";
     }
 
-    @GetMapping("/original/balance")
-    public String paginaOriBalance() {
-
-        return "original/balance";
-    }
-
-
-    @GetMapping("/original/ingresos")
-    public String paginaOriIngresos() {
-
-        return "original/ingreso";
-    }
-
 
     @GetMapping("/balance/")
     public String paginaBalance() {
@@ -140,7 +128,6 @@ public class WebController {
 
     @GetMapping("/balance/egresos")
     public String paginaEgresos() {
-
         return "balance/egresos";
     }
 

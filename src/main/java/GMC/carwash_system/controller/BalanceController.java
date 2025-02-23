@@ -1,5 +1,6 @@
 package GMC.carwash_system.controller;
 
+import GMC.carwash_system.model.dto.balance.BalanceDTO;
 import GMC.carwash_system.model.dto.balance.IngresosDTO;
 import GMC.carwash_system.repository.entidades.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,5 +53,26 @@ public class BalanceController {
 
         return ResponseEntity.ok(ingresos);
     }
+
+    @GetMapping("/balances")
+    public ResponseEntity<List<BalanceDTO>> obtenerBalances(@RequestParam int year, @RequestParam int month) {
+
+        List<Object[]> balancesData = ventaRepository.obtenerBalances(year, month);
+
+        // Convertir los datos en DTO
+        List<BalanceDTO> balances = balancesData.stream().map(obj ->
+                new BalanceDTO(
+                        (String) obj[0],     // fecha
+                        (String) obj[1],     // subDia
+                        (Integer) obj[2],    // dia
+                        (BigDecimal) obj[3], // ingresos
+                        (BigDecimal) obj[4], // egresos
+                        (BigDecimal) obj[5]  // balance
+                )
+        ).toList();
+
+        return ResponseEntity.ok(balances);
+    }
+
 
 }

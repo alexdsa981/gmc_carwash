@@ -17,7 +17,11 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">Gestión de Egresos</h2>
-
+    <div class="d-flex justify-content-between mb-3">
+        <a href="/inicio" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
+        </a>
+    </div>
     <!-- Navegación por pestañas -->
     <ul class="nav nav-tabs" id="egresosTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -37,11 +41,11 @@
                     <form id="egresoForm" class="row g-3">
                         <div class="col-md-6">
                             <label for="concepto" class="form-label">Descripción</label>
-                            <input type="text" class="form-control" id="concepto" placeholder="Ej: Compra de insumos" required>
+                            <input type="text" class="form-control" id="concepto" name="descripcion" placeholder="Ej: Compra de insumos" required>
                         </div>
                         <div class="col-md-6">
                             <label for="monto" class="form-label">Monto (S/)</label>
-                            <input type="number" class="form-control" id="monto" placeholder="Ej: 150.00" required min="0" step="0.01">
+                            <input type="number" class="form-control" id="monto" name="monto" placeholder="Ej: 150.00" required min="0" step="0.01">
                         </div>
                         <div class="col-12 text-end">
                             <button type="submit" class="btn btn-success">Agregar Egreso</button>
@@ -69,6 +73,35 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar egreso -->
+<div class="modal fade" id="modalEditarEgreso" tabindex="-1" aria-labelledby="modalEditarEgresoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarEgresoLabel">Editar Egreso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarEgreso">
+                    <input type="hidden" id="egresoId">
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="descripcion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto (S/)</label>
+                        <input type="text" class="form-control" id="montoM" required>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
