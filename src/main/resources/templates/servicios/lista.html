@@ -30,7 +30,6 @@
     <table class="table table-striped" id="example">
         <thead>
         <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Especial</th>
@@ -39,7 +38,6 @@
         </thead>
         <tbody>
         <tr th:each="servicio : ${ListaTipoServicio}">
-            <td th:text="${servicio.id}"></td>
             <td th:text="${servicio.nombre}"></td>
             <td th:text="${servicio.descripcion}"></td>
             <td th:text="${servicio.isEspecial ? 'Sí' : 'No'}"></td>
@@ -268,14 +266,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
-        });
-    });
-</script>
+<script src="/serviciosLista.js"></script>
 </body>
 </html>
 

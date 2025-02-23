@@ -32,7 +32,6 @@
     <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>N°</th>
             <th>Nombre Producto</th>
             <th>Categoría</th>
             <th>Precio Costo (S/.)</th>
@@ -44,7 +43,6 @@
         <tbody>
         <!-- Iteramos sobre la lista de productos -->
         <tr th:each="producto, iterStat : ${listaProductos}">
-            <td th:text="${iterStat.index + 1}"></td>
             <td th:text="${producto.nombre}"></td>
             <td th:text="${producto.tipo_producto.nombre}"></td>
             <td th:text="${producto.precio_costo}"></td>
