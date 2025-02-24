@@ -113,7 +113,7 @@ public class WebController {
     }
 
 
-    @GetMapping("/balance/")
+    @GetMapping("/balance")
     public String paginaBalance() {
 
         return "balance/balance";

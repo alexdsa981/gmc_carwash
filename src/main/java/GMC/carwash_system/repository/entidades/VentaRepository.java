@@ -17,7 +17,7 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
 
     @Query(value = "SELECT " +
             "CONVERT(VARCHAR, F.Fecha, 23) AS fecha, " +
-            "DATENAME(WEEKDAY, F.Fecha) AS subDia, " +
+            "UPPER(LEFT(FORMAT(F.Fecha, 'dddd', 'es-ES'), 1)) + LOWER(SUBSTRING(FORMAT(F.Fecha, 'dddd', 'es-ES'), 2, LEN(FORMAT(F.Fecha, 'dddd', 'es-ES')))) AS subDia, " +
             "DAY(F.Fecha) AS dia, " +
             "COALESCE(SUM(va.SubTotal), 0) AS subtotal, " +
             "COUNT(DISTINCT v.id) AS cantidad, " +
@@ -38,7 +38,7 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
 
     @Query(value = "SELECT " +
             "CONVERT(VARCHAR, F.Fecha, 23) AS fecha, " +
-            "DATENAME(WEEKDAY, F.Fecha) AS subDia, " +
+            "UPPER(LEFT(FORMAT(F.Fecha, 'dddd', 'es-ES'), 1)) + LOWER(SUBSTRING(FORMAT(F.Fecha, 'dddd', 'es-ES'), 2, LEN(FORMAT(F.Fecha, 'dddd', 'es-ES')))) AS subDia, " +
             "DAY(F.Fecha) AS dia, " +
             "COALESCE(SUM(va.SubTotal), 0) AS ingresos, " +
             "COALESCE(SUM(e.monto), 0) AS egresos, " +
@@ -53,8 +53,6 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
             "ORDER BY F.Fecha",
             nativeQuery = true)
     List<Object[]> obtenerBalances(@Param("year") int year, @Param("month") int month);
-
-
 
 
     @Query(value = """
