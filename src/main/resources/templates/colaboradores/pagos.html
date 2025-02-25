@@ -20,14 +20,8 @@
 <div class="container title-container">
     <h2 class="text-center">Registro de Pagos</h2>
 </div>
-<!-- Vista de Pagos -->
-<div class="container" id="paymentsView">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a class="btn btn-outline-secondary" href="/colaboradores/lista">Regresar</a>
-        <!-- Botón Pagar Sueldo -->
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#paySalaryModal">Pagar Sueldo</button>
-    </div>
-    <!-- Tabla de Pagos -->
+<div class="container">
+
     <table id="paymentsTable" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
@@ -107,51 +101,6 @@
     </div>
 </div>
 
-<script>
-
-    // Función para eliminar un pago
-    document.querySelectorAll('.delete-payment').forEach(button => {
-        button.addEventListener('click', function () {
-            const pagoId = this.getAttribute('data-id');
-
-            // Usar SweetAlert para la confirmación
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: 'No podrás revertir esta acción.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Llamar a la API para eliminar el pago
-                    fetch(`/app/pagos/eliminar/${pagoId}`, {
-                        method: 'DELETE'
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                Swal.fire(
-                                    'Eliminado!',
-                                    'El pago ha sido eliminado.',
-                                    'success'
-                                ).then(() => {
-                                    location.reload(); // Recargar la página para actualizar la lista
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    'Hubo un problema al eliminar el pago.',
-                                    'error'
-                                );
-                            }
-                        });
-                }
-            });
-        });
-    });
-</script>
-
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -159,13 +108,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/pagos.js"></script>
 </body>
-<script>
-    $(document).ready(function () {
-var paymentsTable = $('#paymentsTable').DataTable({
-    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
-    });
-});
-</script>
 
 </html>

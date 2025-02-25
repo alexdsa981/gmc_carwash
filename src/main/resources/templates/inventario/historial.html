@@ -19,14 +19,6 @@
     <h2 class="text-center">Registro de Almacen</h2>
 </div>
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <a href="/inventario/lista" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left me-2"></i> Regresar
-            </a>
-        </div>
-    </div>
-
     <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
@@ -60,61 +52,8 @@
         </tbody>
     </table>
 
-
-
 </div>
 
-<script>
-    function eliminarHistorial(button) {
-        const id = button.getAttribute('data-id');
-
-        Swal.fire({
-            icon: 'warning',
-            title: '¿Estás seguro de que deseas eliminar este historial?',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-            focusCancel: true
-        }).then(result => {
-            if (result.isConfirmed) {
-                fetch(`/app/inventario/eliminar-historial/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Si la eliminación fue exitosa, eliminamos la fila de la tabla
-                        const row = button.closest('tr');
-                        row.remove();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Historial eliminado exitosamente',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Error al eliminar el historial.',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error al eliminar el historial.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                });
-            }
-        });
-    }
-</script>
 
 
 <!-- jQuery -->
@@ -125,14 +64,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    $(document).ready(function () {
-        var table = $('#example').DataTable({
-            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
-        });
-    });
-</script>
+<script src="/invHistorial.js"></script>
 </body>
 </html>
 

@@ -1,9 +1,15 @@
     $(document).ready(function () {
-        const table = $('#example').DataTable({
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-            },
-            order: [[0, 'desc']] // Ordenar por la primera columna (FECHA) en orden descendente
+        var table = $('#example').DataTable({
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+            order: [[0, "desc"]],
+            dom: '<"d-flex justify-content-between align-items-center"lf>tip',
+            initComplete: function () {
+                $(".dataTables_length").prepend(`
+                    <a href="/inicio" class="btn btn-outline-primary me-3">
+                        <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
+                    </a>
+                `);
+            }
         });
 
 
