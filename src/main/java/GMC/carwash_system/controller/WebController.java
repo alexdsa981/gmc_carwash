@@ -50,6 +50,12 @@ public class WebController {
         return "atencion/atencion";
     }
 
+    @GetMapping("/atencion/ventas")
+    public String paginaVentasRealizadas(Model model) {
+        atencionController.retornaListaRealizados(model);
+        return "atencion/ventas";
+    }
+
     //PAGINAS DE COLABORADORES
     @GetMapping("/colaboradores/lista")
     public String paginaListaColaboradores(Model model) {
@@ -91,11 +97,10 @@ public class WebController {
     @GetMapping("/servicios/lista")
     public String paginaListaServicios(Model model) {
         servicioController.getListaTipoServicioActivos(model);
-
         return "servicios/lista";
     }
 
-    //PAGINAS DE Cuadre
+    //PAGINAS DE CUADRE DE CAJA
     @GetMapping("/caja/cuadre")
     public String paginaCuadreDeCaja(Model model) {
         return "caja/cuadre";
@@ -113,18 +118,13 @@ public class WebController {
     }
 
 
+
+    //PAGINAS DE BALANCE
     @GetMapping("/balance")
-    public String paginaBalance() {
-
-        return "balance/balance";
-    }
-
+    public String paginaBalance() { return "balance/balance"; }
 
     @GetMapping("/balance/ingresos")
-    public String paginaIngresos() {
-
-        return "balance/ingresos";
-    }
+    public String paginaIngresos() { return "balance/ingresos"; }
 
     @GetMapping("/balance/egresos")
     public String paginaEgresos() {

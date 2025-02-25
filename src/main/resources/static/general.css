@@ -1,0 +1,42 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f8f9fa, #dee2e6);
+}
+
+.title-container {
+    position: relative;
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: white;
+    text-align: center;
+    overflow: hidden; /* Para evitar que el desenfoque sobresalga */
+}
+
+.title-container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; /* Tamaño del logo */
+    height: 100px;
+    background: url("/img/logo.png") no-repeat center/contain;
+    opacity: 0.3; /* Baja la opacidad para que no resalte demasiado */
+    pointer-events: none; /* Evita que interfiera con eventos del mouse */
+}
+
+.text-center {
+    position: relative; /* Asegura que el texto quede sobre el fondo */
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 2; /* Lo pone sobre el logo */
+}
+
+
+.container {
+    margin-top:20px;
+    margin-bottom:20px;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}

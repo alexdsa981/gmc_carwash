@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMC - VENTAS REALIZADAS</title>
+    <link rel="stylesheet" href="/general.css">
+    <link rel="icon" href="/img/logo.png" type="image/png">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container title-container">
+    <h2 class="text-center">Ventas Realizadas</h2>
+</div>
+<div class="container">
+
+    <table id="realizadosTable" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Vehículo</th> <!-- Placa, marca y tipo de vehículo -->
+            <th>Cliente</th> <!-- Nombre, teléfono e identificación -->
+            <th>Servicios/Productos</th> <!-- Detalla servicios y productos realizados -->
+            <th>Total</th> <!-- Monto total de la venta -->
+            <th>Método de Pago</th> <!-- Efectivo, tarjeta, etc. -->
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="detalle, iterStat : ${listaIngresosRealizados}">
+            <tr>
+                <!-- Fecha y Hora -->
+                <td th:attr="data-order=${detalle.fecha}" th:text="${detalle.formattedFecha}">FECHA</td>
+
+
+                <td th:text="${detalle.formattedHora != null ? detalle.formattedHora : ''}">HORA</td>
+
+                <!-- Vehículo -->
+                <td>
+                    <strong th:text="${detalle.vehiculo != null ? detalle.vehiculo.placa : ''}">PLACA</strong><br>
+                    <span th:text="${detalle.vehiculo != null ? detalle.vehiculo.marca : ''}">MARCA</span><br>
+                    <span th:text="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.nombre : ''}">TIPO</span>
+                </td>
+
+                <!-- Cliente -->
+                <td>
+                    <i class="bi bi-person"></i> <strong
+                        th:text="${detalle.cliente != null ? detalle.cliente.nombre : ''}">CLIENTE</strong><br>
+                    <i class="bi bi-telephone"></i> <span
+                        th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELÉFONO</span><br>
+                    <i class="bi bi-card-text"></i> <span
+                        th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">RUC</span>
+                </td>
+
+                <!-- Servicios/Productos -->
+                <td>
+                    <!-- Servicios -->
+                    <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
+                        <strong><i class="bi bi-tools"></i> Servicios:</strong>
+                        <ul style="list-style: none; padding-left: 1em;">
+                            <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
+                                th:if="${detalleVenta.tipoItemNombre == 'Servicio'}">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                <span th:text="${detalleVenta.nombreItem}"></span>
+                                - <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong><br>
+                                <small>Atendido por: <span th:text="${detalleVenta.colaborador.nombre}"></span></small>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr style="margin: 10px 0;">
+
+                    <!-- Productos -->
+                    <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
+                        <strong><i class="bi bi-box"></i> Productos:</strong>
+                        <ul style="list-style: none; padding-left: 1em;">
+                            <li th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
+                                th:if="${detalleVenta.tipoItemNombre == 'Producto'}">
+                                <i class="bi bi-cart-fill text-primary"></i>
+                                <span th:text="${detalleVenta.nombreItem}"></span>,
+                                x<span th:text="${detalleVenta.cantidad}"></span><br>
+                                Subtotal: <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+
+                <!-- Total -->
+                <td th:text="'S/.' + ${detalle.venta.total}">TOTAL</td>
+
+                <!-- Método de Pago -->
+                <td th:text="${detalle.venta.metodoPago.nombre}">MÉTODO DE PAGO</td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/ventas.js"></script>
+</body>
+</html>

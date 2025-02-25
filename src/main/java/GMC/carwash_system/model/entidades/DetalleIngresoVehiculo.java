@@ -52,9 +52,6 @@ public class DetalleIngresoVehiculo {
     }
 
 
-
-
-
     @Transient
     private String formattedFecha;  // Este campo no será persistido en la base de datos
 
