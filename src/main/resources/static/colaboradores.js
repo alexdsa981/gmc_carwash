@@ -109,7 +109,7 @@ function enviarFormulario() {
     const id = form.getAttribute('data-id');
 
     fetch(`/app/colaboradores/editar/${id}`, {
-        method: 'POST',
+        method: 'PUT',
         body: formData
     })
     .then(response => response.json())

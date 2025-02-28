@@ -25,10 +25,9 @@
     <table id="paymentsTable" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>N°</th>
             <th>Nombre</th>
-            <th>Monto</th>
-            <th>Concepto</th>
+            <th>Sueldo</th>
+            <th>Pagado</th>
             <th>Descripción</th>
             <th>Fecha</th>
             <th>Hora</th>
@@ -38,10 +37,9 @@
         <tbody>
         <th:block th:each="pago, iterStat : ${listaPagos}">
             <tr>
-                <td th:text="${iterStat.index + 1}"></td>
                 <td th:text="${pago.colaborador.nombre}"></td>
+                <td th:text="'S/. ' + ${pago.colaborador.sueldo_fijo}"></td>
                 <td th:text="'S/. ' + ${pago.monto}"></td>
-                <td th:text="${pago.conceptoPago.nombre}"></td>
                 <td th:text="${pago.comentario}"></td>
                 <td th:text="${pago.formattedFecha}"></td>
                 <td th:text="${pago.formattedHora}"></td>
@@ -80,14 +78,6 @@
                     <div class="mb-3">
                         <label for="amount" class="form-label">Monto</label>
                         <input type="number" class="form-control" id="amount" name="monto" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="conceptSelect" class="form-label">Seleccionar Concepto</label>
-                        <select class="form-select" id="conceptSelect" name="idConceptoPago" required>
-                            <th:block th:each="concepto : ${listaConceptoPago}">
-                                <option th:value="${concepto.id}" th:text="${concepto.nombre}"></option>
-                            </th:block>
-                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="comment" class="form-label">Comentario</label>

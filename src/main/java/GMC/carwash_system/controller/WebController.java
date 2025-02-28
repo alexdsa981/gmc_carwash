@@ -68,7 +68,6 @@ public class WebController {
     public String paginaListaPagosColaboradores(Model model) {
         colaboradoresController.retornaListaColaboradores(model);
         sueldosController.retornaListaPagos(model);
-        sueldosController.retornaListaConceptoPagos(model);
         return "colaboradores/pagos";
     }
 
@@ -112,7 +111,6 @@ public class WebController {
     //PAGINAS DE Clasificadores
     @GetMapping("/clasificadores/lista")
     public String paginaClasificadores(Model model) {
-        clasificadoresController.getListaConceptoPagoActivos(model);
         clasificadoresController.getListaMetodoPagoActivos(model);
         clasificadoresController.getListaTipoProductoActivos(model);
         clasificadoresController.getListaTipoVehiculoActivos(model);

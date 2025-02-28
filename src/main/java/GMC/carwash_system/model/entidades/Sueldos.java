@@ -1,11 +1,9 @@
 package GMC.carwash_system.model.entidades;
 
-import GMC.carwash_system.model.clasificadores.ConceptoPago;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -27,10 +25,6 @@ public class Sueldos {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
-
-    @ManyToOne
-    @JoinColumn(name = "id_concepto_pago", nullable = false)
-    private ConceptoPago conceptoPago;
 
     @Column(nullable = false)
     private LocalDate fecha;

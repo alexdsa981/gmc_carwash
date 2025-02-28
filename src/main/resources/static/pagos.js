@@ -11,7 +11,7 @@ $(document).ready(function () {
             // Agregar el botón "Pagar Sueldo" a la derecha después de la barra de búsqueda
             $(".right-section").append(`
                 <button type="button" class="btn btn-outline-success ms-3" data-bs-toggle="modal" data-bs-target="#paySalaryModal">
-                    Pagar Sueldo
+                    Registrar Pago
                 </button>
             `);
         }

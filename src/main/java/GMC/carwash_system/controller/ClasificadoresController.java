@@ -16,8 +16,6 @@ import java.util.List;
 @RequestMapping("/app/clasificadores")
 public class ClasificadoresController {
     @Autowired
-    ConceptoPagoRepository conceptoPagoRepository;
-    @Autowired
     MetodoPagoRepository metodoPagoRepository;
     @Autowired
     TipoProductoRepository productoRepository;
@@ -25,12 +23,6 @@ public class ClasificadoresController {
     @Autowired
     TipoVehiculoRepository tipoVehiculoRepository;
 
-
-    public Model getListaConceptoPagoActivos(Model model) {
-        List<ConceptoPago> ListaConceptoPago = conceptoPagoRepository.findByIsActiveTrue();
-        model.addAttribute("ListaConceptoPago", ListaConceptoPago);
-        return model;
-    }
     // MetodoPago
     public Model getListaMetodoPagoActivos(Model model) {
         List<MetodoPago> listaMetodoPago = metodoPagoRepository.findByIsActiveTrue();
@@ -56,18 +48,7 @@ public class ClasificadoresController {
     }
 
 
-    // Crear ConceptoPago nuevo
-    @PostMapping("/Concepto-Pago/nuevo")
-    public ResponseEntity<String> crearConceptoPago(
-            @RequestParam("nombre") String nombre,
-            HttpServletResponse response) throws IOException {
-        ConceptoPago conceptoPago = new ConceptoPago();
-        conceptoPago.setNombre(nombre);
-        conceptoPago.setIsActive(Boolean.TRUE);
-        conceptoPagoRepository.save(conceptoPago);
-        response.sendRedirect("/clasificadores");
-        return ResponseEntity.ok("Clasificación ConceptoPago creada correctamente");
-    }
+
 
     // Crear MetodoPago nuevo
     @PostMapping("/Metodo-Pago/nuevo")
@@ -115,16 +96,6 @@ public class ClasificadoresController {
 
 
 
-    // Actualizar un ConceptoPago existente
-    @PostMapping("/actualizar/Concepto-Pago/{id}")
-    public String actualizarConceptoPago(@PathVariable Long id,
-                                         @RequestParam("nombre") String nombre) {
-        ConceptoPago conceptoPago = conceptoPagoRepository.findById(id).get();
-        conceptoPago.setNombre(nombre);
-        conceptoPago.setIsActive(Boolean.TRUE);
-        conceptoPagoRepository.save(conceptoPago);
-        return "redirect:/clasificadores";
-    }
 
     // Actualizar un MetodoPago existente
     @PostMapping("/actualizar/Metodo-Pago/{id}")
@@ -148,14 +119,6 @@ public class ClasificadoresController {
         return "redirect:/clasificadores";
     }
 
-    // Desactivar ConceptoPago
-    @GetMapping("/desactivar/Concepto-Pago/{id}")
-    public String desactivarConceptoPago(@PathVariable Long id) {
-        ConceptoPago conceptoPago = conceptoPagoRepository.findById(id).get();
-        conceptoPago.setIsActive(Boolean.FALSE);
-        conceptoPagoRepository.save(conceptoPago);
-        return "redirect:/clasificadores";
-    }
 
     // Desactivar MetodoPago
     @GetMapping("/desactivar/Metodo-Pago/{id}")
