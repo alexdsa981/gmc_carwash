@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('editProducto').value = this.dataset.producto;
             document.getElementById('editPrecio').value = this.dataset.precio;
             document.getElementById('editCantidad').value = this.dataset.cantidad;
-            document.getElementById('editColaborador').value = this.dataset.colaborador;
         });
     });
 
@@ -91,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('editDetalleIdS').value = this.dataset.id;
             document.getElementById('editServicio').value = this.dataset.servicio;
             document.getElementById('editPrecioS').value = this.dataset.precio;
-            document.getElementById('editColaboradorS').value = this.dataset.colaborador;
         });
     });
 

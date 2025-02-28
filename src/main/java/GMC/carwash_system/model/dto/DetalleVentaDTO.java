@@ -34,7 +34,6 @@ public class DetalleVentaDTO {
         this.cantidad = detalleVenta.getCantidad();
         this.precio_unitario = detalleVenta.getPrecio_unitario();
         this.subtotal = detalleVenta.getSubtotal();
-        this.colaborador = detalleVenta.getColaborador();
         this.venta = detalleVenta.getVenta();
     }
 }

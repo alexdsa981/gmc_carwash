@@ -106,7 +106,11 @@ public class AtencionController {
         return model;
     }
 
-
+    public Model retornaListaTipoServicio(Model model) {
+        List<TipoServicio> ListaTipoServicio = tipoServicioRepository.findAll();
+        model.addAttribute("ListaTipoServicio", ListaTipoServicio);
+        return model;
+    }
 
     public Model retornaListaPrecioServicio(Model model) {
         List<PrecioServicio> listaPrecioServicio = precioServicioRepository.findAll();
@@ -226,8 +230,7 @@ public class AtencionController {
             @RequestParam(value = "cantidad", required = false) Integer cantidad,
             @RequestParam(value = "servicioBasico", required = false) Long IDservicioBasico,
             @RequestParam(value = "servicioEspecial", required = false) Long IDservicioEspecial,
-            @RequestParam("precio") BigDecimal precioUnitarioPersonalizado,
-            @RequestParam("idColaborador") Long idColaborador) {
+            @RequestParam("precio") BigDecimal precioUnitarioPersonalizado) {
 
         DetalleIngresoVehiculo detalleIngresoVehiculo = detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get();
         TipoVehiculo tipoVehiculo = detalleIngresoVehiculo.getVehiculo().getTipo_vehiculo();
@@ -260,7 +263,6 @@ public class AtencionController {
             }
         }
         if (idTipoVenta == 2) { //PRODUCTO
-            detalleVenta.setColaborador(null);
             if (IDproducto != null) {
                 detalleVenta.setIdItem(IDproducto);
                 detalleVenta.setTipoItem(tipoItemRepository.findById(2L).get());
@@ -273,7 +275,6 @@ public class AtencionController {
                 detalleVenta.setSubtotal(detalleVenta.getPrecio_unitario().multiply(BigDecimal.valueOf(cantidad)));
             }
         }
-        detalleVenta.setColaborador(colaboradorRepository.findById(idColaborador).get());
         detalleVenta.setDetalleIngresoVehiculo(detalleIngresoVehiculoRepository.findById(idDetalleIngreso).get());
         detalleVentaRepository.save(detalleVenta);
 
@@ -285,17 +286,13 @@ public class AtencionController {
             @RequestParam("idDetalle") Long idDetalle,
             @RequestParam("precio") BigDecimal precio,
             @RequestParam("producto") Long productoId,
-            @RequestParam("cantidad") Integer cantidad,
-            @RequestParam("idColaborador") Long colaboradorId) {
-        // Lógica para editar el producto en la base de datos
+            @RequestParam("cantidad") Integer cantidad){
         try {
-            // Ejemplo: Lógica de actualización
             DetalleVenta detalle = detalleVentaRepository.findById(idDetalle).get();
             detalle.setIdItem(productoId);
             detalle.setCantidad(cantidad);
             detalle.setPrecio_unitario(precio);
             detalle.setSubtotal(detalle.getPrecio_unitario().multiply(BigDecimal.valueOf(cantidad)));
-            detalle.setColaborador(colaboradorRepository.findById(colaboradorId).get());
             detalleVentaRepository.save(detalle);
             return ResponseEntity.ok("Producto actualizado con éxito");
         } catch (Exception e) {
@@ -310,8 +307,7 @@ public class AtencionController {
     public ResponseEntity<String> editarDetalleVentaServicio(
             @RequestParam Long idDetalle,
             @RequestParam Long servicio,
-            @RequestParam BigDecimal precio,
-            @RequestParam Long idColaborador
+            @RequestParam BigDecimal precio
     ) {
         try {
             DetalleVenta detalleVenta = detalleVentaRepository.findById(idDetalle)
@@ -320,7 +316,6 @@ public class AtencionController {
             detalleVenta.setIdItem(servicio);
             detalleVenta.setPrecio_unitario(precio);
             detalleVenta.setSubtotal(precio);
-            detalleVenta.setColaborador(colaboradorRepository.findById(idColaborador).orElseThrow());
             detalleVentaRepository.save(detalleVenta);
 
             return ResponseEntity.ok("Servicio actualizado con éxito");

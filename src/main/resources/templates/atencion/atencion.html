@@ -31,6 +31,8 @@
 <style>
     .detalle-item {
     position: relative;
+    padding-top:1px;
+    padding-bottom:2px;
 }
 
 .detalle-btn {
@@ -82,20 +84,17 @@
 
                 <td>
                     <!-- Servicios -->
-                    <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}">
+                    <div th:if="${#lists.size(detalle.listaDetalleVentasDTO) > 0}" >
                         <strong><i class="bi bi-tools"></i> Servicios:</strong>
                         <div th:each="detalleVenta : ${detalle.listaDetalleVentasDTO}"
                              th:if="${detalleVenta.tipoItemNombre == 'Servicio'}" class="detalle-item">
                             <i class="bi bi-check-circle-fill text-success"></i>
                             <span th:text="${detalleVenta.nombreItem}"></span>
                             - <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
-                            <br>
-                            <small>Atendido por: <span th:text="${detalleVenta.colaborador.nombre}"></span></small>
                             <button class="btn btn-outline-secondary btn-sm detalle-btn edit-servicio-btn"
                                     th:data-id="${detalleVenta.id}"
                                     th:data-servicio="${detalleVenta.idItem}"
                                     th:data-precio="${detalleVenta.precio_unitario}"
-                                    th:data-colaborador="${detalleVenta.colaborador.id}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#editServicioModal">
                                 <i class="bi bi-gear"></i>
@@ -112,17 +111,13 @@
                              th:if="${detalleVenta.tipoItemNombre == 'Producto'}"
                              class="detalle-item">
                             <i class="bi bi-cart-fill text-primary"></i>
-                            <span th:text="${detalleVenta.nombreItem}"></span>,
-                            x<span th:text="${detalleVenta.cantidad}"></span>
-                            <br>
-                            Subtotal: <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
+                            <span th:text="${detalleVenta.nombreItem}"></span> (x<span th:text="${detalleVenta.cantidad}"></span>) = Subtotal: <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
                             <!-- Botón para Abrir el Modal -->
                             <button class="btn btn-outline-secondary btn-sm detalle-btn edit-product-btn"
                                     th:data-id="${detalleVenta.id}"
                                     th:data-producto="${detalleVenta.idItem}"
                                     th:data-cantidad="${detalleVenta.cantidad}"
                                     th:data-precio="${detalleVenta.precio_unitario}"
-                                    th:data-colaborador="${detalleVenta.colaborador.id}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#editProductoModal">
                                 <i class="bi bi-gear"></i>
@@ -215,16 +210,6 @@
                         <input class="form-control" type="number" name="precio" id="editPrecio" min="0.01"
                                step="0.01" placeholder="Precio por unidad" required>
                     </div>
-                    <!-- Colaborador -->
-                    <div class="mb-3">
-                        <label for="editColaborador" class="form-label">Colaborador</label>
-                        <select class="form-select" id="editColaborador" name="idColaborador" required>
-                            <option value="" selected disabled>Seleccione una opción</option>
-                            <th:block th:each="colaborador : ${listaColaboradores}">
-                                <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
-                            </th:block>
-                        </select>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
@@ -259,7 +244,7 @@
                         <label for="editServicio" class="form-label">Servicio</label>
                         <select class="form-select" id="editServicio" name="servicio">
                             <option value="" selected disabled>Seleccione una opción</option>
-                            <option th:each="servicio : ${listaTipoServicio}" th:value="${servicio.id}"
+                            <option th:each="servicio : ${ListaTipoServicio}" th:value="${servicio.id}"
                                     th:text="${servicio.nombre}">
                             </option>
                         </select>
@@ -269,16 +254,6 @@
                         <label for="editPrecio" class="form-label">Precio</label>
                         <input class="form-control" type="number" name="precio" id="editPrecioS" min="0.01" step="0.01"
                                placeholder="Precio por unidad" required>
-                    </div>
-                    <!-- Colaborador -->
-                    <div class="mb-3">
-                        <label for="editColaborador" class="form-label">Colaborador</label>
-                        <select class="form-select" id="editColaboradorS" name="idColaborador" required>
-                            <option value="" selected disabled>Seleccione un colaborador</option>
-                            <th:block th:each="colaborador : ${listaColaboradores}">
-                                <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
-                            </th:block>
-                        </select>
                     </div>
                 </form>
             </div>
@@ -548,17 +523,6 @@
                         <label for="precio" class="form-label">Precio</label>
                         <input class="form-control" type="number" name="precio" id="precio" min="0.01"
                                step="0.01" placeholder="Precio por unidad" required>
-                    </div>
-
-                    <!-- Colaborador -->
-                    <div class="mb-3">
-                        <label for="collaboratorSelect" class="form-label">Colaborador</label>
-                        <select class="form-select" id="collaboratorSelect" name="idColaborador" required>
-                            <option value="" selected disabled>Seleccione una opción</option>
-                            <th:block th:each="colaborador : ${listaColaboradores}">
-                                <option th:value="${colaborador.id}" th:text="${colaborador.nombre}"></option>
-                            </th:block>
-                        </select>
                     </div>
                 </form>
             </div>

@@ -67,8 +67,7 @@
                                 th:if="${detalleVenta.tipoItemNombre == 'Servicio'}">
                                 <i class="bi bi-check-circle-fill text-success"></i>
                                 <span th:text="${detalleVenta.nombreItem}"></span>
-                                - <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong><br>
-                                <small>Atendido por: <span th:text="${detalleVenta.colaborador.nombre}"></span></small>
+                                - <strong th:text="'S/.' + ${detalleVenta.subtotal}"></strong>
                             </li>
                         </ul>
                     </div>

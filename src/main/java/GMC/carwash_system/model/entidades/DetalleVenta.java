@@ -37,10 +37,6 @@ public class DetalleVenta {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal; //multiplicacion de cantidad * precio_unitario
 
-    @ManyToOne
-    @JoinColumn(name = "id_colaborador", nullable = false)
-
-    private Colaborador colaborador;
 
     @ManyToOne
     @JoinColumn(name = "id_entrada_vehiculo", nullable = false)

@@ -40,13 +40,15 @@ public class WebController {
     public String paginaAtencion(Model model) {
         atencionController.retornaListaTipoVehiculo(model);
         atencionController.retornaListaPrecioServicio(model);
-        inventarioController.retornalistaProductosActivos(model);
         atencionController.retornaListaIngresoClientes(model);
         atencionController.retornaListaTipoItem(model);
-        colaboradoresController.retornaListaColaboradores(model);
-        servicioController.retornaListaTipoServicio_Especial_Basico(model);
         atencionController.retornaListaMetodoPago(model);
         atencionController.retornaListaRealizados(model);
+
+        colaboradoresController.retornaListaColaboradores(model);
+        inventarioController.retornalistaProductosActivos(model);
+        servicioController.getListaTipoServicioActivos(model);
+        servicioController.retornaListaTipoServicio_Especial_Basico(model);
         return "atencion/atencion";
     }
 

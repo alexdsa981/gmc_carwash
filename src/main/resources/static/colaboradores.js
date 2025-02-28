@@ -71,38 +71,45 @@ document.querySelectorAll('.delete-row').forEach(button => {
 });
 
 
-
-
-
-// EDITAR COLABORADOR
 document.querySelectorAll('.edit-row').forEach(button => {
     button.addEventListener('click', function () {
-        // Cargar los datos del colaborador en el modal
+        const colaboradorId = this.getAttribute('data-id');
+        const fotoUrl = `/app/colaboradores/foto/${colaboradorId}`;
+
+        console.log("ID del colaborador:", colaboradorId);
+        console.log("URL de la foto:", fotoUrl);
+
         document.getElementById('editName').value = this.getAttribute('data-nombre');
         document.getElementById('editId').value = this.getAttribute('data-identificacion');
         document.getElementById('editPhone').value = this.getAttribute('data-telefono');
         document.getElementById('editMoney').value = this.getAttribute('data-sueldo-fijo');
         document.getElementById('editDescription').value = this.getAttribute('data-descripcion');
 
-        // Guardar el ID del colaborador en un atributo de la forma
-        document.getElementById('editCollaboratorForm').setAttribute('data-id', this.getAttribute('data-id'));
+        // Asignar la imagen al modal
+        const imgElement = document.getElementById('editFotoPreview');
+        imgElement.src = fotoUrl;
+
+        // Manejar errores de carga de imagen
+        imgElement.onerror = function () {
+            this.src = '/img/logo.png';
+        };
+
+        // Guardar el ID en el formulario
+        document.getElementById('editCollaboratorForm').setAttribute('data-id', colaboradorId);
 
         // Abrir el modal
         $('#editModal').modal('show');
     });
 });
 
-// Función para enviar el formulario con una solicitud PUT usando fetch
+
 function enviarFormulario() {
     const form = document.getElementById('editCollaboratorForm');
     const formData = new FormData(form);
-
-    // Obtener el ID del colaborador del atributo de la forma
     const id = form.getAttribute('data-id');
 
-    // Enviar solicitud PUT con fetch
     fetch(`/app/colaboradores/editar/${id}`, {
-        method: 'PUT',
+        method: 'POST',
         body: formData
     })
     .then(response => response.json())
@@ -112,7 +119,6 @@ function enviarFormulario() {
             data.message,
             'success'
         ).then(() => {
-            // Recargar la página después de que el usuario haya cerrado el SweetAlert
             location.reload();
         });
     })
