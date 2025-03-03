@@ -34,6 +34,8 @@ public class Sueldos {
 
     private String comentario;
 
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int tipoOperacion;
 
     @Transient
     private String formattedFecha;  // Este campo no será persistido en la base de datos
