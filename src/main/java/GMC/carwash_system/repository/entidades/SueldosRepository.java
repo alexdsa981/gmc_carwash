@@ -10,7 +10,11 @@ import java.util.List;
 
 @Repository
 public interface SueldosRepository extends JpaRepository<Sueldos, Long> {
-    @Query("SELECT s FROM Sueldos s WHERE YEAR(s.fecha) = :year AND MONTH(s.fecha) = :month")
-    List<Sueldos> findByYearAndMonth(@Param("year") int year, @Param("month") int month);
+    @Query("SELECT s FROM Sueldos s WHERE YEAR(s.fecha) = :year AND MONTH(s.fecha) = :month AND " +
+            "( (:quincena = 1 AND DAY(s.fecha) BETWEEN 1 AND 15) OR (:quincena = 2 AND DAY(s.fecha) BETWEEN 16 AND 31) )")
+    List<Sueldos> findByYearMonthAndQuincena(@Param("year") int year,
+                                             @Param("month") int month,
+                                             @Param("quincena") int quincena);
+
 
 }

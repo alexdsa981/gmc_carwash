@@ -32,8 +32,10 @@ public class SueldosController {
     SueldosRepository sueldosRepository;
 
     @GetMapping("/pagos")
-    public ResponseEntity<List<SueldosDTO>> obtenerSueldos(@RequestParam int year, @RequestParam int month) {
-        List<Sueldos> listaPagos = sueldosRepository.findByYearAndMonth(year, month);
+    public ResponseEntity<List<SueldosDTO>> obtenerSueldos(@RequestParam int year,
+                                                           @RequestParam int month,
+                                                           @RequestParam int quincena) {
+        List<Sueldos> listaPagos = sueldosRepository.findByYearMonthAndQuincena(year, month, quincena);
 
         List<SueldosDTO> pagosDTO = listaPagos.stream().map(pago ->
                 new SueldosDTO(
@@ -45,7 +47,7 @@ public class SueldosController {
                         pago.getFormattedFecha(),
                         pago.getFormattedHora(),
                         pago.getTipoOperacion(),
-                        pago.getEstado() // Agregamos el nuevo campo
+                        pago.getEstado()
                 )
         ).collect(Collectors.toList());
 
@@ -85,7 +87,7 @@ public class SueldosController {
         nuevoPago.setMonto(montoAPagar);
         nuevoPago.setComentario(comentario);
         nuevoPago.setTipoOperacion(tipoOperacion);
-
+        nuevoPago.setEstado(Boolean.FALSE);
         sueldosRepository.save(nuevoPago);
 
         response.sendRedirect("/colaboradores/pagos");

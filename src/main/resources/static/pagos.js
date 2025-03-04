@@ -5,53 +5,58 @@ $(document).ready(function () {
 
     inicializarFiltros();
     inicializarTabla();
-    cargarPagos(anioActual, mesActual);
+    cargarPagos(anioActual, mesActual, calcularQuincena(diaActual));
 
-    function inicializarFiltros() {
-        $("#mesFiltro").val(mesActual);
-        let selectAnio = $("#anioFiltro");
+function inicializarFiltros() {
+    $("#mesFiltro").val(mesActual);
+    let selectAnio = $("#anioFiltro");
 
-        for (let i = anioActual; i >= anioActual - 5; i--) {
-            selectAnio.append(new Option(i, i));
-        }
-        selectAnio.val(anioActual);
+    for (let i = anioActual; i >= anioActual - 5; i--) {
+        selectAnio.append(new Option(i, i));
     }
+    selectAnio.val(anioActual);
 
-    function inicializarTabla() {
-        $('#paymentsTable').DataTable({
-            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-            paging: false,
-            lengthChange: false,
-            info: false,
-            searching: false,
-            order: [[4, 'desc']],
-            columnDefs: [{ type: "datetime", targets: 4 }]
-        });
-    }
+    // Obtener la quincena actual y seleccionarla en el filtro
+    let quincenaActual = calcularQuincena(diaActual);
+    $("#quincenaFiltro").val(quincenaActual);
+}
 
-    function cargarPagos(year, month) {
+function inicializarTabla() {
+    $('#paymentsTable').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+        paging: false,
+        lengthChange: false,
+        info: false,
+        searching: false,
+        order: [[4, 'desc']],
+        columnDefs: [{ type: "datetime", targets: 4 }]
+    });
+
+    $('#totalsTable').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+        paging: false,
+        lengthChange: false,
+        info: false,
+        searching: false
+    });
+}
+
+
+    function cargarPagos(year, month, quincena) {
         $.ajax({
-            url: `/app/sueldos/pagos?year=${year}&month=${month}`,
+            url: `/app/sueldos/pagos?year=${year}&month=${month}&quincena=${quincena}`,
             method: 'GET',
             dataType: 'json',
             success: function (data) {
                 actualizarTabla(data);
+                agregarTotalesPorColaborador(calcularTotales(data));
             },
             error: function (xhr, status, error) {
                 console.error('Error al obtener los datos:', error);
             }
         });
     }
-
-
-
-
-
-function actualizarTabla(data) {
-    let table = $('#paymentsTable').DataTable();
-    table.clear();
-
-    let totalPagado = 0;
+function calcularTotales(data) {
     let pagosPorColaborador = {};
 
     data.forEach(pago => {
@@ -62,14 +67,39 @@ function actualizarTabla(data) {
             pagosPorColaborador[pago.nombre] = sueldoFijo;
         }
 
-        if (pago.tipoOperacion === 1) {
+        if (pago.tipoOperacion === 1 && !pago.estado) {
             pagosPorColaborador[pago.nombre] += monto;
-        } else if (pago.tipoOperacion === -1) {
+        } else if (pago.tipoOperacion === -1 && pago.estado) {
             pagosPorColaborador[pago.nombre] -= monto;
         }
+    });
 
-        if (pago.tipoOperacion !== 0) {
-            totalPagado += monto;
+    return pagosPorColaborador;
+}
+
+    function calcularQuincena(dia) {
+        return dia <= 15 ? 1 : 2;
+    }
+
+
+function actualizarTabla(data) {
+    let table = $('#paymentsTable').DataTable();
+    table.clear();
+
+    let pagosPorColaborador = {};
+
+    data.forEach(pago => {
+        let monto = parseFloat(pago.montoPagado);
+        let sueldoFijo = parseFloat(pago.sueldoFijo);
+
+        if (!pagosPorColaborador[pago.nombre]) {
+            pagosPorColaborador[pago.nombre] = sueldoFijo;
+        }
+
+        if (pago.tipoOperacion === 1 && !pago.estado) {
+            pagosPorColaborador[pago.nombre] += monto; // Se suma si no está confirmado
+        } else if (pago.tipoOperacion === -1 && pago.estado) {
+            pagosPorColaborador[pago.nombre] -= monto; // Se resta solo si está confirmado
         }
 
         let afectaSueldoBadge = pago.tipoOperacion === 1
@@ -79,7 +109,7 @@ function actualizarTabla(data) {
                 : '<span class="badge bg-secondary">No afecta</span>';
 
         let estadoBadge = pago.estado
-            ? '<span class="badge bg-success">Pagado</span>'
+            ? '<span class="badge bg-success">Confirmado</span>'
             : '<span class="badge bg-warning text-dark">Pendiente</span>';
 
         let estadoButton = `<button class="btn btn-sm cambiar-estado" data-id="${pago.id}" data-estado="${pago.estado}" title="Cambiar Estado">
@@ -93,14 +123,12 @@ function actualizarTabla(data) {
             pago.comentario,
             pago.fecha + " " + pago.hora,
             afectaSueldoBadge,
-            `<div class="d-flex align-items-center gap-2">${estadoBadge} ${estadoButton}</div>`, // Alinea en una misma línea
+            `<div class="d-flex align-items-center gap-2">${estadoBadge} ${estadoButton}</div>`,
             '<button class="btn btn-outline-danger delete-payment" data-id="' + pago.id + '" title="Eliminar"><i class="bi bi-trash"></i></button>'
         ]);
     });
 
-    $('#totalPagado').text(`S/. ${totalPagado.toFixed(2)}`);
     table.draw();
-
     agregarTotalesPorColaborador(pagosPorColaborador);
     activarEventosBotones();
 }
@@ -145,25 +173,26 @@ function activarEventosBotones() {
 
 
 
-    function agregarTotalesPorColaborador(pagosPorColaborador) {
-        let tbody = $('#paymentsTable tbody');
-        Object.entries(pagosPorColaborador).forEach(([nombre, total]) => {
-            tbody.append(`
-                <tr class="fw-bold bg-light">
-                    <td colspan="2">${nombre} (Total a pagar)</td>
-                    <td>S/. ${total.toFixed(2)}</td>
-                    <td colspan="4"></td>
-                </tr>
-            `);
-        });
-    }
+function agregarTotalesPorColaborador(pagosPorColaborador) {
+    let tbody = $('#totalsTable tbody');
+    tbody.empty(); // Limpiar la tabla antes de agregar nuevos datos
+
+    Object.entries(pagosPorColaborador).forEach(([nombre, total]) => {
+        tbody.append(`
+            <tr>
+                <td>${nombre}</td>
+                <td>S/. ${total.toFixed(2)}</td>
+            </tr>
+        `);
+    });
+}
 
     window.filtrarPagos = function () {
         let mes = $("#mesFiltro").val();
         let anio = $("#anioFiltro").val();
-        cargarPagos(anio, mes);
+        let quincena = $("#quincenaFiltro").val(); // Obtener quincena seleccionada
+        cargarPagos(anio, mes, quincena);
     };
-
 
 
 
