@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,12 +44,29 @@ public class SueldosController {
                         pago.getComentario(),
                         pago.getFormattedFecha(),
                         pago.getFormattedHora(),
-                        pago.getTipoOperacion()
+                        pago.getTipoOperacion(),
+                        pago.getEstado() // Agregamos el nuevo campo
                 )
         ).collect(Collectors.toList());
 
         return ResponseEntity.ok(pagosDTO);
     }
+
+
+    @PutMapping("/cambiar-estado/{id}")
+    public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestBody Map<String, Boolean> request) {
+        Optional<Sueldos> pagoOpt = sueldosRepository.findById(id);
+
+        if (pagoOpt.isPresent()) {
+            Sueldos pago = pagoOpt.get();
+            pago.setEstado(request.get("estado"));
+            sueldosRepository.save(pago);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
 
     @PostMapping("/realizar-transaccion")

@@ -1,9 +1,6 @@
 package GMC.carwash_system.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 public class SueldosDTO {
     private Long id;
@@ -11,14 +8,13 @@ public class SueldosDTO {
     private BigDecimal sueldoFijo;
     private BigDecimal montoPagado;
     private String comentario;
-
     private String fecha;
-
     private String hora;
-
     private int tipoOperacion;
+    private Boolean estado; // Nuevo campo agregado
 
-    public SueldosDTO(Long id, String nombre, BigDecimal sueldoFijo, BigDecimal montoPagado, String comentario, String fecha, String hora, int tipoOperacion) {
+    public SueldosDTO(Long id, String nombre, BigDecimal sueldoFijo, BigDecimal montoPagado,
+                      String comentario, String fecha, String hora, int tipoOperacion, Boolean estado) {
         this.id = id;
         this.nombre = nombre;
         this.sueldoFijo = sueldoFijo;
@@ -27,6 +23,7 @@ public class SueldosDTO {
         this.fecha = fecha;
         this.hora = hora;
         this.tipoOperacion = tipoOperacion;
+        this.estado = estado; // Inicializamos el nuevo campo
     }
 
     public Long getId() {
@@ -59,5 +56,9 @@ public class SueldosDTO {
 
     public int getTipoOperacion() {
         return tipoOperacion;
+    }
+
+    public Boolean getEstado() {
+        return estado; // Getter para el nuevo campo
     }
 }

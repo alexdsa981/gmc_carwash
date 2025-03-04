@@ -37,6 +37,9 @@ public class Sueldos {
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int tipoOperacion;
 
+    @Column(nullable = false, columnDefinition = "BIT DEFAULT 0")
+    private Boolean estado;
+
     @Transient
     private String formattedFecha;  // Este campo no será persistido en la base de datos
 
@@ -45,22 +48,16 @@ public class Sueldos {
 
     public String getFormattedFecha() {
         if (fecha != null) {
-            // Usar DateTimeFormatter para formatear LocalDate
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return fecha.format(formatter);
         }
         return "";
     }
 
-    // Método para obtener la hora formateada
     public String getFormattedHora() {
         if (hora != null) {
-            // Usar DateTimeFormatter para formatear LocalTime
             return hora.format(DateTimeFormatter.ofPattern("HH:mm"));
         }
         return "";
     }
-
-
-
 }
