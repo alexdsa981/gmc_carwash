@@ -12,7 +12,7 @@ $(document).ready(function () {
                     <i class="bi bi-cash"></i> Ir a Ventas
                 </a>
                 <a href="/atencion/otros" class="btn btn-outline-secondary me-3">
-                    <i class="bi bi-cash"></i> Otros
+                    <i class="bi bi-gear"></i> Otros
                 </a>
             `);
 

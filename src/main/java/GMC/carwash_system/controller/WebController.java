@@ -38,14 +38,15 @@ public class WebController {
     //PAGINAS DE SERVICIOS
     @GetMapping("/atencion")
     public String paginaAtencion(Model model) {
-        atencionController.retornaListaTipoVehiculo(model);
         atencionController.retornaListaPrecioServicio(model);
         atencionController.retornaListaIngresoClientes(model);
         atencionController.retornaListaTipoItem(model);
-        atencionController.retornaListaMetodoPago(model);
         atencionController.retornaListaRealizados(model);
 
-        colaboradoresController.retornaListaColaboradores(model);
+
+        clasificadoresController.getListaMetodoPagoActivos(model);
+        clasificadoresController.getListaTipoVehiculoActivos(model);
+        colaboradoresController.retornaListaColaboradoresActivos(model);
         inventarioController.retornalistaProductosActivos(model);
         servicioController.getListaTipoServicioActivos(model);
         servicioController.retornaListaTipoServicio_Especial_Basico(model);
@@ -67,19 +68,19 @@ public class WebController {
     //PAGINAS DE COLABORADORES
     @GetMapping("/colaboradores/lista")
     public String paginaListaColaboradores(Model model) {
-        colaboradoresController.retornaListaColaboradores(model);
+        colaboradoresController.retornaListaColaboradoresActivos(model);
         return "colaboradores/lista";
     }
     @GetMapping("/colaboradores/pagos")
     public String paginaListaPagosColaboradores(Model model) {
-        colaboradoresController.retornaListaColaboradores(model);
+        colaboradoresController.retornaListaColaboradoresActivos(model);
         return "colaboradores/pagos";
     }
 
     //PAGINAS DE CLIENTES
     @GetMapping("/clientes/lista")
     public String paginaListaClientes(Model model) {
-        atencionController.retornaListaTipoVehiculo(model);
+        clasificadoresController.getListaTipoVehiculoActivos(model);
         clienteController.retornaListaClientes(model);
         return "clientes/lista";
     }

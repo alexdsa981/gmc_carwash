@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/app/colaboradores")
@@ -26,7 +24,7 @@ public class ColaboradoresController {
     @Autowired
     ColaboradorRepository colaboradorRepository;
 
-    public Model retornaListaColaboradores(Model model) {
+    public Model retornaListaColaboradoresActivos(Model model) {
         List<Colaborador> listaColaboradores = colaboradorRepository.findByIsActiveTrue();
         model.addAttribute("listaColaboradores", listaColaboradores);
         return model;

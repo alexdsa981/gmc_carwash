@@ -106,33 +106,16 @@ public class AtencionController {
         return model;
     }
 
-    public Model retornaListaTipoServicio(Model model) {
-        List<TipoServicio> ListaTipoServicio = tipoServicioRepository.findAll();
-        model.addAttribute("ListaTipoServicio", ListaTipoServicio);
-        return model;
-    }
-
     public Model retornaListaPrecioServicio(Model model) {
         List<PrecioServicio> listaPrecioServicio = precioServicioRepository.findAll();
         model.addAttribute("listaPrecioServicio", listaPrecioServicio);
         return model;
     }
 
-    public Model retornaListaTipoVehiculo(Model model) {
-        List<TipoVehiculo> listaTipoVehiculo = tipoVehiculoRepository.findAll();
-        model.addAttribute("listaTipoVehiculo", listaTipoVehiculo);
-        return model;
-    }
 
     public Model retornaListaTipoItem(Model model) {
         List<TipoItem> listaTipoItem = tipoItemRepository.findAll();
         model.addAttribute("listaTipoItem", listaTipoItem);
-        return model;
-    }
-
-    public Model retornaListaMetodoPago(Model model) {
-        List<MetodoPago> ListaMetodoPago = metodoPagoRepository.findAll();
-        model.addAttribute("ListaMetodoPago", ListaMetodoPago);
         return model;
     }
 

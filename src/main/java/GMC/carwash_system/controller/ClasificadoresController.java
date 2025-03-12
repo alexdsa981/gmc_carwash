@@ -34,7 +34,7 @@ public class ClasificadoresController {
     // TipoVehiculo
     public Model getListaTipoVehiculoActivos(Model model) {
         List<TipoVehiculo> listaTipoVehiculo = tipoVehiculoRepository.findByIsActiveTrue();
-        model.addAttribute("ListaTipoVehiculo", listaTipoVehiculo);
+        model.addAttribute("listaTipoVehiculo", listaTipoVehiculo);
         return model;
     }
 
@@ -48,7 +48,7 @@ public class ClasificadoresController {
         metodoPago.setNombre(nombre);
         metodoPago.setIsActive(Boolean.TRUE);
         metodoPagoRepository.save(metodoPago);
-        response.sendRedirect("/clasificadores");
+        response.sendRedirect("/atencion/otros");
         return ResponseEntity.ok("Clasificación MetodoPago creada correctamente");
     }
 
@@ -62,8 +62,20 @@ public class ClasificadoresController {
         tipoVehiculo.setNombre(nombre);
         tipoVehiculo.setIsActive(Boolean.TRUE);
         tipoVehiculoRepository.save(tipoVehiculo);
-        response.sendRedirect("/clasificadores");
+        response.sendRedirect("/atencion/otros");
         return ResponseEntity.ok("Clasificación TipoVehiculo creada correctamente");
+    }
+
+
+    // Actualizar un MetodoPago existente
+    @PostMapping("/actualizar/Tipo-Vehiculo/{id}")
+    public String actualizarTipoVehiculo(@PathVariable Long id,
+                                       @RequestParam("nombre") String nombre) {
+        TipoVehiculo tipoVehiculo = tipoVehiculoRepository.findById(id).get();
+        tipoVehiculo.setNombre(nombre);
+        tipoVehiculo.setIsActive(Boolean.TRUE);
+        tipoVehiculoRepository.save(tipoVehiculo);
+        return "redirect:/atencion/otros";
     }
 
 
@@ -75,7 +87,7 @@ public class ClasificadoresController {
         metodoPago.setNombre(nombre);
         metodoPago.setIsActive(Boolean.TRUE);
         metodoPagoRepository.save(metodoPago);
-        return "redirect:/clasificadores";
+        return "redirect:/atencion/otros";
     }
 
 
@@ -86,7 +98,7 @@ public class ClasificadoresController {
         MetodoPago metodoPago = metodoPagoRepository.findById(id).get();
         metodoPago.setIsActive(Boolean.FALSE);
         metodoPagoRepository.save(metodoPago);
-        return "redirect:/clasificadores";
+        return "redirect:/atencion/otros";
     }
 
 
@@ -96,7 +108,7 @@ public class ClasificadoresController {
         TipoVehiculo tipoVehiculo = tipoVehiculoRepository.findById(id).get();
         tipoVehiculo.setIsActive(Boolean.FALSE);
         tipoVehiculoRepository.save(tipoVehiculo);
-        return "redirect:/clasificadores";
+        return "redirect:/atencion/otros";
     }
 
 
