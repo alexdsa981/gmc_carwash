@@ -30,15 +30,6 @@ public class ClasificadoresController {
         return model;
     }
 
-    // TipoProducto
-    public Model getListaTipoProductoActivos(Model model) {
-        List<TipoProducto> listaTipoProducto = productoRepository.findByIsActiveTrue();
-        model.addAttribute("ListaTipoProducto", listaTipoProducto);
-        return model;
-    }
-
-
-
 
     // TipoVehiculo
     public Model getListaTipoVehiculoActivos(Model model) {
@@ -46,8 +37,6 @@ public class ClasificadoresController {
         model.addAttribute("ListaTipoVehiculo", listaTipoVehiculo);
         return model;
     }
-
-
 
 
     // Crear MetodoPago nuevo
@@ -61,19 +50,6 @@ public class ClasificadoresController {
         metodoPagoRepository.save(metodoPago);
         response.sendRedirect("/clasificadores");
         return ResponseEntity.ok("Clasificación MetodoPago creada correctamente");
-    }
-
-    // Crear TipoProducto nuevo
-    @PostMapping("/Tipo-Producto/nuevo")
-    public ResponseEntity<String> crearTipoProducto(
-            @RequestParam("nombre") String nombre,
-            HttpServletResponse response) throws IOException {
-        TipoProducto tipoProducto = new TipoProducto();
-        tipoProducto.setNombre(nombre);
-        tipoProducto.setIsActive(Boolean.TRUE);
-        productoRepository.save(tipoProducto);
-        response.sendRedirect("/clasificadores");
-        return ResponseEntity.ok("Clasificación TipoProducto creada correctamente");
     }
 
 
@@ -91,12 +67,6 @@ public class ClasificadoresController {
     }
 
 
-
-
-
-
-
-
     // Actualizar un MetodoPago existente
     @PostMapping("/actualizar/Metodo-Pago/{id}")
     public String actualizarMetodoPago(@PathVariable Long id,
@@ -108,16 +78,6 @@ public class ClasificadoresController {
         return "redirect:/clasificadores";
     }
 
-    // Actualizar un TipoProducto existente
-    @PostMapping("/actualizar/Tipo-Producto/{id}")
-    public String actualizarTipoProducto(@PathVariable Long id,
-                                         @RequestParam("nombre") String nombre) {
-        TipoProducto tipoProducto = productoRepository.findById(id).get();
-        tipoProducto.setNombre(nombre);
-        tipoProducto.setIsActive(Boolean.TRUE);
-        productoRepository.save(tipoProducto);
-        return "redirect:/clasificadores";
-    }
 
 
     // Desactivar MetodoPago
@@ -126,15 +86,6 @@ public class ClasificadoresController {
         MetodoPago metodoPago = metodoPagoRepository.findById(id).get();
         metodoPago.setIsActive(Boolean.FALSE);
         metodoPagoRepository.save(metodoPago);
-        return "redirect:/clasificadores";
-    }
-
-    // Desactivar TipoProducto
-    @GetMapping("/desactivar/Tipo-Producto/{id}")
-    public String desactivarTipoProducto(@PathVariable Long id) {
-        TipoProducto tipoProducto = productoRepository.findById(id).get();
-        tipoProducto.setIsActive(Boolean.FALSE);
-        productoRepository.save(tipoProducto);
         return "redirect:/clasificadores";
     }
 

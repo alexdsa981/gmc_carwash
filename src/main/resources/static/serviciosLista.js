@@ -14,7 +14,7 @@ $(document).ready(function () {
             // Agregar el botón "AÑADIR SERVICIOS" a la derecha después de la barra de búsqueda
             $(".right-section").append(`
                 <button class="btn btn-primary ms-3" id="addServicioBtn" data-bs-toggle="modal" data-bs-target="#addServicioModal">
-                    AÑADIR SERVICIOS
+                    Añadir Servicios
                 </button>
             `);
         }

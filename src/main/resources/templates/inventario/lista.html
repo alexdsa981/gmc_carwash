@@ -157,9 +157,11 @@
                                 </button>
 
                                 <button class="btn btn-danger btn-sm delete-btn"
-                                        th:attr="data-id=${tipoProducto.id}">
+                                        th:data-id="${tipoProducto.id}"
+                                        onclick="eliminarTipoProducto(this)">
                                     <i class="bi bi-trash"></i>
                                 </button>
+
                             </td>
                         </tr>
                         </tbody>

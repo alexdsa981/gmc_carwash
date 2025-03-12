@@ -57,6 +57,12 @@ public class WebController {
         atencionController.retornaListaRealizados(model);
         return "atencion/ventas";
     }
+    @GetMapping("/atencion/otros")
+    public String paginaAtencionOtros(Model model) {
+        clasificadoresController.getListaTipoVehiculoActivos(model);
+        clasificadoresController.getListaMetodoPagoActivos(model);
+        return "atencion/otros";
+    }
 
     //PAGINAS DE COLABORADORES
     @GetMapping("/colaboradores/lista")

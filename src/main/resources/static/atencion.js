@@ -8,14 +8,17 @@ $(document).ready(function () {
                 <a href="/inicio" class="btn btn-outline-primary me-2">
                     <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
                 </a>
-                <a href="/atencion/ventas" class="btn btn-outline-success me-3">
+                <a href="/atencion/ventas" class="btn btn-outline-success me-2">
                     <i class="bi bi-cash"></i> Ir a Ventas
+                </a>
+                <a href="/atencion/otros" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-cash"></i> Otros
                 </a>
             `);
 
             $(".dataTables_filter").append(`
                 <button class="btn btn-success ms-3" data-bs-toggle="modal" data-bs-target="#addIngresoModal">
-                    AÑADIR INGRESO
+                    Añadir Ingreso
                 </button>
             `);
         }

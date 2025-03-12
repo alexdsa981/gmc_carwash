@@ -49,7 +49,6 @@
     <table id="clientTable" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>N°</th>
             <th>Nombre</th>
             <th>DNI</th>
             <th>Teléfono</th>
@@ -60,7 +59,6 @@
         </thead>
         <tbody>
         <tr th:each="cliente, iterStat : ${listaClientes}" th:data-id="${cliente.id}">
-            <td th:text="${iterStat.index + 1}"></td>
             <td th:text="${cliente.nombre}"></td>
             <td th:text="${cliente.identificacion}"></td>
             <td th:text="${cliente.telefono}"></td>

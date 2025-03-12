@@ -55,7 +55,6 @@
     <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>Nº</th>
             <th>VEHICULO</th>
             <th>CLIENTE</th>
             <th>SERVICIOS/PRODUCTOS</th>
@@ -66,20 +65,46 @@
         <tbody>
         <th:block th:each="detalle, iterStat : ${listaIngresos}">
             <tr>
-                <td th:text="${iterStat.index + 1}">Nº</td>
                 <td>
-                    <strong th:text="${detalle.vehiculo != null ? detalle.vehiculo.placa : ''}">PLACA</strong><br>
-                    <span th:text="${detalle.vehiculo != null ? detalle.vehiculo.marca : ''}">MARCA</span><br>
-                    <span th:text="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.nombre : ''}">TIPO VEHÍCULO</span>
+                    <ul style="list-style-type: none; margin-bottom: 5px; padding-left: 0; border: 1px solid #ccc; border-radius: 5px; padding: 5px;" class="vehiculo-ul">
+                        <li>
+                            <!-- Ícono y Placa -->
+                            <i class="bi bi-card-list"></i>
+                            <span th:text="${detalle.vehiculo != null ? detalle.vehiculo.placa : 'N/D'}">N/D</span>
+                        </li>
+                        <li>
+                            <!-- Ícono y Marca -->
+                            <i class="bi bi-tag-fill"></i>
+                            <span th:text="${detalle.vehiculo != null ? detalle.vehiculo.marca : 'N/D'}">N/D</span>
+                        </li>
+                        <li>
+                            <!-- Ícono y Tipo de Vehículo -->
+                            <i class="bi bi-truck"></i>
+                            <span th:text="${detalle.vehiculo != null && detalle.vehiculo.tipo_vehiculo != null ? detalle.vehiculo.tipo_vehiculo.nombre : 'N/D'}">N/D</span>
+                        </li>
+                    </ul>
                 </td>
+
                 <td>
-                    <i class="bi bi-person"></i> <strong
-                        th:text="${detalle.cliente != null ? detalle.cliente.nombre : ''}">CLIENTE</strong><br>
-                    <i class="bi bi-telephone"></i> <span
-                        th:text="${detalle.cliente != null ? detalle.cliente.telefono : ''}">TELÉFONO</span><br>
-                    <i class="bi bi-card-text"></i> <span
-                        th:text="${detalle.cliente != null ? detalle.cliente.identificacion : ''}">RUC</span>
+                    <ul style="list-style-type: none; margin-bottom: 5px; padding-left: 0; border: 1px solid #ccc; border-radius: 5px; padding: 5px;" class="cliente-ul">
+                        <li>
+                            <!-- Ícono y Nombre del Cliente -->
+                            <i class="bi bi-person"></i>
+                            <span th:text="${detalle.cliente != null ? detalle.cliente.nombre : 'N/D'}">N/D</span>
+                        </li>
+                        <li>
+                            <!-- Ícono y Teléfono -->
+                            <i class="bi bi-telephone"></i>
+                            <span th:text="${detalle.cliente != null ? detalle.cliente.telefono : 'N/D'}">N/D</span>
+                        </li>
+                        <li>
+                            <!-- Ícono y Identificación (RUC/DNI) -->
+                            <i class="bi bi-card-text"></i>
+                            <span th:text="${detalle.cliente != null ? detalle.cliente.identificacion : 'N/D'}">N/D</span>
+                        </li>
+                    </ul>
                 </td>
+
 
 
                 <td>

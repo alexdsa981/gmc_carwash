@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMC - ATENCIÓN - OTROS</title>
+    <link rel="stylesheet" href="/general.css">
+    <link rel="icon" href="/img/logo.png" type="image/png">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container title-container">
+    <h2 class="text-center">Clasificadores de Venta</h2>
+</div>
+<div class="container">
+    <div class="row">
+        <!-- Tabla de Clasificadores de Vehículo -->
+        <div class="col-md-5">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <a class="btn btn-outline-secondary me-3" href="/atencion">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <h5 class="mb-0">Tipos de Vehículo</h5>
+                </div>
+                <button class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-lg"></i> <!-- Ícono de agregar -->
+                </button>
+            </div>
+
+            <table id="tablaVehiculo" class="table table-sm table-striped">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="tipoVehiculo : ${ListaTipoVehiculo}">
+                    <td th:text="${tipoVehiculo.nombre}">Nombre</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil-square"></i> <!-- Ícono de editar -->
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> <!-- Ícono de eliminar -->
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Separador -->
+        <div class="col-md-1 d-none d-md-block">
+            <div class="border-end" style="height: 100%;"></div>
+        </div>
+
+        <!-- Tabla de Clasificadores de Método de Pago -->
+        <div class="col-md-5">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>Métodos de Pago</h5>
+                <button class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-lg"></i> <!-- Ícono de agregar -->
+                </button>
+            </div>
+            <table id="tablaMetodoPago" class="table table-sm table-striped">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="metodoPago : ${ListaMetodoPago}">
+                    <td th:text="${metodoPago.nombre}">Nombre</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil-square"></i> <!-- Ícono de editar -->
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> <!-- Ícono de eliminar -->
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/otros.js"></script>
+</body>
+
+</html>
