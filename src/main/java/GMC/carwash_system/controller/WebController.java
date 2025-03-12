@@ -83,7 +83,7 @@ public class WebController {
     @GetMapping("/inventario/lista")
     public String paginaListaInventario(Model model) {
         inventarioController.retornalistaProductosActivos(model);
-        inventarioController.retornalistaTipoProductos(model);
+        inventarioController.retornalistaTipoProductosActivos(model);
         return "inventario/lista";
     }
 
@@ -91,7 +91,7 @@ public class WebController {
     public String paginaListaHistorialInventario(Model model) {
         inventarioController.retornaHistorialAlmacen(model);
         inventarioController.retornalistaProductosActivos(model);
-        inventarioController.retornalistaTipoProductos(model);
+        inventarioController.retornalistaTipoProductosActivos(model);
         return "inventario/historial";
     }
     @GetMapping("/servicios/lista")
@@ -104,16 +104,6 @@ public class WebController {
     @GetMapping("/caja/cuadre")
     public String paginaCuadreDeCaja(Model model) {
         return "caja/cuadre";
-    }
-
-
-    //PAGINAS DE Clasificadores
-    @GetMapping("/clasificadores/lista")
-    public String paginaClasificadores(Model model) {
-        clasificadoresController.getListaMetodoPagoActivos(model);
-        clasificadoresController.getListaTipoProductoActivos(model);
-        clasificadoresController.getListaTipoVehiculoActivos(model);
-        return "clasificadores/lista";
     }
 
 

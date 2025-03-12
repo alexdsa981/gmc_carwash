@@ -1,9 +1,9 @@
 $(document).ready(function () {
+    // DataTable para la tabla principal
     var table = $('#example').DataTable({
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-        dom: '<"d-flex justify-content-between align-items-center"<"left-section d-flex align-items-center"l><"right-section d-flex align-items-center"f>>tip',
+        dom: '<"d-flex justify-content-between align-items-center"<"left-section d-flex align-items-center"l><"right-section-main d-flex align-items-center"f>>tip',
         initComplete: function () {
-            // Agregar botones "Volver a Inicio" e "Ir a Historial" a la izquierda
             $(".left-section").prepend(`
                 <a href="/inicio" class="btn btn-outline-primary me-2">
                     <i class="bi bi-arrow-left me-2"></i> Volver a Inicio
@@ -13,16 +13,30 @@ $(document).ready(function () {
                 </a>
             `);
 
-            // Agregar botón "AÑADIR PRODUCTO" a la derecha
-            $(".right-section").append(`
-                <button class="btn btn-primary ms-3" id="addProductBtn" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    AÑADIR PRODUCTO
+            $(".right-section-main").append(`
+                <button class="btn btn-secondary ms-3" data-bs-toggle="modal" data-bs-target="#tipoProductoModal">
+                    Ver Categorias
+                </button>
+                <button class="btn btn-primary ms-2" id="addProductBtn" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    Añadir Producto
+                </button>
+            `);
+        }
+    });
+
+    // DataTable para la tabla dentro del modal
+    $('#tipoProductoTable').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+        dom: '<"d-flex justify-content-between align-items-center"<"left-section-modal d-flex align-items-center"l><"right-section-modal d-flex align-items-center"f>>tip',
+        initComplete: function () {
+            $(".right-section-modal").append(`
+                <button class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#addTipoProductoModal">
+                    Añadir Categoría
                 </button>
             `);
         }
     });
 });
-
 
 // EDITAR PRODUCTO
     document.addEventListener("DOMContentLoaded", function () {
@@ -229,3 +243,94 @@ function actualizarStock(productId) {
         });
     });
 }
+
+
+    $(document).ready(function() {
+        $('table').DataTable();
+    });
+
+    // Añadir Tipo Producto con SweetAlert
+    $('#addTipoProductoForm').submit(function(event) {
+        event.preventDefault();
+        let nombre = $('#nombreTipoProducto').val();
+        $.post("/app/inventario/tipoproducto/crear", {nombre: nombre}, function(response) {
+            Swal.fire({
+                title: "¡Éxito!",
+                text: "Tipo de producto creado correctamente",
+                icon: "success"
+            }).then(() => {
+                location.reload();
+            });
+        }).fail(function() {
+            Swal.fire({
+                title: "Error",
+                text: "Error al crear tipo de producto",
+                icon: "error"
+            });
+        });
+    });
+
+    // Eliminar Tipo Producto con SweetAlert
+    function eliminarTipoProducto(element) {
+        let id = $(element).attr("data-id");
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción desactivará el tipo de producto",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, eliminar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.get(`/app/inventario/desactivar/Tipo-Producto/${id}`, function() {
+                    Swal.fire({
+                        title: "Eliminado!",
+                        text: "Tipo de producto eliminado correctamente",
+                        icon: "success"
+                    }).then(() => {
+                        location.reload();
+                    });
+                }).fail(function() {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Error al eliminar tipo de producto",
+                        icon: "error"
+                    });
+                });
+            }
+        });
+    }
+
+
+
+// Cargar datos en el modal de edición
+$('button[data-bs-target="#editTipoProductoModal"]').click(function() {
+    let id = $(this).attr("data-id");
+    let nombre = $(this).attr("data-nombre");
+    $('#editTipoProductoId').val(id);
+    $('#editNombreTipoProducto').val(nombre);
+});
+
+// Enviar formulario de edición con SweetAlert
+$('#editTipoProductoForm').submit(function(event) {
+    event.preventDefault();
+    let id = $('#editTipoProductoId').val();
+    let nombre = $('#editNombreTipoProducto').val();
+
+    $.post(`/app/inventario/tipoproducto-${id}/editar`, {nombre: nombre}, function(response) {
+        Swal.fire({
+            title: "¡Éxito!",
+            text: "Tipo de producto editado correctamente",
+            icon: "success"
+        }).then(() => {
+            location.reload();
+        });
+    }).fail(function() {
+        Swal.fire({
+            title: "Error",
+            text: "Error al editar tipo de producto",
+            icon: "error"
+        });
+    });
+});

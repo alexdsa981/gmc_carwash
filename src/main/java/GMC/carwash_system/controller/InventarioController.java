@@ -33,8 +33,8 @@ public class InventarioController {
     @Autowired
     TipoProductoRepository tipoProductoRepository;
 
-    public Model retornalistaTipoProductos(Model model) {
-        List<TipoProducto> listaTipoProductos = tipoProductoRepository.findAll();
+    public Model retornalistaTipoProductosActivos(Model model) {
+        List<TipoProducto> listaTipoProductos = tipoProductoRepository.findByIsActiveTrue();
         model.addAttribute("listaTipoProductos", listaTipoProductos);
         return model;
     }
@@ -57,6 +57,7 @@ public class InventarioController {
     ) throws IOException {
         TipoProducto tipoProducto = new TipoProducto();
         tipoProducto.setNombre(nombre);
+        tipoProducto.setIsActive(Boolean.TRUE);
         tipoProductoRepository.save(tipoProducto);
         response.sendRedirect("/inventario/lista");
         return ResponseEntity.ok("Tipo producto creado correctamente");
@@ -68,7 +69,6 @@ public class InventarioController {
             @RequestParam("nombre")String nombre,
             HttpServletResponse response
     ) {
-        // Buscar al colaborador
         Optional<TipoProducto> optionalTipoProducto = tipoProductoRepository.findById(id);
         if (optionalTipoProducto.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tipo Producto no encontrado");
@@ -79,11 +79,14 @@ public class InventarioController {
 
         return ResponseEntity.ok("Tipo producto editado correctamente");
     }
-    //
-    //
-    //Manejar logica de desactivacion o eliminacion de tipo producot
-    //
-    //
+    // Desactivar TipoProducto
+    @GetMapping("/desactivar/Tipo-Producto/{id}")
+    public String desactivarTipoProducto(@PathVariable Long id) {
+        TipoProducto tipoProducto = tipoProductoRepository.findById(id).get();
+        tipoProducto.setIsActive(Boolean.FALSE);
+        tipoProductoRepository.save(tipoProducto);
+        return "redirect:/inventario/lista";
+    }
 
     @PostMapping("/producto/crear")
     public ResponseEntity<String> crearProducto(

@@ -16,10 +16,13 @@
 </head>
 <body>
 
+
 <div class="container title-container">
     <h2 class="text-center">Lista de Productos</h2>
 </div>
 <div class="container">
+
+
     <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
@@ -81,6 +84,96 @@
     </table>
 
 </div>
+<!-- Modal para editar tipo de producto -->
+<div class="modal fade" id="editTipoProductoModal" tabindex="-1" aria-labelledby="editTipoProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTipoProductoModalLabel">Editar Categoria de Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTipoProductoForm">
+                    <input type="hidden" id="editTipoProductoId">
+                    <div class="mb-3">
+                        <label for="editNombreTipoProducto" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editNombreTipoProducto" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para añadir tipo de producto -->
+<div class="modal fade" id="addTipoProductoModal" tabindex="-1" aria-labelledby="addTipoProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTipoProductoModalLabel">Añadir Categoria de Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTipoProductoForm">
+                    <div class="mb-3">
+                        <label for="nombreTipoProducto" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombreTipoProducto" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal tipos producto -->
+<div class="modal fade" id="tipoProductoModal" tabindex="-1" aria-labelledby="tipoProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title" id="tipoProductoModalLabel">Lista de Categorias de Producto</h5>
+                <div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="tipoProductoTable" class="table table-striped table-bordered w-100">
+                        <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="tipoProducto : ${listaTipoProductos}">
+                            <td th:text="${tipoProducto.nombre}"></td>
+                            <td>
+                                <button class="btn btn-primary btn-sm"
+                                        th:attr="data-id=${tipoProducto.id}, data-nombre=${tipoProducto.nombre}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editTipoProductoModal">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="btn btn-danger btn-sm delete-btn"
+                                        th:attr="data-id=${tipoProducto.id}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 <!-- Modal para Cambiar Stock -->
 <div class="modal fade" id="changeStockModal" tabindex="-1" aria-labelledby="changeStockModalLabel" aria-hidden="true">
