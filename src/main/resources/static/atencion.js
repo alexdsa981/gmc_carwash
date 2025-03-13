@@ -596,8 +596,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-//LOGICA DE ENVIO SOLO PRODUCTO O SOLO SERVICIO
-//enviar el id del detalle servicio al modal:
+// LÓGICA DE ENVÍO SOLO PRODUCTO O SOLO SERVICIO
+// Enviar el id del detalle servicio al modal:
 document.addEventListener('DOMContentLoaded', function () {
     const addServiceButtons = document.querySelectorAll('.add-service-btn');
     addServiceButtons.forEach(button => {
@@ -607,180 +607,279 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
 document.addEventListener('DOMContentLoaded', function () {
     const productoSelect = document.getElementById('producto');
     const cantidadInput = document.getElementById('cantidad');
     const tipoServicioSelect = document.getElementById('tipoServicio');
     const servicioBasicoSelect = document.getElementById('servicioBasico');
     const servicioEspecialSelect = document.getElementById('servicioEspecial');
-    // Resetea los atributos `required`
-    function resetRequired(inputs) {
-        inputs.forEach(input => input.removeAttribute('required'));
-    }
 
-    // Asigna los atributos `required`
-    function setRequired(inputs) {
-        inputs.forEach(input => input.setAttribute('required', ''));
-    }
-
-    // Cambios dinámicos en el tipo de venta
     const tipoVentaSelect = document.getElementById('tipoVenta');
     const productoContainer = document.getElementById('productoContainer');
     const servicioContainer = document.getElementById('servicioContainer');
 
+    const servicioBasicoContainer = document.getElementById('servicioBasicoContainer');
+    const servicioEspecialContainer = document.getElementById('servicioEspecialContainer');
+
+    function resetRequired(inputs) {
+        inputs.forEach(input => input.removeAttribute('required'));
+    }
+
+    function setRequired(inputs) {
+        inputs.forEach(input => input.setAttribute('required', ''));
+    }
+
+    // Cuando cambia el tipo de venta (Producto o Servicio)
     tipoVentaSelect.addEventListener('change', function () {
         const tipo = tipoVentaSelect.value;
         productoContainer.classList.toggle('d-none', tipo !== '2');
         servicioContainer.classList.toggle('d-none', tipo !== '1');
 
-        // Si se muestra el contenedor de producto o servicio, selecciona el primer option
-        if (tipo === '2') { // Producto
-            document.getElementById('producto').selectedIndex = 0; // Selecciona el primer producto
-
+        if (tipo === '2') { // Producto seleccionado
+            productoSelect.selectedIndex = 0; // Reinicia selección
             setRequired([productoSelect, cantidadInput]);
             resetRequired([tipoServicioSelect, servicioBasicoSelect, servicioEspecialSelect]);
-
-        }
-        if (tipo === '1') { // Servicio
-            document.getElementById('tipoServicio').selectedIndex = 0; // Selecciona el primer tipo de servicio
-            // Resetea los servicios básicos y especiales a su primer opción
-            document.getElementById('servicioBasico').selectedIndex = 0;
-            document.getElementById('servicioEspecial').selectedIndex = 0;
-            resetRequired([cantidadInput, productoSelect]);
+        } else if (tipo === '1') { // Servicio seleccionado
+            tipoServicioSelect.selectedIndex = 0; // Reinicia selección de tipo de servicio
+            servicioBasicoSelect.selectedIndex = 0;
+            servicioEspecialSelect.selectedIndex = 0;
             setRequired([tipoServicioSelect]);
-
+            resetRequired([productoSelect, cantidadInput, servicioBasicoSelect, servicioEspecialSelect]);
+            servicioBasicoContainer.classList.add('d-none');
+            servicioEspecialContainer.classList.add('d-none');
+        } else {
+            resetRequired([productoSelect, cantidadInput, tipoServicioSelect, servicioBasicoSelect, servicioEspecialSelect]);
         }
     });
 
-    // Cambios dinámicos en el tipo de servicio
-    const servicioBasicoContainer = document.getElementById('servicioBasicoContainer');
-    const servicioEspecialContainer = document.getElementById('servicioEspecialContainer');
-
+    // Cuando cambia el tipo de servicio (Básico o Especial)
     tipoServicioSelect.addEventListener('change', function () {
         const tipoServicio = tipoServicioSelect.value;
+
         servicioBasicoContainer.classList.toggle('d-none', tipoServicio !== 'Basico');
         servicioEspecialContainer.classList.toggle('d-none', tipoServicio !== 'Especial');
 
-        // Resetea los servicios a su primer opción al mostrar un contenedor
         if (tipoServicio === 'Basico') {
-            document.getElementById('servicioBasico').selectedIndex = 0;
+            servicioBasicoSelect.selectedIndex = 0; // Reinicia selección
             setRequired([servicioBasicoSelect]);
-        }
-        if (tipoServicio === 'Especial') {
-            document.getElementById('servicioEspecial').selectedIndex = 0;
+            resetRequired([servicioEspecialSelect]);
+            servicioEspecialSelect.selectedIndex = 0; // Limpia la otra selección
+        } else if (tipoServicio === 'Especial') {
+            servicioEspecialSelect.selectedIndex = 0; // Reinicia selección
             setRequired([servicioEspecialSelect]);
+            resetRequired([servicioBasicoSelect]);
+            servicioBasicoSelect.selectedIndex = 0; // Limpia la otra selección
+        } else {
+            resetRequired([servicioBasicoSelect, servicioEspecialSelect]);
         }
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 //CONCRETAR PAGO
-const pagarModal = document.getElementById('pagarModal');
-pagarModal.addEventListener('show.bs.modal', async function (event) {
-    const button = event.relatedTarget;  // Botón que abrió el modal
-    const detalleId = button.getAttribute('data-id');  // ID del detalle ingreso
+document.addEventListener("DOMContentLoaded", function () {
+    const pagarModal = document.getElementById("pagarModal");
+    const metodosPagoContainer = document.getElementById("metodosPagoContainer");
+    const totalPagadoInput = document.getElementById("totalPagado");
+    let detalleVentaIds = [];
 
-    try {
-        const response = await fetch(`/app/atencion/ingreso/${detalleId}`);
-        const servicios = await response.json();
+    // Obtener los métodos de pago desde el modelo en el HTML
+    const metodosPagoOptions = document.getElementById("metodosPagoOptions").innerHTML;
 
-        const detallePago = document.getElementById('detallePago');
-        detallePago.innerHTML = '';  // Limpiar la tabla
+    pagarModal.addEventListener("show.bs.modal", async function (event) {
+        const button = event.relatedTarget;
+        const detalleId = button.getAttribute("data-id");
 
-        let total = 0;
-        servicios.forEach(servicio => {
-            const row = document.createElement('tr');
-            row.setAttribute('data-id', servicio.id);  // Agregar el atributo data-id aquí
-            row.innerHTML = `
-                <td>${servicio.nombreItem}</td>
-                <td>${servicio.cantidad}</td>
-                <td>${servicio.precio_unitario}</td>
-                <td>S/. ${servicio.subtotal}</td>
-            `;
-            detallePago.appendChild(row);
-            total += parseFloat(servicio.subtotal);  // Sumar el subtotal
-        });
+        try {
+            const response = await fetch(`/app/atencion/ingreso/${detalleId}`);
+            const servicios = await response.json();
 
-        document.getElementById('total').value = 'S/. ' + total.toFixed(2);
-    } catch (error) {
-        console.error("Error al obtener los servicios:", error);
-    }
-});
-document.getElementById('confirmarPago').addEventListener('click', async function () {
-    // Obtener los datos del modal
-    const total = document.getElementById('total').value.replace('S/. ', '').trim(); // Eliminar el prefijo de moneda
-    const metodoPago = document.getElementById('metodoPago').value; // Obtener el método de pago
-    const detallePagoRows = document.querySelectorAll('#detallePago tr'); // Filas de la tabla
-    const detalleVentaIds = []; // Lista de IDs de detalle_venta
+            const detallePago = document.getElementById("detallePago");
+            detallePago.innerHTML = "";
 
-    // Extraer los IDs de detalle_venta (asumiendo que has agregado un atributo "data-id" en cada fila)
-    detallePagoRows.forEach(row => {
-        const id = row.getAttribute('data-id'); // Asume que has agregado el atributo data-id en cada fila
-        if (id) {
-            detalleVentaIds.push(id);
+            let total = 0;
+            detalleVentaIds = [];
+
+            servicios.forEach(servicio => {
+                detalleVentaIds.push(servicio.id);
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${servicio.nombreItem}</td>
+                    <td>${servicio.cantidad}</td>
+                    <td>${servicio.precio_unitario}</td>
+                    <td>S/. ${servicio.subtotal}</td>
+                `;
+                detallePago.appendChild(row);
+                total += parseFloat(servicio.subtotal);
+            });
+
+            document.getElementById("total").value = `S/. ${total.toFixed(2)}`;
+            totalPagadoInput.value = "S/. 0.00";
+            metodosPagoContainer.innerHTML = "";
+        } catch (error) {
+            console.error("Error al obtener los servicios:", error);
         }
     });
 
-    // Validar datos requeridos
-    if (!metodoPago || detalleVentaIds.length === 0) {
-        console.log('Método de pago seleccionado:', metodoPago);
-        console.log('Lista id detalle venta:', detalleVentaIds);
-        Swal.fire({
-            icon: 'error',
-            title: 'Debe seleccionar un método de pago y tener al menos un detalle para pagar.',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
+    document.getElementById("agregarMetodoPago").addEventListener("click", function () {
+        const total = parseFloat(document.getElementById("total").value.replace("S/. ", "").trim());
+        const totalPagado = Array.from(document.querySelectorAll(".subtotalPago"))
+            .reduce((sum, input) => sum + parseFloat(input.value || 0), 0);
 
-    try {
-        // Crear un objeto JSON para enviar los datos
-        const data = {
-            total: total,
-            metodoPago: metodoPago,
-            detalleVentaIds: detalleVentaIds
-        };
-
-        // Verificar el contenido antes de enviarlo
-        console.log('Datos a enviar:', JSON.stringify(data));
-
-        // Realizar la solicitud POST con el objeto JSON
-        const response = await fetch('/app/atencion/venta', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Establecemos el tipo de contenido a JSON
-            },
-            body: JSON.stringify(data) // Enviar el objeto JSON
-        });
-
-        if (response.ok) {
-            $('#pagarModal').modal('hide');
-            window.location.reload();
-        } else {
-            const error = await response.json();
-            console.error('Error al realizar el pago:', error);
+        if (totalPagado >= total) {
             Swal.fire({
-                icon: 'error',
-                title: 'Error al realizar el pago',
-                text: error.message,
-                confirmButtonText: 'Aceptar'
+                icon: "warning",
+                title: "El total ya ha sido cubierto.",
+                confirmButtonText: "Aceptar"
             });
+            return;
         }
 
-    } catch (error) {
-        console.error('Error en la solicitud:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Ocurrió un error inesperado',
-            text: 'Inténtelo de nuevo más tarde.',
-            confirmButtonText: 'Aceptar'
-        });
+        const metodoPagoDiv = document.createElement("div");
+        metodoPagoDiv.classList.add("row", "mb-2", "metodoPagoGroup");
+        metodoPagoDiv.innerHTML = `
+            <div class="col-6">
+                <select class="form-select metodoPago">
+                    <option value="" selected disabled>Seleccione un método</option>
+                    ${metodosPagoOptions}
+                </select>
+            </div>
+            <div class="col-4">
+                <input type="number" class="form-control subtotalPago" min="0" step="0.01" placeholder="Monto">
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-danger btn-sm eliminarMetodoPago">X</button>
+            </div>
+        `;
+        metodosPagoContainer.appendChild(metodoPagoDiv);
+        actualizarTotalPagado();
+    });
+
+    function actualizarTotalPagado() {
+        const total = parseFloat(document.getElementById("total").value.replace("S/. ", "").trim());
+        const totalPagado = Array.from(document.querySelectorAll(".subtotalPago"))
+            .reduce((sum, input) => sum + parseFloat(input.value || 0), 0);
+
+        totalPagadoInput.value = `S/. ${totalPagado.toFixed(2)}`;
+
+        if (totalPagado > total) {
+            Swal.fire({
+                icon: "error",
+                title: "El total pagado excede el total a pagar.",
+                confirmButtonText: "Aceptar"
+            });
+        }
     }
 
+    document.addEventListener("input", function (event) {
+        if (event.target.classList.contains("subtotalPago")) {
+            actualizarTotalPagado();
+        }
+    });
+
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("eliminarMetodoPago")) {
+            let metodoPagoGroups = document.querySelectorAll(".metodoPagoGroup");
+            if (metodoPagoGroups.length > 1) {
+                event.target.closest(".row").remove();
+                actualizarTotalPagado();
+            }
+        }
+    });
+
+    document.getElementById("confirmarPago").addEventListener("click", async function () {
+        const total = parseFloat(document.getElementById("total").value.replace("S/. ", "").trim());
+        const totalPagado = parseFloat(totalPagadoInput.value.replace("S/. ", "").trim());
+
+        if (totalPagado !== total) {
+            Swal.fire({
+                icon: "error",
+                title: "El monto total no coincide con el total a pagar.",
+                confirmButtonText: "Aceptar"
+            });
+            return;
+        }
+
+        const metodosPago = Array.from(document.querySelectorAll("#metodosPagoContainer .row"))
+            .map(row => {
+                const metodoId = row.querySelector(".metodoPago").value;
+                const monto = parseFloat(row.querySelector(".subtotalPago").value || 0);
+                return metodoId && monto > 0 ? { idMetodoPago: metodoId, monto: monto } : null;
+            }).filter(item => item !== null);
+
+        const data = { total, metodosPago, detalleVentaIds };
+
+        try {
+            const response = await fetch("/app/atencion/venta", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                Swal.fire({ icon: "success", title: "Pago realizado con éxito" });
+                $('#pagarModal').modal('hide');
+                window.location.reload();
+            } else {
+                const errorData = await response.json();
+                Swal.fire({ icon: "error", title: "Error", text: errorData.message || "Error al procesar el pago." });
+            }
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "Error", text: "No se pudo procesar el pago." });
+        }
+    });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //PRESIONAR ENTER EN MODAL

@@ -42,6 +42,7 @@ public class DetalleIngresoVehiculo {
 
     @Transient
     private List<DetalleVentaDTO> listaDetalleVentasDTO = new ArrayList<>();
+
     @Transient
     private Venta venta;
 

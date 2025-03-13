@@ -560,6 +560,21 @@
 </div>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- Modal para Pagar -->
 <div class="modal fade" id="pagarModal" tabindex="-1" aria-labelledby="pagarModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -579,21 +594,40 @@
                     </tr>
                     </thead>
                     <tbody id="detallePago">
-                    <!-- Aquí se llenará dinámicamente con datos desde tu base de datos -->
+                    <!-- Se llenará dinámicamente con datos desde la base de datos -->
                     </tbody>
                 </table>
                 <div class="mb-3">
                     <label for="total" class="form-label">Total:</label>
                     <input type="text" id="total" class="form-control" readonly>
                 </div>
+
+                <!-- Selección de métodos de pago -->
                 <div class="mb-3">
-                    <label for="metodoPago" class="form-label">Método de Pago</label>
-                    <select class="form-select" id="metodoPago" name="idMetodoPago" required>
-                        <option value="" selected disabled>Seleccione una opción</option>
-                        <th:block th:each="metodopago : ${ListaMetodoPago}">
-                            <option th:value="${metodopago.id}" th:text="${metodopago.nombre}"></option>
-                        </th:block>
-                    </select>
+                    <label class="form-label">Métodos de Pago</label>
+                    <div id="metodosPagoContainer">
+                        <div class="input-group mb-2 metodoPagoGroup">
+                            <select class="form-select metodoPagoSelect" name="metodosPago[]">
+                                <option th:each="metodo : ${ListaMetodoPago}"
+                                        th:value="${metodo.id}"
+                                        th:text="${metodo.nombre}"></option>
+                            </select>
+                            <input type="number" class="form-control subtotalPago" min="0" step="0.01" placeholder="Monto">
+                            <button type="button" class="btn btn-danger btn-sm eliminarMetodoPago">X</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm mt-2" id="agregarMetodoPago">Agregar Método de Pago</button>
+                </div>
+
+                <!-- Opciones de métodos de pago (oculto) -->
+                <div id="metodosPagoOptions" style="display: none;">
+                    <option th:each="metodo : ${ListaMetodoPago}" th:value="${metodo.id}" th:text="${metodo.nombre}"></option>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="totalPagado" class="form-label">Total Pagado:</label>
+                    <input type="text" id="totalPagado" class="form-control" readonly>
                 </div>
             </div>
             <div class="modal-footer">
@@ -603,7 +637,27 @@
         </div>
     </div>
 </div>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <!-- Bootstrap Icons -->

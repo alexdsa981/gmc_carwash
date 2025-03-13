@@ -22,8 +22,7 @@
     <table id="realizadosTable" class="table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>Fecha</th>
-            <th>Hora</th>
+            <th>Fecha Pago</th>
             <th>Vehículo</th> <!-- Placa, marca y tipo de vehículo -->
             <th>Cliente</th> <!-- Nombre, teléfono e identificación -->
             <th>Servicios/Productos</th> <!-- Detalla servicios y productos realizados -->
@@ -35,10 +34,9 @@
         <th:block th:each="detalle, iterStat : ${listaIngresosRealizados}">
             <tr>
                 <!-- Fecha y Hora -->
-                <td th:attr="data-order=${detalle.fecha}" th:text="${detalle.formattedFecha}">FECHA</td>
-
-
-                <td th:text="${detalle.formattedHora != null ? detalle.formattedHora : ''}">HORA</td>
+                <td th:attr="data-order=${detalle.venta.fecha.toString()} + ' ' + ${detalle.venta.hora.toString()}"
+                    th:text="${detalle.venta.formattedFecha} + ' ' + ${detalle.venta.formattedHora}">
+                </td>
 
                 <!-- Vehículo -->
                 <td>
@@ -92,7 +90,16 @@
                 <td th:text="'S/.' + ${detalle.venta.total}">TOTAL</td>
 
                 <!-- Método de Pago -->
-                <td th:text="${detalle.venta.metodoPago.nombre}">MÉTODO DE PAGO</td>
+                <td>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li th:each="detalle : ${detalle.venta.listaDetalleMetodoPago}">
+                            <i class="bi bi-cash-stack"></i>
+                            <span th:text="${detalle.metodoPago.nombre}"></span>:
+                            <strong th:text="'S/.' + ${detalle.monto}"></strong>
+                        </li>
+                    </ul>
+                </td>
+
             </tr>
         </th:block>
         </tbody>

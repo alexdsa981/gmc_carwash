@@ -34,7 +34,7 @@ public class ClasificadoresController {
     // TipoVehiculo
     public Model getListaTipoVehiculoActivos(Model model) {
         List<TipoVehiculo> listaTipoVehiculo = tipoVehiculoRepository.findByIsActiveTrue();
-        model.addAttribute("listaTipoVehiculo", listaTipoVehiculo);
+        model.addAttribute("ListaTipoVehiculo", listaTipoVehiculo);
         return model;
     }
 

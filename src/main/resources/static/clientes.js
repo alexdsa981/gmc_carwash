@@ -109,7 +109,7 @@ function filtrarClientes() {
                 celdaVisitas.text(textoVisitas);
 
                 let index = this.index();
-                tabla.cell(index, 5).data(textoVisitas);
+                tabla.cell(index, 4).data(textoVisitas);
             });
 
             tabla.draw(false);

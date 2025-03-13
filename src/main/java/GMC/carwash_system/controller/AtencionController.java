@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/app/atencion")
@@ -55,6 +56,8 @@ public class AtencionController {
     MetodoPagoRepository metodoPagoRepository;
     @Autowired
     VentaRepository ventaRepository;
+    @Autowired
+    DetalleMetodoPagoRepository detalleMetodoPagoRepository;
 
     public Model retornaListaIngresoClientes(Model model) {
         List<DetalleIngresoVehiculo> listaIngresos = detalleIngresoVehiculoRepository.findByRealizadoFalseOrderByFechaDescHoraDesc();
@@ -123,61 +126,65 @@ public class AtencionController {
     @PostMapping("/venta")
     public ResponseEntity<?> procesarPago(@RequestBody Map<String, Object> body) {
         try {
-            // Extraer los datos del JSON recibido
             BigDecimal total = new BigDecimal(body.get("total").toString());
-            Long idMetodoPago = Long.parseLong(body.get("metodoPago").toString());
-            String detalleVentaIdsJson = body.get("detalleVentaIds").toString();
+            List<Map<String, Object>> metodosPagoList = (List<Map<String, Object>>) body.get("metodosPago");
+            List<Long> detalleVentaIds = ((List<?>) body.get("detalleVentaIds"))
+                    .stream()
+                    .map(id -> Long.parseLong(id.toString()))
+                    .collect(Collectors.toList());
 
-            System.out.println("Total: " + total);
-            System.out.println("Método de pago: " + idMetodoPago);
-            System.out.println("Detalle Venta IDs (JSON): " + detalleVentaIdsJson);
+            // Verificar que los métodos de pago sumen el total
+            BigDecimal sumaPagos = BigDecimal.ZERO;
+            List<DetalleMetodoPago> detalleMetodoPagos = new ArrayList<>();
+            for (Map<String, Object> metodoPagoMap : metodosPagoList) {
+                Long idMetodoPago = Long.parseLong(metodoPagoMap.get("idMetodoPago").toString());
+                BigDecimal monto = new BigDecimal(metodoPagoMap.get("monto").toString());
+                sumaPagos = sumaPagos.add(monto);
 
-            // Deserializar el JSON de los IDs de detalleVenta como una lista de objetos
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<Object> detalleVentaIdsObjects = objectMapper.readValue(detalleVentaIdsJson, List.class);
-
-            // Convertir la lista de objetos a una lista de Longs
-            List<Long> detalleVentaIds = new ArrayList<>();
-            for (Object idObj : detalleVentaIdsObjects) {
-                try {
-                    // Convertir cada objeto a Long (en caso de que sea Integer o String)
-                    detalleVentaIds.add(Long.parseLong(idObj.toString()));
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Formato inválido para el ID de detalleVenta: " + idObj);
-                }
+                DetalleMetodoPago detalleMetodoPago = new DetalleMetodoPago();
+                detalleMetodoPago.setMetodoPago(metodoPagoRepository.findById(idMetodoPago)
+                        .orElseThrow(() -> new IllegalArgumentException("Método de pago no encontrado")));
+                detalleMetodoPago.setMonto(monto);
+                detalleMetodoPagos.add(detalleMetodoPago);
             }
 
-            // Verificar que la lista de detalleVentaIds no esté vacía
-            if (detalleVentaIds.isEmpty()) {
+            if (sumaPagos.compareTo(total) != 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Collections.singletonMap("message", "No se proporcionaron IDs de detalle de venta"));
+                        .body(Collections.singletonMap("message", "Los métodos de pago no suman el total."));
             }
 
+            // Obtener cliente y marcar el ingreso como realizado
             DetalleVenta primerDetalleVenta = detalleVentaRepository.findById(detalleVentaIds.get(0)).get();
             Cliente cliente = primerDetalleVenta.getDetalleIngresoVehiculo().getCliente();
             DetalleIngresoVehiculo detalleIngresoVehiculo = primerDetalleVenta.getDetalleIngresoVehiculo();
-            detalleIngresoVehiculo.setRealizado(Boolean.TRUE);
+            detalleIngresoVehiculo.setRealizado(true);
             detalleIngresoVehiculoRepository.save(detalleIngresoVehiculo);
 
-            // Lógica para procesar el pago
+            // Crear la venta
             Venta venta = new Venta();
             venta.setTotal(total);
-            venta.setMetodoPago(metodoPagoRepository.findById(idMetodoPago).orElseThrow(() -> new IllegalArgumentException("Método de pago no encontrado")));
             venta.setCliente(cliente);
             venta.setFecha(LocalDate.now());
             venta.setHora(LocalTime.now());
             ventaRepository.save(venta);
 
+            // Asociar los métodos de pago a la venta
+            for (DetalleMetodoPago detalleMetodoPago : detalleMetodoPagos) {
+                detalleMetodoPago.setVenta(venta);
+                detalleMetodoPagoRepository.save(detalleMetodoPago);
+            }
+
+            // Asociar los detalles de venta a la venta
             for (Long id : detalleVentaIds) {
                 DetalleVenta detalleVenta = detalleVentaRepository.findById(id).get();
                 detalleVenta.setVenta(venta);
                 detalleVentaRepository.save(detalleVenta);
             }
 
-            // Respuesta de éxito
-            return ResponseEntity.ok().build();  // Respuesta vacía, solo éxito
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 

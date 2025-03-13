@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -27,17 +28,43 @@ public class Venta {
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name = "id_metodo_pago", nullable = false)
-    private MetodoPago metodoPago;
+
+    @OneToMany(mappedBy = "venta")
+    private List<DetalleMetodoPago> listaDetalleMetodoPago;
+
+
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal total;
 
 
     @Column(nullable = false)
     private LocalDate fecha;
     @Column(nullable = false)
     private LocalTime hora;
+    @Transient
+    private String formattedFecha;  // Este campo no será persistido en la base de datos
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal total;
+    @Transient
+    private String formattedHora;   // Campo para la hora formateada
+
+    public String getFormattedFecha() {
+        if (fecha != null) {
+            // Usar DateTimeFormatter para formatear LocalDate
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return fecha.format(formatter);
+        }
+        return "";
+    }
+
+    // Método para obtener la hora formateada
+    public String getFormattedHora() {
+        if (hora != null) {
+            // Usar DateTimeFormatter para formatear LocalTime
+            return hora.format(DateTimeFormatter.ofPattern("HH:mm"));
+        }
+        return "";
+    }
+
 
 }
