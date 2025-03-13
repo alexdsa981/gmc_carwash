@@ -109,6 +109,43 @@ public class AtencionController {
         return model;
     }
 
+    @PostMapping("/eliminar-venta/{id}")
+    public ResponseEntity<String> eliminarIngresoConVenta(@PathVariable("id") Long id) {
+
+        if (detalleIngresoVehiculoRepository.existsById(id)) {
+
+            //obtiene lista detalle venta e id venta
+            List<DetalleVenta> listaDetalleVenta =  detalleVentaRepository.findByDetalleIngresoVehiculoId(id);
+            Long idVenta = listaDetalleVenta.get(0).getVenta().getId();
+
+            //elimina metodos pago
+            List<DetalleMetodoPago> listaDetalleMetodoPago = detalleMetodoPagoRepository.findByVentaId(idVenta);
+            for (DetalleMetodoPago detalleMetodoPago : listaDetalleMetodoPago){
+                System.out.println("elimina dmetodo: " + detalleMetodoPago.getId());
+                detalleMetodoPagoRepository.deleteById(detalleMetodoPago.getId());
+            }
+
+            //elimina detalles venta
+            for (DetalleVenta detalleVenta : listaDetalleVenta){
+                System.out.println("elimina dventa: " + detalleVenta.getId());
+                detalleVentaRepository.deleteById(detalleVenta.getId());
+            }
+            //elimina venta
+            System.out.println("elimina venta: " + idVenta);
+            ventaRepository.deleteById(idVenta);
+            //elimina detalle ingreso
+            System.out.println("elimina ingreso: " + id);
+            detalleIngresoVehiculoRepository.deleteById(id);
+            return ResponseEntity.ok("venta eliminado correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Detalle de Ingreso no encontrado");
+        }
+    }
+
+
+
+
+
     public Model retornaListaPrecioServicio(Model model) {
         List<PrecioServicio> listaPrecioServicio = precioServicioRepository.findAll();
         model.addAttribute("listaPrecioServicio", listaPrecioServicio);

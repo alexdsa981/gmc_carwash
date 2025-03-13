@@ -925,3 +925,65 @@ document.getElementById("placa").addEventListener("keydown", function (event) {
     document.getElementById("addIngresoModal").addEventListener("shown.bs.modal", function () {
     document.getElementById("placa").focus(); // Selecciona automáticamente el input de Placa
 });
+
+
+
+
+//AGREGAR SERVICIO/PRODUCTO
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("addServicioForm");
+        const submitButton = document.getElementById("btnGuardar");
+
+        if (!form || !submitButton) {
+            console.error("Formulario o botón no encontrado en el DOM.");
+            return;
+        }
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío tradicional
+            submitButton.disabled = true; // Deshabilita el botón
+            submitButton.innerText = "Guardando..."; // Cambia el texto
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error("Error al agregar el servicio.");
+                }
+            })
+            .then(data => {
+                Swal.fire({
+                    title: "Éxito",
+                    text: "El servicio fue agregado correctamente.",
+                    icon: "success",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    location.reload(); // Recarga la página tras éxito
+                });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un problema al agregar el servicio.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "OK"
+                });
+
+                // Cooldown: Reactiva el botón después de 3 segundos
+                setTimeout(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerText = "Guardar";
+                }, 3000);
+            });
+        });
+    });

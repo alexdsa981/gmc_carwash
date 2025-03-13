@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface DetalleMetodoPagoRepository extends JpaRepository<DetalleMetodoPago, Long> {
 
+    List<DetalleMetodoPago> findByVentaId(Long idVenta);
+
 }

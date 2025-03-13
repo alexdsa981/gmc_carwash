@@ -24,3 +24,60 @@ $(document).ready(function () {
         }
     });
 });
+
+
+
+    function eliminarVenta(button) {
+        let id = button.getAttribute("data-id");
+
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará la venta de forma permanente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/app/atencion/eliminar-venta/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            title: "Eliminado",
+                            text: "La venta ha sido eliminada correctamente.",
+                            icon: "success",
+                            confirmButtonColor: "#3085d6",
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Ocurrió un problema al eliminar la venta.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "OK"
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        title: "Error",
+                        text: "Ocurrió un error inesperado.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "OK"
+                    });
+                });
+            }
+        });
+    }

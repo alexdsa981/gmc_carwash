@@ -21,6 +21,7 @@ public class CajaController {
 
 
     @GetMapping("/cuadre-caja")
+
     public ResponseEntity<List<CuadreCajaDTO>> obtenerCuadresCaja() {
         // Obtener la información por día para cada tipo de datos
         List<Object[]> resultadosServicios = ventaRepository.obtenerServiciosPorDia();

@@ -347,7 +347,7 @@
                         <label for="editTipoVehiculo" class="form-label">Tipo de Vehículo</label>
                         <select class="form-select" id="editTipoVehiculo" required>
                             <option value="" disabled>Seleccione el tipo de vehículo</option>
-                            <option th:each="tipoVehiculo : ${listaTipoVehiculo}"
+                            <option th:each="tipoVehiculo : ${ListaTipoVehiculo}"
                                     th:value="${tipoVehiculo.id}" th:text="${tipoVehiculo.nombre}">
                             </option>
                         </select>
@@ -445,7 +445,7 @@
                         <div class="input-group">
                             <select class="form-select" id="tipoVehiculo" name="tipoVehiculo" required>
                                 <option value="" selected disabled>Seleccione el tipo de vehículo</option>
-                                <option th:each="tipoVehiculo : ${listaTipoVehiculo}"
+                                <option th:each="tipoVehiculo : ${ListaTipoVehiculo}"
                                         th:value="${tipoVehiculo.id}"
                                         th:text="${tipoVehiculo.nombre}">
                                 </option>
@@ -553,7 +553,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="submit" class="btn btn-primary" form="addServicioForm">Guardar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardar" form="addServicioForm">Guardar</button>
             </div>
         </div>
     </div>
