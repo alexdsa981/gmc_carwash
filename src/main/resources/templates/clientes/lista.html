@@ -158,7 +158,7 @@
                         <label for="editTipo" class="form-label">Tipo de Vehículo</label>
                         <select class="form-select" id="editTipo" name="tipoVehiculoId">
                             <option value="" disabled>Seleccione el tipo de vehículo</option>
-                            <option th:each="tipoVehiculo : ${listaTipoVehiculo}"
+                            <option th:each="tipoVehiculo : ${ListaTipoVehiculo}"
                                     th:value="${tipoVehiculo.id}" th:text="${tipoVehiculo.nombre}">
                             </option>
                         </select>
